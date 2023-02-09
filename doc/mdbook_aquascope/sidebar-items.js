@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":[["annotations","Parser for annotations within an Aquascope code block body."],["block","Parser for Aquascope code blocks within Markdown."],["cache","Disk cache for persisting computed Aquascope results."]]};

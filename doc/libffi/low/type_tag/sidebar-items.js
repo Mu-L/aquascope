@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":[["STRUCT","Indicates a structure type."]]};

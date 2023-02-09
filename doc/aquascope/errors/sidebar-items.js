@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":[["errors_exist",""],["get_span_of_first_error",""],["initialize_error_tracking","This should be called before analysing a new crate."],["track_body_diagnostics","Initialize the error tracking for a given routine. It’s recommended to call this on start of every new analysis. In Aquascope, this would be per-body analyzed."]]};

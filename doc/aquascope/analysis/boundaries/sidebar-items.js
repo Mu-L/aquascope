@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":[["compute_permission_boundaries",""]],"struct":[["PermissionsBoundary","A point where the permissions reality are checked against their expectations."]]};

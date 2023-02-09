@@ -1,0 +1,152 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Direct, unsafe bindings for Linux `perf_event_open` and friends."><meta name="keywords" content="rust, rustlang, rust-lang, perf_event_open_sys"><title>perf_event_open_sys - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-389f8b4a37bc03c9.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../static.files/light-046227e470cd3629.css"><link rel="stylesheet" disabled href="../static.files/dark-800f2ee593c8e6f7.css"><link rel="stylesheet" disabled href="../static.files/ayu-9edae3c387f5a5b3.css"><script id="default-settings" ></script><script src="../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../perf_event_open_sys/index.html"><div class="logo-container"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></div></a><h2></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../perf_event_open_sys/index.html"><div class="logo-container"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></div></a><h2 class="location"><a href="#">Crate perf_event_open_sys</a></h2><div class="sidebar-elems"><ul class="block"><li class="version">Version 3.0.0</li><li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#modules">Modules</a></li><li><a href="#functions">Functions</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1 class="fqn">Crate <a class="mod" href="#">perf_event_open_sys</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="srclink" href="../src/perf_event_open_sys/lib.rs.html#1-263">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Direct, unsafe bindings for Linux <a href="http://man7.org/linux/man-pages/man2/perf_event_open.2.html"><code>perf_event_open</code></a> and friends.</p>
+<p>Linux’s <code>perf_event_open</code> system call provides access to the processor’s
+performance measurement counters (things like instructions retired, cache
+misses, and so on), kernel counters (context switches, page faults), and
+many other sources of performance information.</p>
+<p>You can’t get the <code>perf_event_open</code> function from the <code>libc</code> crate, as you
+would any other system call. The Linux standard C library does not provide a
+binding for this function or its associated types and constants.</p>
+<p>Rust analogs to the C types and constants from <code>&lt;linux/perf_event.h&gt;</code> and
+<code>&lt;linux/hw_breakpoint.h&gt;</code>, generated with <code>bindgen</code>, are available in the
+<a href="bindings/index.html"><code>bindings</code></a> module.</p>
+<p>There are several ioctls for use with <code>perf_event_open</code> file descriptors;
+see the <a href="ioctls/index.html"><code>ioctls</code></a> module for those.</p>
+<p>For a safe and convenient interface to this functionality, see the
+<a href="https://crates.io/crates/perf_event"><code>perf_event</code></a> crate.</p>
+<h3 id="using-the-raw-api"><a href="#using-the-raw-api">Using the raw API</a></h3>
+<p>As the kernel interface evolves, the struct and union types from the
+<a href="bindings/index.html"><code>bindings</code></a> module may acquire new fields. To ensure that your code will
+continue to compile against newer versions of this crate, you should
+construct values of these types by calling their <code>Default</code> implementations,
+which return zero-filled values, and then assigning to the fields you care
+about. For example:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>perf_event_open_sys <span class="kw">as </span>sys;
+
+<span class="comment">// Construct a zero-filled `perf_event_attr`.
+</span><span class="kw">let </span><span class="kw-2">mut </span>attrs = sys::bindings::perf_event_attr::default();
+
+<span class="comment">// Populate the fields we need.
+</span>attrs.size = std::mem::size_of::&lt;sys::bindings::perf_event_attr&gt;() <span class="kw">as </span>u32;
+attrs.type_ = sys::bindings::perf_type_id_PERF_TYPE_HARDWARE;
+attrs.config = sys::bindings::perf_hw_id_PERF_COUNT_HW_INSTRUCTIONS <span class="kw">as </span>u64;
+attrs.set_disabled(<span class="number">1</span>);
+attrs.set_exclude_kernel(<span class="number">1</span>);
+attrs.set_exclude_hv(<span class="number">1</span>);
+
+<span class="comment">// Make the system call.
+</span><span class="kw">let </span>result = <span class="kw">unsafe </span>{
+    sys::perf_event_open(<span class="kw-2">&amp;mut </span>attrs, <span class="number">0</span>, -<span class="number">1</span>, -<span class="number">1</span>, <span class="number">0</span>)
+};
+
+<span class="kw">if </span>result &lt; <span class="number">0 </span>{
+    <span class="comment">// ... handle error
+</span>}
+
+<span class="comment">// ... use `result` as a raw file descriptor</span></code></pre></div>
+<p>It is not necessary to adjust <code>size</code> to what the running kernel expects:
+older kernels can accept newer <code>perf_event_attr</code> structs, and vice versa. As
+long as the <code>size</code> field was properly initialized, an error result of
+<code>E2BIG</code> indicates that the <code>attrs</code> structure has requested behavior the
+kernel is too old to support.</p>
+<p>When <code>E2BIG</code> is returned, the kernel writes the size it expected back to the
+<code>size</code> field of the <code>attrs</code> struct. Again, if you want to retry the call, it
+is not necessary to adjust the size you pass to match what the kernel passed
+back. The size from the kernel just indicates which version of the API the
+kernel supports; see the documentation for the <code>PERF_EVENT_ATTR_SIZE_VER...</code>
+constants for details.</p>
+<h3 id="kernel-versions"><a href="#kernel-versions">Kernel versions</a></h3>
+<p>The bindings in this crate are generated from the Linux kernel headers
+packaged by Fedora as <code>kernel-headers-5.18.4-200.fc36</code>, which
+corresponds to <code>PERF_EVENT_ATTR_SIZE_VER7</code>.</p>
+<p>As explained above, bugs aside, it is not necessary to use the version of
+these structures that matches the kernel you want to run under, so it should
+always be acceptable to use the latest version of this crate, even if you
+want to support older kernels.</p>
+<p>This crate’s <code>README.md</code> file includes instructions on regenerating the
+bindings from newer kernel headers. However, this can be a breaking change
+for users that have not followed the advice above, so regeneration should
+cause a major version increment.</p>
+<p>If you need features that are available only in a more recent version of the
+types than this crate provides, please file an issue.</p>
+<h3 id="linux-api-backwardforward-compatibility-strategy"><a href="#linux-api-backwardforward-compatibility-strategy">Linux API Backward/Forward Compatibility Strategy</a></h3>
+<p>(This is more detail than necessary if you just want to use the crate. I
+want to write this down somewhere so that I have something to refer to when
+I forget the details.)</p>
+<p>It is an important principle of Linux kernel development that new versions
+of the kernel should not break userspace. If upgrading your kernel breaks a
+user program, then that’s a bug in the kernel. (This refers to the run-time
+interface. I don’t know what the stability rules are for the kernel headers:
+can new headers cause old code to fail to compile? Anyway, run time is our
+concern here.)</p>
+<p>But when you have an open-ended, complex system call like <code>perf_event_open</code>,
+it’s really important for the interface to be able to evolve. Certainly, old
+programs must run properly on new kernels, but ideally, it should work the
+other way, too: a program built against a newer version of the kernel
+headers should run on an older kernel, as long as it only requests features
+the old kernel actually supports. That is, simply compiling against newer
+headers should not be disqualifying - only using those new headers to
+request new features the running kernel can’t provide should cause an error.</p>
+<p>Consider the specific case of passing a struct like <code>perf_event_attr</code> to a
+system call like <code>perf_event_open</code>. In general, there are two versions of
+the struct in play: the version the user program was compiled against, and
+the version the running kernel was compiled against. How can we let old
+programs call <code>perf_event_open</code> on new kernels, and vice versa?</p>
+<p>Linux has a neat strategy for making this work. There are four rules:</p>
+<ul>
+<li>
+<p>Every system call that passes a struct to the kernel includes some
+indication of how large userspace thinks that struct is. For
+<code>perf_event_open</code>, it’s the <code>size</code> field of the <code>perf_event_attr</code>
+struct. For <code>ioctl</code>s that pass a struct, it’s a bitfield of the
+<code>request</code> value.</p>
+</li>
+<li>
+<p>Fields are never deleted from structs. At most, newer kernel headers may
+rename them to <code>__reserved_foo</code> or something like that, but once a field
+has been placed, its layout in the struct never changes.</p>
+</li>
+<li>
+<p>New fields are added to the end of structs.</p>
+</li>
+<li>
+<p>New fields’ semantics are chosen such that filling them with zeros
+preserves the old behavior. That is, turning an old struct into a new
+struct by extending it with zero bytes should always give you a new
+struct with the same meaning as the old struct.</p>
+</li>
+</ul>
+<p>Then, the kernel’s strategy for receiving structs from userspace is as
+follows (according to the comments for <code>copy_struct_from_user</code> in
+the kernel source <code>include/linux/uaccess.h</code>):</p>
+<ul>
+<li>
+<p>If the kernel’s struct is larger than the one passed from userspace,
+then that means the kernel is newer than the userspace program. The
+kernel copies the userspace data into the initial bytes of its own
+struct, and zeros the remaining bytes. Since zeroed fields have no
+effect, the resulting struct properly reflects the user’s intent.</p>
+</li>
+<li>
+<p>If the kernel’s struct is smaller than the one passed from userspace,
+then that means that a userspace program compiled against newer kernel
+headers is running on an older kernel. The kernel checks that the excess
+bytes in the userspace struct are all zero; if they are not, the system
+call returns <code>E2BIG</code>, indicating that userspace has requested a feature
+the kernel doesn’t support. If they are all zero, then the kernel
+initializes its own struct with the bytes from the start of the
+userspace struct, and drops the rest. Since the dropped bytes were all
+zero, they did not affect the requested behavior, and the resulting
+struct reflects the user’s intent.</p>
+</li>
+<li>
+<p>In either case, the kernel verifies that any <code>__reserved_foo</code> fields in
+its own version of the struct are zero.</p>
+</li>
+</ul>
+<p>This covers both the old-on-new and new-on-old cases, and returns an error
+only when the call requests functionality the kernel doesn’t support.</p>
+<p>You can find one example of using <code>perf_event_open</code> in the <a href="https://crates.io/crates/perf_event"><code>perf_event</code></a>
+crate, which provides a safe interface to a subset of <code>perf_event_open</code>’s
+functionality.</p>
+</div></details><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="bindings/index.html" title="perf_event_open_sys::bindings mod">bindings</a></div><div class="item-right docblock-short">Types and constants used with <code>perf_event_open</code>.</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="ioctls/index.html" title="perf_event_open_sys::ioctls mod">ioctls</a></div><div class="item-right docblock-short">Ioctls for use with <code>perf_event_open</code> file descriptors.</div></div></div><h2 id="functions" class="small-section-header"><a href="#functions">Functions</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.perf_event_open.html" title="perf_event_open_sys::perf_event_open fn">perf_event_open</a><sup title="unsafe function">⚠</sup></div><div class="item-right docblock-short">The <code>perf_event_open</code> system call.</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="perf_event_open_sys" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (b28d30e1e 2022-12-06)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>

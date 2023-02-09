@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":[["arg","Constructs an [`Arg`] for passing to [`fn@call`]."],["call","Performs a dynamic call to a C function."]],"struct":[["Arg","Encapsulates an argument with its type information."]]};
