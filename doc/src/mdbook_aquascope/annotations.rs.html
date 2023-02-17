@@ -153,11 +153,31 @@
 <a href="#153" id="153">153</a>
 <a href="#154" id="154">154</a>
 <a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Parser for annotations within an Aquascope code block body.
 
 </span><span class="kw">use </span>std::{collections::HashMap, hash::Hash};
 
 <span class="kw">use </span>anyhow::Result;
+<span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>regex::Regex;
 <span class="kw">use </span>serde::Serialize;
 <span class="kw">use </span>ts_rs::TS;
@@ -179,6 +199,12 @@
 
 <span class="attr">#[derive(PartialEq, Eq, Debug, TS, Serialize, Default, Clone)]
 #[ts(export)]
+</span><span class="kw">pub struct </span>BoundariesAnnotations {
+  focused_lines: Vec&lt;LinePos&gt;,
+}
+
+<span class="attr">#[derive(PartialEq, Eq, Debug, TS, Serialize, Default, Clone)]
+#[ts(export)]
 </span><span class="kw">pub struct </span>InterpAnnotations {
   state_locations: Vec&lt;CharPos&gt;,
 }
@@ -189,6 +215,7 @@
   hidden_lines: Vec&lt;LinePos&gt;,
   interp: InterpAnnotations,
   stepper: StepperAnnotations,
+  boundaries: BoundariesAnnotations,
 }
 
 <span class="attr">#[allow(clippy::derive_hash_xor_eq)]
@@ -202,19 +229,22 @@
 <span class="kw">pub fn </span>parse_annotations(code: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;(String, AquascopeAnnotations)&gt; {
   <span class="kw">let </span>marker_interp = (<span class="string">&quot;`[&quot;</span>, <span class="string">&quot;]`&quot;</span>, <span class="string">&quot;interp&quot;</span>);
   <span class="kw">let </span>marker_stepper = (<span class="string">&quot;`(&quot;</span>, <span class="string">&quot;)`&quot;</span>, <span class="string">&quot;stepper&quot;</span>);
+  <span class="kw">let </span>marker_boundaries = (<span class="string">&quot;`{&quot;</span>, <span class="string">&quot;}`&quot;</span>, <span class="string">&quot;boundaries&quot;</span>);
 
-  <span class="kw">let </span>pattern = [marker_interp, marker_stepper]
-    .into_iter()
-    .map(|(open, close, name)| {
-      <span class="macro">format!</span>(
-        <span class="string">&quot;{}(?P&lt;{name}&gt;[^{}]*){}&quot;</span>,
-        regex::escape(open),
-        regex::escape(<span class="kw-2">&amp;</span>close[.. <span class="number">1</span>]),
-        regex::escape(close)
-      )
-    })
-    .intersperse(<span class="string">&quot;|&quot;</span>.into())
-    .collect::&lt;String&gt;();
+  <span class="kw">let </span>pattern = Itertools::intersperse(
+    [marker_interp, marker_stepper, marker_boundaries]
+      .into_iter()
+      .map(|(open, close, name)| {
+        <span class="macro">format!</span>(
+          <span class="string">&quot;{}(?P&lt;{name}&gt;[^{}]*){}&quot;</span>,
+          regex::escape(open),
+          regex::escape(<span class="kw-2">&amp;</span>close[.. <span class="number">1</span>]),
+          regex::escape(close)
+        )
+      }),
+    <span class="string">&quot;|&quot;</span>.into(),
+  )
+  .collect::&lt;String&gt;();
   <span class="kw">let </span>re = Regex::new(<span class="kw-2">&amp;</span>pattern)<span class="question-mark">?</span>;
 
   <span class="kw">let </span><span class="kw-2">mut </span>annots = AquascopeAnnotations::default();
@@ -240,8 +270,10 @@
         <span class="kw">let </span>match_str = matched.as_str();
         <span class="kw">let </span>match_type = <span class="kw">if </span>match_str.starts_with(marker_interp.<span class="number">0</span>) {
           <span class="string">&quot;interp&quot;
-        </span>} <span class="kw">else </span>{
+        </span>} <span class="kw">else if </span>match_str.starts_with(marker_stepper.<span class="number">0</span>) {
           <span class="string">&quot;stepper&quot;
+        </span>} <span class="kw">else </span>{
+          <span class="string">&quot;boundaries&quot;
         </span>};
 
         <span class="kw">let </span>interior = cap.name(match_type).unwrap();
@@ -253,18 +285,23 @@
           };
         }
 
-        <span class="kw">if </span>match_type == <span class="string">&quot;interp&quot; </span>{
-          annots.interp.state_locations.push(CharPos(idx));
-        } <span class="kw">else </span>{
-          <span class="kw">if </span>config.contains_key(<span class="string">&quot;focus&quot;</span>) {
-            annots.stepper.focused_lines.push(line_pos);
+        <span class="kw">match </span>match_type {
+          <span class="string">&quot;interp&quot; </span>=&gt; annots.interp.state_locations.push(CharPos(idx)),
+          <span class="string">&quot;stepper&quot; </span>=&gt; {
+            <span class="kw">if </span>config.contains_key(<span class="string">&quot;focus&quot;</span>) {
+              annots.stepper.focused_lines.push(line_pos);
+            }
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(paths) = config.get(<span class="string">&quot;paths&quot;</span>) {
+              annots
+                .stepper
+                .focused_paths
+                .insert(line_pos, paths.to_string());
+            }
           }
-          <span class="kw">if let </span><span class="prelude-val">Some</span>(paths) = config.get(<span class="string">&quot;paths&quot;</span>) {
-            annots
-              .stepper
-              .focused_paths
-              .insert(line_pos, paths.to_string());
+          <span class="string">&quot;boundaries&quot; </span>=&gt; {
+            annots.boundaries.focused_lines.push(line_pos);
           }
+          <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         }
 
         line = <span class="kw-2">&amp;</span>line[matched.end() ..];
@@ -275,9 +312,7 @@
     </span>output_lines.push(fragments);
   }
 
-  <span class="kw">let </span>output = output_lines
-    .into_iter()
-    .intersperse(<span class="macro">vec!</span>[<span class="string">&quot;\n&quot;</span>])
+  <span class="kw">let </span>output = Itertools::intersperse(output_lines.into_iter(), <span class="macro">vec!</span>[<span class="string">&quot;\n&quot;</span>])
     .flatten()
     .collect::&lt;String&gt;();
   <span class="prelude-val">Ok</span>((output, annots))
@@ -287,7 +322,7 @@
 </span><span class="kw">fn </span>test_parse_annotations() {
   <span class="kw">let </span>input = <span class="string">r#&quot;#fn main() {
 let x = 1;`(focus,paths:x)`
-`[]`let y = 2;
+`[]`let y = 2;`{}`
 #}&quot;#</span>;
   <span class="kw">let </span>(cleaned, annot) = parse_annotations(input).unwrap();
   <span class="macro">assert_eq!</span>(
@@ -305,6 +340,9 @@ let y = 2;
     stepper: StepperAnnotations {
       focused_lines: <span class="macro">vec!</span>[LinePos(<span class="number">2</span>)],
       focused_paths: <span class="macro">maplit::hashmap! </span>{ LinePos(<span class="number">2</span>) =&gt; <span class="string">&quot;x&quot;</span>.into() }
+    },
+    boundaries: BoundariesAnnotations {
+      focused_lines: <span class="macro">vec!</span>[LinePos(<span class="number">3</span>)]
     }
   });
 }

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/flowistry-9d79e8eb70ca74bf/5266f57/crates/flowistry/src/mir/utils.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>utils.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-389f8b4a37bc03c9.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-046227e470cd3629.css"><link rel="stylesheet" disabled href="../../../static.files/dark-800f2ee593c8e6f7.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-9edae3c387f5a5b3.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../flowistry/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/flowistry-9d79e8eb70ca74bf/8cc08ea/crates/flowistry/src/mir/utils.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>utils.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-389f8b4a37bc03c9.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-046227e470cd3629.css"><link rel="stylesheet" disabled href="../../../static.files/dark-800f2ee593c8e6f7.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-9edae3c387f5a5b3.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../flowistry/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1078,10 +1078,115 @@
 <a href="#1078" id="1078">1078</a>
 <a href="#1079" id="1079">1079</a>
 <a href="#1080" id="1080">1080</a>
+<a href="#1081" id="1081">1081</a>
+<a href="#1082" id="1082">1082</a>
+<a href="#1083" id="1083">1083</a>
+<a href="#1084" id="1084">1084</a>
+<a href="#1085" id="1085">1085</a>
+<a href="#1086" id="1086">1086</a>
+<a href="#1087" id="1087">1087</a>
+<a href="#1088" id="1088">1088</a>
+<a href="#1089" id="1089">1089</a>
+<a href="#1090" id="1090">1090</a>
+<a href="#1091" id="1091">1091</a>
+<a href="#1092" id="1092">1092</a>
+<a href="#1093" id="1093">1093</a>
+<a href="#1094" id="1094">1094</a>
+<a href="#1095" id="1095">1095</a>
+<a href="#1096" id="1096">1096</a>
+<a href="#1097" id="1097">1097</a>
+<a href="#1098" id="1098">1098</a>
+<a href="#1099" id="1099">1099</a>
+<a href="#1100" id="1100">1100</a>
+<a href="#1101" id="1101">1101</a>
+<a href="#1102" id="1102">1102</a>
+<a href="#1103" id="1103">1103</a>
+<a href="#1104" id="1104">1104</a>
+<a href="#1105" id="1105">1105</a>
+<a href="#1106" id="1106">1106</a>
+<a href="#1107" id="1107">1107</a>
+<a href="#1108" id="1108">1108</a>
+<a href="#1109" id="1109">1109</a>
+<a href="#1110" id="1110">1110</a>
+<a href="#1111" id="1111">1111</a>
+<a href="#1112" id="1112">1112</a>
+<a href="#1113" id="1113">1113</a>
+<a href="#1114" id="1114">1114</a>
+<a href="#1115" id="1115">1115</a>
+<a href="#1116" id="1116">1116</a>
+<a href="#1117" id="1117">1117</a>
+<a href="#1118" id="1118">1118</a>
+<a href="#1119" id="1119">1119</a>
+<a href="#1120" id="1120">1120</a>
+<a href="#1121" id="1121">1121</a>
+<a href="#1122" id="1122">1122</a>
+<a href="#1123" id="1123">1123</a>
+<a href="#1124" id="1124">1124</a>
+<a href="#1125" id="1125">1125</a>
+<a href="#1126" id="1126">1126</a>
+<a href="#1127" id="1127">1127</a>
+<a href="#1128" id="1128">1128</a>
+<a href="#1129" id="1129">1129</a>
+<a href="#1130" id="1130">1130</a>
+<a href="#1131" id="1131">1131</a>
+<a href="#1132" id="1132">1132</a>
+<a href="#1133" id="1133">1133</a>
+<a href="#1134" id="1134">1134</a>
+<a href="#1135" id="1135">1135</a>
+<a href="#1136" id="1136">1136</a>
+<a href="#1137" id="1137">1137</a>
+<a href="#1138" id="1138">1138</a>
+<a href="#1139" id="1139">1139</a>
+<a href="#1140" id="1140">1140</a>
+<a href="#1141" id="1141">1141</a>
+<a href="#1142" id="1142">1142</a>
+<a href="#1143" id="1143">1143</a>
+<a href="#1144" id="1144">1144</a>
+<a href="#1145" id="1145">1145</a>
+<a href="#1146" id="1146">1146</a>
+<a href="#1147" id="1147">1147</a>
+<a href="#1148" id="1148">1148</a>
+<a href="#1149" id="1149">1149</a>
+<a href="#1150" id="1150">1150</a>
+<a href="#1151" id="1151">1151</a>
+<a href="#1152" id="1152">1152</a>
+<a href="#1153" id="1153">1153</a>
+<a href="#1154" id="1154">1154</a>
+<a href="#1155" id="1155">1155</a>
+<a href="#1156" id="1156">1156</a>
+<a href="#1157" id="1157">1157</a>
+<a href="#1158" id="1158">1158</a>
+<a href="#1159" id="1159">1159</a>
+<a href="#1160" id="1160">1160</a>
+<a href="#1161" id="1161">1161</a>
+<a href="#1162" id="1162">1162</a>
+<a href="#1163" id="1163">1163</a>
+<a href="#1164" id="1164">1164</a>
+<a href="#1165" id="1165">1165</a>
+<a href="#1166" id="1166">1166</a>
+<a href="#1167" id="1167">1167</a>
+<a href="#1168" id="1168">1168</a>
+<a href="#1169" id="1169">1169</a>
+<a href="#1170" id="1170">1170</a>
+<a href="#1171" id="1171">1171</a>
+<a href="#1172" id="1172">1172</a>
+<a href="#1173" id="1173">1173</a>
+<a href="#1174" id="1174">1174</a>
+<a href="#1175" id="1175">1175</a>
+<a href="#1176" id="1176">1176</a>
+<a href="#1177" id="1177">1177</a>
+<a href="#1178" id="1178">1178</a>
+<a href="#1179" id="1179">1179</a>
+<a href="#1180" id="1180">1180</a>
+<a href="#1181" id="1181">1181</a>
+<a href="#1182" id="1182">1182</a>
+<a href="#1183" id="1183">1183</a>
 </pre><pre class="rust"><code><span class="doccomment">//! A potpourri of utilities for working with the MIR, primarily exposed as extension traits.
 
 </span><span class="kw">use </span>std::{
+  borrow::Cow,
   cmp,
+  collections::VecDeque,
   io::Write,
   ops::ControlFlow,
   path::Path,
@@ -1553,54 +1658,95 @@
   }
 
   <span class="kw">fn </span>to_string(<span class="kw-2">&amp;</span><span class="self">self</span>, tcx: TyCtxt&lt;<span class="lifetime">&#39;tcx</span>&gt;, body: <span class="kw-2">&amp;</span>Body&lt;<span class="lifetime">&#39;tcx</span>&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
-    <span class="kw">let </span>local_name = <span class="kw">if </span><span class="self">self</span>.local == RETURN_PLACE {
-      <span class="string">&quot;RETURN&quot;</span>.into()
+    <span class="comment">// Get the local&#39;s debug name from the Body&#39;s VarDebugInfo
+    </span><span class="kw">let </span>local_name = <span class="kw">if </span><span class="self">self</span>.local == RETURN_PLACE {
+      Cow::Borrowed(<span class="string">&quot;RETURN&quot;</span>)
     } <span class="kw">else </span>{
-      body
-        .var_debug_info
-        .iter()
-        .filter_map(|info| <span class="kw">match </span>info.value {
-          VarDebugInfoContents::Place(place) <span class="kw">if </span>place.local == <span class="self">self</span>.local =&gt; info
-            .source_info
-            .span
-            .as_local(body.span)
-            .map(|<span class="kw">_</span>| info.name.to_string()),
-          <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
-        })
-        .next()<span class="question-mark">?
-    </span>};
+      <span class="kw">let </span>get_local_name = |info: <span class="kw-2">&amp;</span>VarDebugInfo&lt;<span class="lifetime">&#39;tcx</span>&gt;| <span class="kw">match </span>info.value {
+        VarDebugInfoContents::Place(place) <span class="kw">if </span>place.local == <span class="self">self</span>.local =&gt; info
+          .source_info
+          .span
+          .as_local(body.span)
+          .map(|<span class="kw">_</span>| info.name.to_string()),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+      };
+      <span class="kw">let </span>local_name = body.var_debug_info.iter().find_map(get_local_name)<span class="question-mark">?</span>;
+      Cow::Owned(local_name)
+    };
 
-    <span class="kw">let </span>projection_to_string =
-      |s: String, (place, elem): (PlaceRef&lt;<span class="lifetime">&#39;tcx</span>&gt;, PlaceElem&lt;<span class="lifetime">&#39;tcx</span>&gt;)| <span class="kw">match </span>elem {
-        ProjectionElem::Deref =&gt; <span class="macro">format!</span>(<span class="string">&quot;*{s}&quot;</span>),
-        ProjectionElem::Field(f, <span class="kw">_</span>) =&gt; {
+    <span class="attr">#[derive(Copy, Clone)]
+    </span><span class="kw">enum </span>ElemPosition {
+      Prefix,
+      Suffix,
+    }
+
+    <span class="comment">// Turn each PlaceElem into a prefix (e.g. * for deref) or a suffix
+    // (e.g. .field for projection).
+    </span><span class="kw">let </span>elem_to_string = |(index, (place, elem)): (
+      usize,
+      (PlaceRef&lt;<span class="lifetime">&#39;tcx</span>&gt;, PlaceElem&lt;<span class="lifetime">&#39;tcx</span>&gt;),
+    )|
+     -&gt; (ElemPosition, Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;) {
+      <span class="kw">match </span>elem {
+        ProjectionElem::Deref =&gt; (ElemPosition::Prefix, <span class="string">&quot;*&quot;</span>.into()),
+
+        ProjectionElem::Field(field, <span class="kw">_</span>) =&gt; {
           <span class="kw">let </span>ty = place.ty(<span class="kw-2">&amp;</span>body.local_decls, tcx).ty;
-          <span class="kw">let </span>default = || <span class="macro">format!</span>(<span class="string">&quot;{s}.{}&quot;</span>, f.as_usize());
-          <span class="kw">if let </span><span class="prelude-val">Some</span>(def) = ty.ty_adt_def() {
-            <span class="kw">match </span>def.adt_kind() {
-              AdtKind::Struct =&gt; {
-                <span class="kw">let </span>name = def.non_enum_variant().fields[f.as_usize()].ident(tcx);
-                <span class="macro">format!</span>(<span class="string">&quot;{s}.{name}&quot;</span>)
-              }
-              <span class="kw">_ </span>=&gt; default(),
+
+          <span class="kw">let </span>field_name = <span class="kw">match </span>ty.kind() {
+            TyKind::Adt(def, _substs) =&gt; {
+              <span class="kw">let </span>fields = <span class="kw">match </span>def.adt_kind() {
+                AdtKind::Struct =&gt; <span class="kw-2">&amp;</span>def.non_enum_variant().fields,
+                AdtKind::Enum =&gt; {
+                  <span class="kw">let </span><span class="prelude-val">Some</span>(PlaceElem::Downcast(<span class="kw">_</span>, variant_idx)) = <span class="self">self</span>.projection.get(index - <span class="number">1</span>) <span class="kw">else </span>{ <span class="macro">unimplemented!</span>() } ;
+                  <span class="kw-2">&amp;</span>def.variant(<span class="kw-2">*</span>variant_idx).fields
+                }
+                <span class="kw">_ </span>=&gt; <span class="macro">unimplemented!</span>(),
+              };
+
+              fields[field.as_usize()].ident(tcx).to_string()
             }
-          } <span class="kw">else </span>{
-            default()
+
+            TyKind::Tuple(<span class="kw">_</span>) =&gt; field.as_usize().to_string(),
+
+            <span class="kw">_ </span>=&gt; <span class="macro">unimplemented!</span>(),
+          };
+
+          (ElemPosition::Suffix, <span class="macro">format!</span>(<span class="string">&quot;.{field_name}&quot;</span>).into())
+        }
+        ProjectionElem::Downcast(sym, <span class="kw">_</span>) =&gt; {
+          <span class="kw">let </span>variant = sym.map(|s| s.to_string()).unwrap_or_else(|| <span class="string">&quot;??&quot;</span>.into());
+          (ElemPosition::Suffix, <span class="macro">format!</span>(<span class="string">&quot;@{variant}&quot;</span>,).into())
+        }
+
+        ProjectionElem::Index(<span class="kw">_</span>) =&gt; (ElemPosition::Suffix, <span class="string">&quot;[..]&quot;</span>.into()),
+        <span class="kw">_ </span>=&gt; <span class="macro">unimplemented!</span>(),
+      }
+    };
+
+    <span class="kw">let </span>(positions, contents): (Vec&lt;<span class="kw">_</span>&gt;, Vec&lt;<span class="kw">_</span>&gt;) = <span class="self">self
+      </span>.iter_projections()
+      .enumerate()
+      .map(elem_to_string)
+      .unzip();
+
+    <span class="comment">// Combine the prefixes and suffixes into a corresponding sequence
+    </span><span class="kw">let </span><span class="kw-2">mut </span>parts = VecDeque::from([local_name]);
+    <span class="kw">for </span>(i, string) <span class="kw">in </span>contents.into_iter().enumerate() {
+      <span class="kw">match </span>positions[i] {
+        ElemPosition::Prefix =&gt; {
+          parts.push_front(string);
+          <span class="kw">if </span><span class="macro">matches!</span>(positions.get(i + <span class="number">1</span>), <span class="prelude-val">Some</span>(ElemPosition::Suffix)) {
+            parts.push_front(Cow::Borrowed(<span class="string">&quot;(&quot;</span>));
+            parts.push_back(Cow::Borrowed(<span class="string">&quot;)&quot;</span>));
           }
         }
-        ProjectionElem::Downcast(sym, <span class="kw">_</span>) =&gt; <span class="macro">format!</span>(
-          <span class="string">&quot;{s} as {}&quot;</span>,
-          sym.map(|s| s.to_string()).unwrap_or_else(|| <span class="string">&quot;??&quot;</span>.into())
-        ),
-        ProjectionElem::Index(<span class="kw">_</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{s}[]&quot;</span>),
-        <span class="kw">_ </span>=&gt; <span class="macro">unimplemented!</span>(),
-      };
+        ElemPosition::Suffix =&gt; parts.push_back(string),
+      }
+    }
 
-    <span class="prelude-val">Some</span>(
-      <span class="self">self
-        </span>.iter_projections()
-        .fold(local_name, projection_to_string),
-    )
+    <span class="kw">let </span>full = parts.make_contiguous().join(<span class="string">&quot;&quot;</span>);
+    <span class="prelude-val">Some</span>(full)
   }
 
   <span class="kw">fn </span>normalize(<span class="kw-2">&amp;</span><span class="self">self</span>, tcx: TyCtxt&lt;<span class="lifetime">&#39;tcx</span>&gt;, def_id: DefId) -&gt; Place&lt;<span class="lifetime">&#39;tcx</span>&gt; {
@@ -2146,6 +2292,7 @@
   <span class="kw">use </span>rustc_span::BytePos;
 
   <span class="kw">use super</span>::<span class="kw-2">*</span>;
+  <span class="kw">use </span><span class="kw">crate</span>::test_utils;
 
   <span class="attr">#[test]
   </span><span class="kw">fn </span>test_span_subtract() {
@@ -2155,6 +2302,65 @@
       <span class="kw">let </span>inner: Vec&lt;Span&gt; = <span class="macro">vec!</span>[mk(<span class="number">0</span>, <span class="number">2</span>), mk(<span class="number">3</span>, <span class="number">4</span>), mk(<span class="number">3</span>, <span class="number">5</span>), mk(<span class="number">7</span>, <span class="number">8</span>), mk(<span class="number">9</span>, <span class="number">13</span>)];
       <span class="kw">let </span>desired: Vec&lt;Span&gt; = <span class="macro">vec!</span>[mk(<span class="number">2</span>, <span class="number">3</span>), mk(<span class="number">5</span>, <span class="number">7</span>), mk(<span class="number">8</span>, <span class="number">9</span>)];
       <span class="macro">assert_eq!</span>(outer.subtract(inner), desired);
+    });
+  }
+
+  <span class="attr">#[test]
+  </span><span class="kw">fn </span>test_place_to_string() {
+    <span class="kw">let </span>input = <span class="string">r#&quot;
+    struct Point { x: usize, y: usize }
+    fn main() {
+      let x = (0, 0);
+      let y = Some(1);
+      let z = &amp;[Some((0, 1))];    
+      let w = (&amp;y,);
+      let p = &amp;Point { x: 0, y: 0 };
+    }
+    &quot;#</span>;
+    test_utils::compile_body(input, |tcx, _body_id, body_with_facts| {
+      <span class="kw">let </span>body = <span class="kw-2">&amp;</span>body_with_facts.body;
+      <span class="kw">let </span>name_map = body
+        .debug_info_name_map()
+        .into_iter()
+        .map(|(k, v)| (v.to_string(), k))
+        .collect::&lt;HashMap&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt;&gt;();
+
+      <span class="kw">let </span>downcast = |s: <span class="kw-2">&amp;</span>str, i: usize| {
+        PlaceElem::Downcast(<span class="prelude-val">Some</span>(Symbol::intern(s)), VariantIdx::from_usize(i))
+      };
+      <span class="kw">let </span>field = |i: usize| PlaceElem::Field(Field::from_usize(i), tcx.mk_unit());
+      <span class="kw">let </span>index = |i: usize| PlaceElem::Index(Local::from_usize(i));
+      <span class="kw">let </span>deref = || PlaceElem::Deref;
+
+      <span class="kw">let </span>x = Place::from_local(name_map[<span class="string">&quot;x&quot;</span>], tcx);
+      <span class="kw">let </span>x_1 = Place::make(name_map[<span class="string">&quot;x&quot;</span>], <span class="kw-2">&amp;</span>[field(<span class="number">1</span>)], tcx);
+      <span class="kw">let </span>y_some_0 = Place::make(name_map[<span class="string">&quot;y&quot;</span>], <span class="kw-2">&amp;</span>[downcast(<span class="string">&quot;Some&quot;</span>, <span class="number">1</span>), field(<span class="number">0</span>)], tcx);
+      <span class="kw">let </span>z_deref_some_0_1 = Place::make(
+        name_map[<span class="string">&quot;z&quot;</span>],
+        <span class="kw-2">&amp;</span>[deref(), index(<span class="number">0</span>), downcast(<span class="string">&quot;Some&quot;</span>, <span class="number">1</span>), field(<span class="number">0</span>), field(<span class="number">1</span>)],
+        tcx,
+      );
+      <span class="kw">let </span>w_0_deref = Place::make(name_map[<span class="string">&quot;w&quot;</span>], <span class="kw-2">&amp;</span>[field(<span class="number">0</span>), deref()], tcx);
+      <span class="kw">let </span>w_0_deref_some = Place::make(
+        name_map[<span class="string">&quot;w&quot;</span>],
+        <span class="kw-2">&amp;</span>[field(<span class="number">0</span>), deref(), downcast(<span class="string">&quot;Some&quot;</span>, <span class="number">1</span>)],
+        tcx,
+      );
+      <span class="kw">let </span>p_deref_x = Place::make(name_map[<span class="string">&quot;p&quot;</span>], <span class="kw-2">&amp;</span>[deref(), field(<span class="number">0</span>)], tcx);
+
+      <span class="kw">let </span>tests = [
+        (x, <span class="string">&quot;x&quot;</span>),
+        (x_1, <span class="string">&quot;x.1&quot;</span>),
+        (y_some_0, <span class="string">&quot;y@Some.0&quot;</span>),
+        (z_deref_some_0_1, <span class="string">&quot;(*z)[..]@Some.0.1&quot;</span>),
+        (w_0_deref, <span class="string">&quot;*w.0&quot;</span>),
+        (w_0_deref_some, <span class="string">&quot;(*w.0)@Some&quot;</span>),
+        (p_deref_x, <span class="string">&quot;(*p).x&quot;</span>),
+      ];
+
+      <span class="kw">for </span>(place, expected) <span class="kw">in </span>tests {
+        <span class="macro">assert_eq!</span>(place.to_string(tcx, body).unwrap(), expected);
+      }
     });
   }
 }

@@ -204,6 +204,9 @@
 <a href="#204" id="204">204</a>
 <a href="#205" id="205">205</a>
 <a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
 </pre><pre class="rust"><code><span class="kw">mod </span>context;
 <span class="attr">#[allow(clippy::all, clippy::pedantic)]
 </span><span class="kw">mod </span>graphviz;
@@ -262,6 +265,7 @@
 <span class="kw">pub type </span>Point = &lt;AquascopeFacts <span class="kw">as </span>FactTypes&gt;::Point;
 <span class="kw">pub type </span>Loan = &lt;AquascopeFacts <span class="kw">as </span>FactTypes&gt;::Loan;
 <span class="kw">pub type </span>Variable = &lt;AquascopeFacts <span class="kw">as </span>FactTypes&gt;::Variable;
+<span class="kw">pub type </span>Move = rustc_mir_dataflow::move_paths::MoveOutIndex;
 
 <span class="comment">// ------------------------------------------------
 // Permission Boundaries
@@ -299,10 +303,12 @@
   <span class="doccomment">/// Is the [`Place`] currently live?
   </span><span class="kw">pub </span>is_live: bool,
 
-  <span class="comment">// Initialization information
-  // TODO: this should be an Option&lt;MoveKey&gt; once moves are tracked.
-  </span><span class="doccomment">/// Is the [`Place`] currently uninitialzed due to a move?
-  </span><span class="kw">pub </span>path_moved: bool,
+  <span class="doccomment">/// Is this place uninitialized?
+  </span><span class="kw">pub </span>path_uninitialized: bool,
+
+  <span class="doccomment">/// Is the [`Place`] currently uninitialzed due to a move?
+  </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+  </span><span class="kw">pub </span>path_moved: <span class="prelude-ty">Option</span>&lt;MoveKey&gt;,
 
   <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
   </span><span class="doccomment">/// Is a live loan removing `read` permissions?

@@ -513,57 +513,19 @@
 <a href="#513" id="513">513</a>
 <a href="#514" id="514">514</a>
 <a href="#515" id="515">515</a>
-<a href="#516" id="516">516</a>
-<a href="#517" id="517">517</a>
-<a href="#518" id="518">518</a>
-<a href="#519" id="519">519</a>
-<a href="#520" id="520">520</a>
-<a href="#521" id="521">521</a>
-<a href="#522" id="522">522</a>
-<a href="#523" id="523">523</a>
-<a href="#524" id="524">524</a>
-<a href="#525" id="525">525</a>
-<a href="#526" id="526">526</a>
-<a href="#527" id="527">527</a>
-<a href="#528" id="528">528</a>
-<a href="#529" id="529">529</a>
-<a href="#530" id="530">530</a>
-<a href="#531" id="531">531</a>
-<a href="#532" id="532">532</a>
-<a href="#533" id="533">533</a>
-<a href="#534" id="534">534</a>
-<a href="#535" id="535">535</a>
-<a href="#536" id="536">536</a>
-<a href="#537" id="537">537</a>
-<a href="#538" id="538">538</a>
-<a href="#539" id="539">539</a>
-<a href="#540" id="540">540</a>
-<a href="#541" id="541">541</a>
-<a href="#542" id="542">542</a>
-<a href="#543" id="543">543</a>
-<a href="#544" id="544">544</a>
-<a href="#545" id="545">545</a>
-<a href="#546" id="546">546</a>
-<a href="#547" id="547">547</a>
-<a href="#548" id="548">548</a>
-<a href="#549" id="549">549</a>
-<a href="#550" id="550">550</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Interpreting memory as Rust data types
 
-</span><span class="kw">use </span>std::collections::HashMap;
-
-<span class="kw">use </span>miri::{
+</span><span class="kw">use </span>miri::{
   AllocKind, AllocMap, Immediate, InterpError, InterpErrorInfo, InterpResult,
   MPlaceTy, MemPlaceMeta, MemoryKind, OpTy, UndefinedBehaviorInfo, Value,
 };
 <span class="kw">use </span>rustc_abi::FieldsShape;
 <span class="kw">use </span>rustc_apfloat::Float;
-<span class="kw">use </span>rustc_hir::def_id::DefId;
 <span class="kw">use </span>rustc_middle::{
-  mir::{PlaceElem, ProjectionElem, VarDebugInfo, VarDebugInfoContents},
+  mir::PlaceElem,
   ty::{
     layout::{LayoutOf, TyAndLayout},
-    AdtKind, ClosureKind, Instance, SubstsRef, Ty, TyKind,
+    AdtKind, Ty, TyKind,
   },
 };
 <span class="kw">use </span>rustc_target::abi::Size;
@@ -1022,15 +984,23 @@
 
       TyKind::Closure(def_id, substs) =&gt; {
         <span class="kw">let </span>closure = substs.as_closure();
-
         <span class="kw">let </span>name = <span class="self">self</span>.ev.fn_name(<span class="kw-2">*</span>def_id);
-        <span class="kw">let </span>upvar_names = <span class="self">self</span>.ev.closure_upvar_names(<span class="kw-2">*</span>def_id, substs)<span class="question-mark">?</span>;
+
+        <span class="kw">let </span>upvar_names = <span class="kw">match </span>def_id.as_local() {
+          <span class="prelude-val">Some</span>(def_id) =&gt; {
+            <span class="kw">let </span>tcx = <span class="self">self</span>.ev.ecx.tcx;
+            <span class="kw">let </span>symbols = tcx.symbols_for_closure_captures((def_id, def_id));
+            symbols.iter().map(|s| s.to_ident_string()).collect()
+          }
+          <span class="prelude-val">None </span>=&gt; <span class="macro">vec!</span>[String::from(<span class="string">&quot;(tmp)&quot;</span>); closure.upvar_tys().count()],
+        };
 
         <span class="kw">let </span>env_ty = closure.tupled_upvars_ty();
         <span class="kw">let </span><span class="kw-2">mut </span>env_op = op.clone();
         env_op.layout.ty = env_ty;
         <span class="kw">let </span>MValue::Tuple(env) = <span class="self">self</span>.read(<span class="kw-2">&amp;</span>env_op)<span class="question-mark">? </span><span class="kw">else </span>{ <span class="macro">unreachable!</span>() };
         <span class="kw">let </span>fields = upvar_names.into_iter().zip(env).collect();
+
         MValue::Adt {
           name,
           variant: <span class="prelude-val">None</span>,
@@ -1056,46 +1026,6 @@
       heap_alloc_kinds: Vec::new(),
     }
     .read(op)
-  }
-
-  <span class="kw">fn </span>closure_upvar_names(
-    <span class="kw-2">&amp;</span><span class="self">self</span>,
-    def_id: DefId,
-    substs: SubstsRef&lt;<span class="lifetime">&#39;tcx</span>&gt;,
-  ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, Vec&lt;String&gt;&gt; {
-    <span class="kw">let </span>closure = substs.as_closure();
-    <span class="kw">let </span>inst = Instance::new(def_id, substs);
-    <span class="kw">let </span>body = <span class="self">self</span>.ecx.load_mir(inst.def, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
-    <span class="kw">let </span><span class="kw-2">mut </span>upvar_names = body
-      .var_debug_info
-      .iter()
-      .filter_map(|VarDebugInfo { name, value, .. }| <span class="kw">match </span>value {
-        VarDebugInfoContents::Place(place) <span class="kw">if </span>place.local.as_usize() == <span class="number">1 </span>=&gt; {
-          <span class="comment">// If it&#39;s a FnOnce closure, then the environment is moved
-          // and the places are like _1.0, _1.1, etc.
-          // Otherwise, the environment is passed by reference and the
-          // places are like (*_1).0, (*_1).1, so we need to index
-          // the appropriate projection.
-          </span><span class="kw">let </span>projection_idx = <span class="kw">match </span>closure.kind() {
-            ClosureKind::FnOnce =&gt; <span class="number">0</span>,
-            ClosureKind::Fn | ClosureKind::FnMut =&gt; <span class="number">1</span>,
-          };
-          <span class="kw">match </span>place.projection.get(projection_idx)<span class="question-mark">? </span>{
-            ProjectionElem::Field(field, <span class="kw">_</span>) =&gt; {
-              <span class="prelude-val">Some</span>((field.as_usize(), name.to_ident_string()))
-            }
-            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
-          }
-        }
-        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
-      })
-      .collect::&lt;HashMap&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt;&gt;();
-
-    <span class="prelude-val">Ok</span>(
-      (<span class="number">0 </span>.. closure.upvar_tys().count())
-        .map(|i| upvar_names.remove(<span class="kw-2">&amp;</span>i).unwrap_or_else(|| <span class="string">&quot;(tmp)&quot;</span>.into()))
-        .collect(),
-    )
   }
 }
 </code></pre></div>

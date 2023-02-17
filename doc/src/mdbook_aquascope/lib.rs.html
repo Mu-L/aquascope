@@ -4,11 +4,17 @@
 <a href="#4" id="4">4</a>
 <a href="#5" id="5">5</a>
 <a href="#6" id="6">6</a>
-</pre><pre class="rust"><code><span class="attr">#![feature(iter_intersperse)]
-#![allow(clippy::comparison_to_empty)]
+<a href="#7" id="7">7</a>
+<a href="#8" id="8">8</a>
+<a href="#9" id="9">9</a>
+</pre><pre class="rust"><code><span class="attr">#![allow(clippy::comparison_to_empty)]
 
-</span><span class="kw">pub mod </span>annotations;
-<span class="kw">pub mod </span>block;
-<span class="kw">pub mod </span>cache;
+</span><span class="kw">mod </span>annotations;
+<span class="kw">mod </span>block;
+<span class="kw">mod </span>cache;
+<span class="kw">mod </span>preprocessor;
+
+<span class="kw">pub use </span>cache::CACHE_PATH;
+<span class="kw">pub use </span>preprocessor::AquascopePreprocessor;
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="mdbook_aquascope" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (b28d30e1e 2022-12-06)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>

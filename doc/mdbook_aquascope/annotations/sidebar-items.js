@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":[["parse_annotations",""]],"struct":[["AquascopeAnnotations",""],["CharPos",""],["InterpAnnotations",""],["LinePos",""],["StepperAnnotations",""]]};

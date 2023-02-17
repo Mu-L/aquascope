@@ -169,7 +169,7 @@
   <span class="kw">if </span><span class="macro">log::log_enabled!</span>(log::Level::Trace) {
     <span class="kw">for </span>step <span class="kw">in </span><span class="kw-2">&amp;</span>mir_steps.steps {
       <span class="kw">let </span>(inst, mir_body_loc) = step.stack.frames.last().unwrap().location;
-      <span class="macro">eprintln!</span>(<span class="string">&quot;{}&quot;</span>, <span class="kw">match </span>mir_body_loc {
+      <span class="macro">log::trace!</span>(<span class="string">&quot;{}&quot;</span>, <span class="kw">match </span>mir_body_loc {
         Either::Left(loc) =&gt; {
           <span class="kw">let </span>body = evaluator.ecx.load_mir(inst, <span class="prelude-val">None</span>).unwrap();
           <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, body.stmt_at(loc))
@@ -187,7 +187,7 @@
   <span class="kw">if </span><span class="macro">log::log_enabled!</span>(log::Level::Trace) {
     <span class="kw">for </span>step <span class="kw">in </span><span class="kw-2">&amp;</span>hir_steps.steps {
       <span class="kw">let </span>(<span class="kw">_</span>, hir_body_loc) = step.stack.frames.last().unwrap().location;
-      <span class="macro">eprintln!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="kw">match </span>hir_body_loc {
+      <span class="macro">log::trace!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="kw">match </span>hir_body_loc {
         Either::Left(node_id) =&gt; tcx.hir().node_to_string(node_id),
         Either::Right(span) =&gt;
           tcx.sess.source_map().span_to_snippet(span).unwrap(),

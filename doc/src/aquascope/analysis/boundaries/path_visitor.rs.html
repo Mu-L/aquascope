@@ -167,22 +167,86 @@
 <a href="#167" id="167">167</a>
 <a href="#168" id="168">168</a>
 <a href="#169" id="169">169</a>
-</pre><pre class="rust"><code><span class="kw">use </span>rustc_hir::{
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+</pre><pre class="rust"><code><span class="kw">use </span>anyhow::{bail, <span class="prelude-ty">Result</span>};
+<span class="kw">use </span>rustc_hir::{
+  def::Res,
   intravisit::{<span class="self">self</span>, Visitor},
-  BodyId, Expr, ExprKind, Mutability,
+  BodyId, Expr, ExprKind, Mutability, Path, QPath, UnOp,
 };
 <span class="kw">use </span>rustc_middle::{
   hir::nested_filter::OnlyBodies,
-  ty::{TyCtxt, TypeckResults},
+  ty::{
+    adjustment::{Adjust, AutoBorrow, AutoBorrowMutability},
+    TyCtxt, TypeckResults,
+  },
 };
+<span class="kw">use </span>rustc_span::Span;
 
-<span class="kw">use super</span>::{AquascopeAnalysis, PathBoundary, Permissions};
+<span class="kw">use super</span>::{PathBoundary, Permissions};
+<span class="kw">use </span><span class="kw">crate</span>::analysis::permissions::PermissionsCtxt;
 
 <span class="kw">struct </span>HirExprScraper&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;tcx</span>: <span class="lifetime">&#39;a</span>&gt; {
   tcx: TyCtxt&lt;<span class="lifetime">&#39;tcx</span>&gt;,
   typeck_res: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>TypeckResults&lt;<span class="lifetime">&#39;tcx</span>&gt;,
-  data: Vec&lt;PathBoundary&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;tcx</span>&gt;&gt;,
-  ctxt: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>AquascopeAnalysis&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;tcx</span>&gt;,
+  data: Vec&lt;PathBoundary&gt;,
+  unsupported_feature: <span class="prelude-ty">Option</span>&lt;(Span, String)&gt;,
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;tcx</span>: <span class="lifetime">&#39;a</span>&gt; HirExprScraper&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;tcx</span>&gt; {
+  <span class="kw">fn </span>get_adjusted_permissions(<span class="kw-2">&amp;</span><span class="self">self</span>, expr: <span class="kw-2">&amp;</span>Expr) -&gt; Permissions {
+    <span class="kw">let </span>ty_adj = <span class="self">self</span>.typeck_res.expr_ty_adjusted(expr);
+    <span class="kw">let </span>adjs = <span class="self">self</span>.typeck_res.expr_adjustments(expr);
+
+    <span class="macro">log::debug!</span>(<span class="string">&quot;Path TY-ADJ: {:#?} from {:#?}&quot;</span>, ty_adj, adjs);
+
+    <span class="kw">let </span>is_auto_borrow = adjs.iter().find_map(|adj| {
+      <span class="kw">if let </span>Adjust::Borrow(AutoBorrow::Ref(<span class="kw">_</span>, m)) = adj.kind {
+        <span class="prelude-val">Some</span>(m)
+      } <span class="kw">else </span>{
+        <span class="prelude-val">None
+      </span>}
+    });
+
+    Permissions {
+      read: <span class="bool-val">true</span>,
+      write: <span class="macro">matches!</span>(is_auto_borrow, <span class="prelude-val">Some</span>(AutoBorrowMutability::Mut { .. })),
+      <span class="comment">// Paths which are not reborrowed are moved.
+      </span>drop: is_auto_borrow.is_none(),
+    }
+  }
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;tcx</span>: <span class="lifetime">&#39;a</span>&gt; Visitor&lt;<span class="lifetime">&#39;tcx</span>&gt; <span class="kw">for </span>HirExprScraper&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;tcx</span>&gt; {
@@ -196,145 +260,147 @@
     <span class="kw">let </span>hir_id = expr.hir_id;
 
     <span class="macro">log::debug!</span>(
-      <span class="string">&quot;visiting {}&quot;</span>,
+      <span class="string">&quot;visiting {}\n\n&quot;</span>,
       <span class="self">self</span>.nested_visit_map().node_to_string(hir_id)
     );
 
     <span class="kw">match </span>expr.kind {
-            <span class="comment">// For method calls, it&#39;s most accurate to get the expected
-            // permissions from the method signature declared type.
-            </span>ExprKind::MethodCall(<span class="kw">_</span>, rcvr, args, fn_span)
-                <span class="kw">if </span>!fn_span.from_expansion()
-                &amp;&amp; rcvr
-                .is_place_expr(|e| !<span class="macro">matches!</span>(e.kind, ExprKind::Lit(<span class="kw">_</span>))) =&gt;
-            {
-                <span class="kw">let </span>def_id = <span class="self">self</span>.typeck_res.type_dependent_def_id(hir_id).unwrap();
-                <span class="kw">let </span>fn_sig = <span class="self">self</span>.tcx.fn_sig(def_id).skip_binder();
+      <span class="comment">// For method calls, it&#39;s most accurate to get the expected
+      // permissions from the method signature declared type.
+      </span>ExprKind::MethodCall(<span class="kw">_</span>, rcvr, args, fn_span)
+        <span class="kw">if </span>!fn_span.from_expansion()
+          &amp;&amp; rcvr.is_place_expr(|e| !<span class="macro">matches!</span>(e.kind, ExprKind::Lit(<span class="kw">_</span>))) =&gt;
+      {
+        <span class="kw">let </span>def_id = <span class="self">self</span>.typeck_res.type_dependent_def_id(hir_id).unwrap();
+        <span class="kw">let </span>fn_sig = <span class="self">self</span>.tcx.fn_sig(def_id).skip_binder();
 
-                <span class="kw">let </span>pb = PathBoundary {
-                    location: rcvr.span,
-                    hir_id,
-                    expected: fn_sig.inputs()[<span class="number">0</span>].into(),
-                    analysis_ctxt: <span class="self">self</span>.ctxt,
-                };
+        <span class="kw">let </span>pb = PathBoundary {
+          location: rcvr.span,
+          hir_id: rcvr.hir_id,
+          conflicting_node: <span class="prelude-val">None</span>,
+          expected: fn_sig.inputs()[<span class="number">0</span>].into(),
+        };
 
-                <span class="self">self</span>.data.push(pb);
+        <span class="self">self</span>.data.push(pb);
 
-                <span class="kw">for </span>a <span class="kw">in </span>args.iter() {
-                    intravisit::walk_expr(<span class="self">self</span>, a);
-                }
-            }
-
-            ExprKind::AddrOf(<span class="kw">_</span>, mutability, inner)
-            <span class="comment">// FIXME: this will only place bounds on
-            // directly referenced paths.
-            // The previous logic (only requiring that the inner
-            // expression not be from an expansion) failed to filter
-            // out the slice reference in the `println!`. Even though,
-            // this reference did in fact come from an expansion.
-                </span><span class="kw">if </span>inner.is_syntactic_place_expr()
-                &amp;&amp; !inner.span.from_expansion() =&gt;
-            {
-                <span class="kw">let </span>pb = PathBoundary {
-                    hir_id,
-                    location: inner.span.shrink_to_lo(),
-                    expected: Permissions {
-                        read: <span class="bool-val">true</span>,
-                        write: <span class="macro">matches!</span>(mutability, Mutability::Mut),
-                        drop: <span class="bool-val">false</span>,
-                    },
-                    analysis_ctxt: <span class="self">self</span>.ctxt,
-                };
-
-                <span class="self">self</span>.data.push(pb);
-
-                <span class="kw">if </span>!<span class="macro">matches!</span>(inner.kind, ExprKind::Path(..)) {
-                    intravisit::walk_expr(<span class="self">self</span>, expr);
-                }
-            }
-
-            ExprKind::AssignOp(<span class="kw">_</span>, lhs, rhs) =&gt; {
-                <span class="kw">let </span>lhs_ty = <span class="self">self</span>.typeck_res.expr_ty_adjusted(lhs);
-                <span class="macro">log::debug!</span>(<span class="string">&quot;Type of LHS: {:?}&quot;</span>, lhs_ty);
-
-
-                <span class="kw">let </span>pb = PathBoundary {
-                    location: lhs.span.shrink_to_lo(),
-                    hir_id,
-                    expected: Permissions {
-                        read: <span class="bool-val">true</span>,
-                        write: <span class="bool-val">true</span>,
-                        drop: <span class="bool-val">false</span>,
-                    },
-                    analysis_ctxt: <span class="self">self</span>.ctxt,
-                };
-
-                <span class="self">self</span>.data.push(pb);
-
-                intravisit::walk_expr(<span class="self">self</span>, lhs);
-                intravisit::walk_expr(<span class="self">self</span>, rhs);
-            }
-
-            <span class="comment">// XXX: we only want to attach permissions to path resolved to `Local` ids.
-            // FIXME: the commented out region produced some hard-to-resolve bugs
-            // which I will come back to later. An example,
-            // ```
-            // fn foo(s: &amp;String, b: &amp;mut String) {}
-            //
-            // fn main() {
-            //   let mut x = &quot;s&quot;.to_owned();
-            //   let w: &amp;mut String = &amp;mut x;
-            //   foo(&amp;x, w);
-            // }
-            // ```
-            // if you allow a permission stack to be placed at the `w` in
-            // the Call `foo( &amp;x, w )`, the analysis will currently
-            // find the permissions for the path `(*w)`, even though,
-            // it is actually reborrowed before the call. Thus, falsely
-            // showing that the drop permission is missing.
-            //
-            // ExprKind::Path(QPath::Resolved(
-            //   _,
-            //   Path {
-            //     span,
-            //     res: Res::Local(_),
-            //     ..
-            //   },
-            // )) if !span.from_expansion() =&gt; {
-            //   let pb = PathBoundary {
-            //     hir_id,
-            //     location: span.shrink_to_lo(),
-            //     expected: Permissions {
-            //       read: true,
-            //       write: false,
-            //       drop: true,
-            //     },
-            //     analysis_ctxt: self.ctxt,
-            //   };
-            //   self.data.push(pb);
-            // }
-
-            </span><span class="kw">_ </span>=&gt; {
-                intravisit::walk_expr(<span class="self">self</span>, expr);
-            }
+        <span class="kw">for </span>a <span class="kw">in </span>args.iter() {
+          <span class="self">self</span>.visit_expr(a);
         }
+      }
+
+      ExprKind::AddrOf(<span class="kw">_</span>, mutability, inner)
+        <span class="kw">if </span>inner.is_syntactic_place_expr() &amp;&amp; !inner.span.from_expansion() =&gt;
+      {
+        <span class="comment">// We don&#39;t have to account for adjusted types because
+        // taking a borrow provides explicit types.
+        </span><span class="kw">let </span>pb = PathBoundary {
+          hir_id,
+          conflicting_node: <span class="prelude-val">None</span>,
+          location: inner.span.shrink_to_lo(),
+          expected: Permissions {
+            read: <span class="bool-val">true</span>,
+            write: <span class="macro">matches!</span>(mutability, Mutability::Mut),
+            drop: <span class="bool-val">false</span>,
+          },
+        };
+
+        <span class="self">self</span>.data.push(pb);
+      }
+
+      <span class="comment">// NOTE: it feels natural to say that the LHS of an assignment
+      // should expect W permissions. However, this isn&#39;t always the case.
+      // It&#39;s true that the path should be declared as *Mutable*, but
+      // this doesn&#39;t mean that there&#39;s write permissions. Example:
+      //
+      // ```text
+      // let s;
+      // s = &quot;all good&quot;.to_string();
+      // ```
+      //
+      // `s` would not have write permissions because it is not yet initialized.
+      // For now, the LHS is simply ignored from the boundaries analysis.
+      </span>ExprKind::Assign(<span class="kw">_</span>, rhs, <span class="kw">_</span>) =&gt; {
+        <span class="self">self</span>.visit_expr(rhs);
+      }
+
+      ExprKind::AssignOp(<span class="kw">_</span>, lhs, rhs) =&gt; {
+        <span class="kw">let </span>lhs_ty = <span class="self">self</span>.typeck_res.expr_ty_adjusted(lhs);
+        <span class="macro">log::debug!</span>(<span class="string">&quot;Type of LHS: {:#?}&quot;</span>, lhs_ty);
+
+        <span class="kw">let </span>pb = PathBoundary {
+          location: lhs.span.shrink_to_lo(),
+          hir_id: lhs.hir_id,
+          conflicting_node: <span class="prelude-val">Some</span>(rhs.hir_id),
+          expected: Permissions {
+            read: <span class="bool-val">true</span>,
+            write: <span class="bool-val">true</span>,
+            drop: <span class="bool-val">false</span>,
+          },
+        };
+
+        <span class="self">self</span>.data.push(pb);
+        <span class="self">self</span>.visit_expr(rhs);
+      }
+
+      ExprKind::Unary(UnOp::Deref, inner)
+        <span class="kw">if </span>inner.is_syntactic_place_expr() &amp;&amp; !inner.span.from_expansion() =&gt;
+      {
+        <span class="kw">let </span>pb = PathBoundary {
+          hir_id,
+          conflicting_node: <span class="prelude-val">None</span>,
+          <span class="comment">// We want the boundary to appear to the left of the deref.
+          </span>location: expr.span.shrink_to_lo(),
+          expected: <span class="self">self</span>.get_adjusted_permissions(expr),
+        };
+        <span class="self">self</span>.data.push(pb);
+      }
+
+      <span class="comment">// XXX: we only want to attach permissions to path resolved to `Local` ids.
+      </span>ExprKind::Path(QPath::Resolved(
+        <span class="kw">_</span>,
+        Path {
+          span,
+          res: Res::Local(<span class="kw">_</span>),
+          ..
+        },
+      )) <span class="kw">if </span>!span.from_expansion() =&gt; {
+        <span class="kw">let </span>pb = PathBoundary {
+          hir_id,
+          conflicting_node: <span class="prelude-val">None</span>,
+          location: span.shrink_to_lo(),
+          expected: <span class="self">self</span>.get_adjusted_permissions(expr),
+        };
+        <span class="self">self</span>.data.push(pb);
+      }
+      <span class="kw">_ </span>=&gt; {
+        intravisit::walk_expr(<span class="self">self</span>, expr);
+      }
+    }
   }
 }
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>get_path_boundaries&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;tcx</span>: <span class="lifetime">&#39;a</span>&gt;(
   tcx: TyCtxt&lt;<span class="lifetime">&#39;tcx</span>&gt;,
   body_id: BodyId,
-  ctxt: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>AquascopeAnalysis&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;tcx</span>&gt;,
-) -&gt; Vec&lt;PathBoundary&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;tcx</span>&gt;&gt; {
+  _ctxt: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>PermissionsCtxt&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;tcx</span>&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;PathBoundary&gt;&gt; {
   <span class="kw">let </span>typeck_res = tcx.typeck_body(body_id);
   <span class="kw">let </span><span class="kw-2">mut </span>finder = HirExprScraper {
     tcx,
     typeck_res,
-    ctxt,
+    unsupported_feature: <span class="prelude-val">None</span>,
     data: Vec::default(),
   };
+
+  <span class="macro">log::debug!</span>(<span class="string">&quot;THE BODY OWNER: {:?}&quot;</span>, tcx.hir().body_owner(body_id));
+
   finder.visit_nested_body(body_id);
-  finder.data
+
+  <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, msg)) = finder.unsupported_feature {
+    <span class="macro">bail!</span>(msg);
+  }
+
+  <span class="prelude-val">Ok</span>(finder.data)
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="aquascope" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (b28d30e1e 2022-12-06)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>

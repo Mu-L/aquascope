@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["compile",""],["compile_normal",""],["for_each_body",""],["load_test_from_file",""],["run_in_dir",""],["test_interpreter_in_file",""],["test_refinements_in_file",""],["test_steps_in_file",""]]};
+window.SIDEBAR_ITEMS = {"fn":[["compile",""],["compile_normal",""],["for_each_body",""],["load_test_from_file",""],["run_in_dir",""],["test_boundaries_in_file",""],["test_interpreter_in_file",""],["test_refinements_in_file",""],["test_steps_in_file",""]]};

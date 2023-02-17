@@ -274,6 +274,13 @@
 <a href="#274" id="274">274</a>
 <a href="#275" id="275">275</a>
 <a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>find_steps;
 <span class="kw">mod </span>segment_tree;
 
@@ -289,7 +296,7 @@
 <span class="kw">use crate</span>::{
   analysis::{
     permissions::{Permissions, PermissionsData, PermissionsDomain},
-    AquascopeAnalysis, LoanKey,
+    AquascopeAnalysis, LoanKey, MoveKey,
   },
   Range,
 };
@@ -415,7 +422,8 @@
   <span class="kw">pub </span>is_live: ValueStep&lt;bool&gt;,
   <span class="kw">pub </span>type_droppable: ValueStep&lt;bool&gt;,
   <span class="kw">pub </span>type_writeable: ValueStep&lt;bool&gt;,
-  <span class="kw">pub </span>path_moved: ValueStep&lt;bool&gt;,
+  <span class="kw">pub </span>path_moved: ValueStep&lt;MoveKey&gt;,
+  <span class="kw">pub </span>path_uninitialized: ValueStep&lt;bool&gt;,
   <span class="kw">pub </span>loan_read_refined: ValueStep&lt;LoanKey&gt;,
   <span class="kw">pub </span>loan_write_refined: ValueStep&lt;LoanKey&gt;,
   <span class="kw">pub </span>loan_drop_refined: ValueStep&lt;LoanKey&gt;,
@@ -511,6 +519,7 @@
       loan_write_refined: <span class="self">self</span>.loan_write_refined.diff(rhs.loan_write_refined),
       loan_drop_refined: <span class="self">self</span>.loan_drop_refined.diff(rhs.loan_drop_refined),
       path_moved: <span class="self">self</span>.path_moved.diff(rhs.path_moved),
+      path_uninitialized: <span class="self">self</span>.path_uninitialized.diff(rhs.path_uninitialized),
       permissions: <span class="self">self</span>.permissions.diff(rhs.permissions),
     }
   }
@@ -548,7 +557,12 @@
   <span class="kw">let </span>mode = INCLUDE_MODE.copied().unwrap_or(PermIncludeMode::Changes);
   <span class="kw">let </span>permissions_ctxt = <span class="kw-2">&amp;</span>ctxt.permissions;
   <span class="kw">let </span>span_to_range = |span| ctxt.span_to_range(span);
-  find_steps::compute_permission_steps(permissions_ctxt, mode, span_to_range)
+  find_steps::compute_permission_steps(
+    permissions_ctxt,
+    <span class="kw-2">&amp;</span>ctxt.ir_mapper,
+    mode,
+    span_to_range,
+  )
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="aquascope" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (b28d30e1e 2022-12-06)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>

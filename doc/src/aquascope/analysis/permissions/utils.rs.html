@@ -348,6 +348,7 @@
 <a href="#348" id="348">348</a>
 <a href="#349" id="349">349</a>
 <a href="#350" id="350">350</a>
+<a href="#351" id="351">351</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Various *debugging* utilities for permissions.
 
 </span><span class="kw">use </span>std::{collections::hash_map::Entry, io::Write, path::Path};
@@ -652,7 +653,8 @@
           type_droppable: <span class="bool-val">false</span>,
           type_writeable: <span class="bool-val">false</span>,
           type_copyable: <span class="bool-val">false</span>,
-          path_moved: <span class="bool-val">false</span>,
+          path_moved: <span class="prelude-val">None</span>,
+          path_uninitialized: <span class="bool-val">false</span>,
           loan_read_refined: <span class="prelude-val">None</span>,
           loan_write_refined: <span class="prelude-val">None</span>,
           loan_drop_refined: <span class="prelude-val">None</span>,

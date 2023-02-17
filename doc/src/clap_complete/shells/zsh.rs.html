@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/clap_complete-4.1.1/src/shells/zsh.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>zsh.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-389f8b4a37bc03c9.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-046227e470cd3629.css"><link rel="stylesheet" disabled href="../../../static.files/dark-800f2ee593c8e6f7.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-9edae3c387f5a5b3.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../clap_complete/index.html">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/clap_complete-4.1.2/src/shells/zsh.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>zsh.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-389f8b4a37bc03c9.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-046227e470cd3629.css"><link rel="stylesheet" disabled href="../../../static.files/dark-800f2ee593c8e6f7.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-9edae3c387f5a5b3.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../clap_complete/index.html">
                         <img src="https://raw.githubusercontent.com/clap-rs/clap/master/assets/clap.png" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -656,14 +656,6 @@
 <a href="#655" id="655">655</a>
 <a href="#656" id="656">656</a>
 <a href="#657" id="657">657</a>
-<a href="#658" id="658">658</a>
-<a href="#659" id="659">659</a>
-<a href="#660" id="660">660</a>
-<a href="#661" id="661">661</a>
-<a href="#662" id="662">662</a>
-<a href="#663" id="663">663</a>
-<a href="#664" id="664">664</a>
-<a href="#665" id="665">665</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::io::Write;
 
 <span class="kw">use </span>clap::<span class="kw-2">*</span>;
@@ -677,7 +669,7 @@
 
 <span class="kw">impl </span>Generator <span class="kw">for </span>Zsh {
     <span class="kw">fn </span>file_name(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; String {
-        <span class="macro">format!</span>(<span class="string">&quot;_{}&quot;</span>, name)
+        <span class="macro">format!</span>(<span class="string">&quot;_{name}&quot;</span>)
     }
 
     <span class="kw">fn </span>generate(<span class="kw-2">&amp;</span><span class="self">self</span>, cmd: <span class="kw-2">&amp;</span>Command, buf: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>Write) {
@@ -777,8 +769,8 @@ _{bin_name_underscore}_commands() {{
     all_subcommands.sort();
     all_subcommands.dedup();
 
-    <span class="kw">for </span><span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="kw-2">ref </span>bin_name) <span class="kw">in </span><span class="kw-2">&amp;</span>all_subcommands {
-        <span class="macro">debug!</span>(<span class="string">&quot;subcommand_details:iter: bin_name={}&quot;</span>, bin_name);
+    <span class="kw">for </span>(<span class="kw">_</span>, <span class="kw-2">ref </span>bin_name) <span class="kw">in </span><span class="kw-2">&amp;</span>all_subcommands {
+        <span class="macro">debug!</span>(<span class="string">&quot;subcommand_details:iter: bin_name={bin_name}&quot;</span>);
 
         ret.push(<span class="macro">format!</span>(
             <span class="string">&quot;\
@@ -889,14 +881,12 @@ _{bin_name_underscore}_commands() {{
     <span class="kw">let </span>subcommand_names = utils::subcommands(parent);
     <span class="kw">let </span><span class="kw-2">mut </span>all_subcommands = <span class="macro">vec!</span>[];
 
-    <span class="kw">for </span><span class="kw-2">&amp;</span>(<span class="kw-2">ref </span>name, <span class="kw-2">ref </span>bin_name) <span class="kw">in </span><span class="kw-2">&amp;</span>subcommand_names {
+    <span class="kw">for </span>(<span class="kw-2">ref </span>name, <span class="kw-2">ref </span>bin_name) <span class="kw">in </span><span class="kw-2">&amp;</span>subcommand_names {
         <span class="macro">debug!</span>(
-            <span class="string">&quot;get_subcommands_of:iter: parent={}, name={}, bin_name={}&quot;</span>,
+            <span class="string">&quot;get_subcommands_of:iter: parent={}, name={name}, bin_name={bin_name}&quot;</span>,
             parent.get_name(),
-            name,
-            bin_name,
         );
-        <span class="kw">let </span><span class="kw-2">mut </span>segments = <span class="macro">vec!</span>[<span class="macro">format!</span>(<span class="string">&quot;({})&quot;</span>, name)];
+        <span class="kw">let </span><span class="kw-2">mut </span>segments = <span class="macro">vec!</span>[<span class="macro">format!</span>(<span class="string">&quot;({name})&quot;</span>)];
         <span class="kw">let </span>subcommand_args = get_args_of(
             parser_of(parent, bin_name).expect(INTERNAL_ERROR_MSG),
             <span class="prelude-val">Some</span>(parent),
@@ -1124,8 +1114,8 @@ esac&quot;</span>,
             <span class="prelude-val">Some</span>(val) =&gt; val[<span class="number">0</span>].to_string(),
         };
         <span class="kw">let </span>vc = <span class="kw">match </span>value_completion(o) {
-            <span class="prelude-val">Some</span>(val) =&gt; <span class="macro">format!</span>(<span class="string">&quot;:{}:{}&quot;</span>, vn, val),
-            <span class="prelude-val">None </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;:{}: &quot;</span>, vn),
+            <span class="prelude-val">Some</span>(val) =&gt; <span class="macro">format!</span>(<span class="string">&quot;:{vn}:{val}&quot;</span>),
+            <span class="prelude-val">None </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;:{vn}: &quot;</span>),
         };
         <span class="kw">let </span>vc = vc.repeat(o.get_num_args().expect(<span class="string">&quot;built&quot;</span>).min_values());
 
@@ -1168,11 +1158,11 @@ esac&quot;</span>,
     <span class="kw">fn </span>push_conflicts(conflicts: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>Arg], res: <span class="kw-2">&amp;mut </span>Vec&lt;String&gt;) {
         <span class="kw">for </span>conflict <span class="kw">in </span>conflicts {
             <span class="kw">if let </span><span class="prelude-val">Some</span>(s) = conflict.get_short() {
-                res.push(<span class="macro">format!</span>(<span class="string">&quot;-{}&quot;</span>, s));
+                res.push(<span class="macro">format!</span>(<span class="string">&quot;-{s}&quot;</span>));
             }
 
             <span class="kw">if let </span><span class="prelude-val">Some</span>(l) = conflict.get_long() {
-                res.push(<span class="macro">format!</span>(<span class="string">&quot;--{}&quot;</span>, l));
+                res.push(<span class="macro">format!</span>(<span class="string">&quot;--{l}&quot;</span>));
             }
         }
     }
@@ -1234,13 +1224,7 @@ esac&quot;</span>,
 
             <span class="kw">if let </span><span class="prelude-val">Some</span>(short_aliases) = f.get_visible_short_aliases() {
                 <span class="kw">for </span>alias <span class="kw">in </span>short_aliases {
-                    <span class="kw">let </span>s = <span class="macro">format!</span>(
-                        <span class="string">&quot;&#39;{conflicts}{multiple}-{arg}[{help}]&#39; \\&quot;</span>,
-                        multiple = multiple,
-                        conflicts = conflicts,
-                        arg = alias,
-                        help = help
-                    );
+                    <span class="kw">let </span>s = <span class="macro">format!</span>(<span class="string">&quot;&#39;{conflicts}{multiple}-{alias}[{help}]&#39; \\&quot;</span>,);
 
                     <span class="macro">debug!</span>(<span class="string">&quot;write_flags_of:iter: Wrote...{}&quot;</span>, <span class="kw-2">&amp;*</span>s);
 

@@ -28,7 +28,6 @@
 <a href="#28" id="28">28</a>
 <a href="#29" id="29">29</a>
 <a href="#30" id="30">30</a>
-<a href="#31" id="31">31</a>
 </pre><pre class="rust"><code><span class="doccomment">//! A smattering of utilities not yet (or that won&#39;t ever be) upstreamed to Flowistry.
 
 </span><span class="kw">use </span>rustc_middle::{
@@ -47,16 +46,15 @@
   <span class="kw">fn </span>is_source_visible(<span class="kw-2">&amp;</span><span class="self">self</span>, tcx: TyCtxt, body: <span class="kw-2">&amp;</span>Body) -&gt; bool {
     <span class="kw">let </span>local = <span class="self">self</span>.local;
     <span class="kw">let </span>local_info = <span class="kw-2">&amp;</span>body.local_decls[local];
-
     <span class="kw">let </span>is_loc = local_info.is_user_variable();
     <span class="kw">let </span>from_desugaring = local_info.from_compiler_desugaring();
     <span class="kw">let </span>source_info = local_info.source_info;
+
     <span class="comment">// The assumption is that decls whose source_scope should be collapsed
     // (i.e. with that of the outermost expansion site) are coming from a
     // HIR -&gt; MIR expansion OR are being expanded from some macro not
     // actually visible in the source scope.
     </span><span class="kw">let </span>should_collapse = tcx.should_collapse_debuginfo(source_info.span);
-
     is_loc &amp;&amp; !should_collapse &amp;&amp; !from_desugaring
   }
 }
