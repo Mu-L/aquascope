@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;700&display=swap" rel="stylesheet">
 
-  
+
 
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
@@ -22,7 +22,7 @@
 </head>
 
 <body>
-  
+
 
   <h1>Aquascope Playground</h1>
 
@@ -31,18 +31,23 @@
     "https://github.com/cognitive-engineering-lab/aquascope">Aquascope</a></span>
     is a tool to visualize the compile-time and run-time behavior of  <a href=
     "https://www.rust-lang.org/">Rust</a> programs.
-    Aquascope is a research tool under active
-    development.
-  </p> 
+
+  </p>
 
   <p>
-    You can try out Aquascope by writing a Rust program in the editor below, then 
+    You can try out Aquascope by writing a Rust program in the editor below, then
     clicking the "Interpret" button to see the runtime states, or clicking "Permissions" to see
     the borrow-checking compiler state.
   </p>
-  
+
+  <p>
+    Aquascope is a research tool under active development, so it doesn't work for some Rust programs.
+    If you want to see Aquascope diagrams in action, check out the new chapter on ownership in the
+    <a href="https://rust-book.cs.brown.edu/ch04-01-what-is-ownership.html">Rust Book Experiment</a>.
+  </p>
+
   <div class="columns">
-    <div class="tabs-container">    
+    <div class="tabs-container">
       <ul class="tabs">
         <li class="tab active" data-tab="0">Code</li>
 
@@ -57,14 +62,14 @@
     <div class="buttons">
       <div>
         <div class="dropdown">
-          <button class="cm-button">            
+          <button class="cm-button">
             <i class="fa fa-caret-down"></i>
           </button>
           <div class="dropdown-content">
             <label class="dropdown-container">Passes borrow checker?
               <input type="checkbox" id="passesBorrowChecker">
               <span class="checkmark">
-            </label>           
+            </label>
           </div>
         </div>
         <button class="cm-button" id="showInterpret">Interpret<span class="loader"></button>
