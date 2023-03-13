@@ -172,6 +172,27 @@
 <a href="#172" id="172">172</a>
 <a href="#173" id="173">173</a>
 <a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Parser for annotations within an Aquascope code block body.
 
 </span><span class="kw">use </span>std::{collections::HashMap, hash::Hash};
@@ -190,11 +211,19 @@
 #[ts(export)]
 </span><span class="kw">pub struct </span>LinePos(usize);
 
+<span class="attr">#[derive(PartialEq, Eq, Debug, TS, Serialize, Clone)]
+#[ts(export)]
+#[serde(tag = <span class="string">&quot;type&quot;</span>, content = <span class="string">&quot;value&quot;</span>)]
+</span><span class="kw">pub enum </span>PathMatcher {
+  Literal(String),
+  Regex(String),
+}
+
 <span class="attr">#[derive(PartialEq, Eq, Debug, TS, Serialize, Default, Clone)]
 #[ts(export)]
 </span><span class="kw">pub struct </span>StepperAnnotations {
   focused_lines: Vec&lt;LinePos&gt;,
-  focused_paths: HashMap&lt;LinePos, String&gt;,
+  focused_paths: HashMap&lt;LinePos, Vec&lt;PathMatcher&gt;&gt;,
 }
 
 <span class="attr">#[derive(PartialEq, Eq, Debug, TS, Serialize, Default, Clone)]
@@ -262,6 +291,9 @@
     <span class="kw">if let </span><span class="prelude-val">Some</span>(suffix) = line.strip_prefix(<span class="string">&#39;#&#39;</span>) {
       annots.hidden_lines.push(line_pos);
       <span class="macro">add_fragment!</span>(suffix);
+    } <span class="kw">else if let </span><span class="prelude-val">Some</span>(suffix) = line.strip_prefix(<span class="string">&quot;\\#&quot;</span>) {
+      <span class="macro">add_fragment!</span>(<span class="string">&quot;#&quot;</span>);
+      <span class="macro">add_fragment!</span>(suffix);
     } <span class="kw">else </span>{
       <span class="kw">while let </span><span class="prelude-val">Some</span>(cap) = re.captures(line) {
         <span class="kw">let </span>matched = cap.get(<span class="number">0</span>).unwrap();
@@ -291,11 +323,19 @@
             <span class="kw">if </span>config.contains_key(<span class="string">&quot;focus&quot;</span>) {
               annots.stepper.focused_lines.push(line_pos);
             }
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(paths) = config.get(<span class="string">&quot;paths&quot;</span>) {
+            <span class="kw">let </span><span class="kw-2">mut </span>add_matcher = |matcher: PathMatcher| {
               annots
                 .stepper
                 .focused_paths
-                .insert(line_pos, paths.to_string());
+                .entry(line_pos)
+                .or_default()
+                .push(matcher)
+            };
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(paths) = config.get(<span class="string">&quot;paths&quot;</span>) {
+              add_matcher(PathMatcher::Literal(paths.to_string()));
+            }
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(rpaths) = config.get(<span class="string">&quot;rxpaths&quot;</span>) {
+              add_matcher(PathMatcher::Regex(rpaths.to_string()));
             }
           }
           <span class="string">&quot;boundaries&quot; </span>=&gt; {
@@ -321,7 +361,7 @@
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_parse_annotations() {
   <span class="kw">let </span>input = <span class="string">r#&quot;#fn main() {
-let x = 1;`(focus,paths:x)`
+let x = 1;`(focus,paths:x,rxpaths:y)`
 `[]`let y = 2;`{}`
 #}&quot;#</span>;
   <span class="kw">let </span>(cleaned, annot) = parse_annotations(input).unwrap();
@@ -339,7 +379,9 @@ let y = 2;
     },
     stepper: StepperAnnotations {
       focused_lines: <span class="macro">vec!</span>[LinePos(<span class="number">2</span>)],
-      focused_paths: <span class="macro">maplit::hashmap! </span>{ LinePos(<span class="number">2</span>) =&gt; <span class="string">&quot;x&quot;</span>.into() }
+      focused_paths: <span class="macro">maplit::hashmap! </span>{
+        LinePos(<span class="number">2</span>) =&gt; <span class="macro">vec!</span>[PathMatcher::Literal(<span class="string">&quot;x&quot;</span>.into()), PathMatcher::Regex(<span class="string">&quot;y&quot;</span>.into())]
+      }
     },
     boundaries: BoundariesAnnotations {
       focused_lines: <span class="macro">vec!</span>[LinePos(<span class="number">3</span>)]

@@ -200,6 +200,33 @@
 <a href="#200" id="200">200</a>
 <a href="#201" id="201">201</a>
 <a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
+<a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
 </pre><pre class="rust"><code><span class="kw">use </span>anyhow::{bail, <span class="prelude-ty">Result</span>};
 <span class="kw">use </span>rustc_hir::{
   def::Res,
@@ -307,7 +334,33 @@
         <span class="self">self</span>.data.push(pb);
       }
 
-      <span class="comment">// NOTE: it feels natural to say that the LHS of an assignment
+      <span class="comment">// If the left-hand-side of the assignment is a deref, then we would
+      // expect both read and write permissions from the path. We can say that
+      // here because in Rust you cannot have a reference to uninitialized memory,
+      // however, if the LHS is a moveable path (no deref) then it *could* be uninitialized.
+      </span>ExprKind::Assign(
+        lhs @ Expr {
+          kind: ExprKind::Unary(UnOp::Deref, <span class="kw">_</span>),
+          ..
+        },
+        rhs,
+        <span class="kw">_</span>,
+      ) =&gt; {
+        <span class="kw">let </span>pb = PathBoundary {
+          location: lhs.span.shrink_to_lo(),
+          hir_id: lhs.hir_id,
+          conflicting_node: <span class="prelude-val">Some</span>(rhs.hir_id),
+          expected: Permissions {
+            read: <span class="bool-val">true</span>,
+            write: <span class="bool-val">true</span>,
+            drop: <span class="bool-val">false</span>,
+          },
+        };
+        <span class="self">self</span>.data.push(pb);
+        <span class="self">self</span>.visit_expr(rhs);
+      }
+
+      <span class="comment">// It feels natural to say that the LHS of an assignment
       // should expect W permissions. However, this isn&#39;t always the case.
       // It&#39;s true that the path should be declared as *Mutable*, but
       // this doesn&#39;t mean that there&#39;s write permissions. Example:
@@ -319,7 +372,8 @@
       //
       // `s` would not have write permissions because it is not yet initialized.
       // For now, the LHS is simply ignored from the boundaries analysis.
-      </span>ExprKind::Assign(<span class="kw">_</span>, rhs, <span class="kw">_</span>) =&gt; {
+      </span>ExprKind::Assign(lhs, rhs, <span class="kw">_</span>) =&gt; {
+        <span class="macro">log::debug!</span>(<span class="string">&quot;ASSIGN: ignoring LHS {lhs:#?}&quot;</span>);
         <span class="self">self</span>.visit_expr(rhs);
       }
 

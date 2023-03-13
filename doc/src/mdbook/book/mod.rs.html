@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mdbook-0.4.27/src/book/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-389f8b4a37bc03c9.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-046227e470cd3629.css"><link rel="stylesheet" disabled href="../../../static.files/dark-800f2ee593c8e6f7.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-9edae3c387f5a5b3.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../mdbook/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mdbook-0.4.28/src/book/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-389f8b4a37bc03c9.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-046227e470cd3629.css"><link rel="stylesheet" disabled href="../../../static.files/dark-800f2ee593c8e6f7.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-9edae3c387f5a5b3.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../mdbook/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -858,6 +858,23 @@
 <a href="#858" id="858">858</a>
 <a href="#859" id="859">859</a>
 <a href="#860" id="860">860</a>
+<a href="#861" id="861">861</a>
+<a href="#862" id="862">862</a>
+<a href="#863" id="863">863</a>
+<a href="#864" id="864">864</a>
+<a href="#865" id="865">865</a>
+<a href="#866" id="866">866</a>
+<a href="#867" id="867">867</a>
+<a href="#868" id="868">868</a>
+<a href="#869" id="869">869</a>
+<a href="#870" id="870">870</a>
+<a href="#871" id="871">871</a>
+<a href="#872" id="872">872</a>
+<a href="#873" id="873">873</a>
+<a href="#874" id="874">874</a>
+<a href="#875" id="875">875</a>
+<a href="#876" id="876">876</a>
+<a href="#877" id="877">877</a>
 </pre><pre class="rust"><code><span class="doccomment">//! The internal representation of a book and infrastructure for loading it from
 //! disk and building it.
 //!
@@ -1056,21 +1073,26 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Run the entire build process for a particular [`Renderer`].
-    </span><span class="kw">pub fn </span>execute_build_process(<span class="kw-2">&amp;</span><span class="self">self</span>, renderer: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Renderer) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>preprocessed_book = <span class="self">self</span>.book.clone();
+    <span class="doccomment">/// Run preprocessors and return the final book.
+    </span><span class="kw">pub fn </span>preprocess_book(<span class="kw-2">&amp;</span><span class="self">self</span>, renderer: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Renderer) -&gt; <span class="prelude-ty">Result</span>&lt;(Book, PreprocessorContext)&gt; {
         <span class="kw">let </span>preprocess_ctx = PreprocessorContext::new(
             <span class="self">self</span>.root.clone(),
             <span class="self">self</span>.config.clone(),
             renderer.name().to_string(),
         );
-
+        <span class="kw">let </span><span class="kw-2">mut </span>preprocessed_book = <span class="self">self</span>.book.clone();
         <span class="kw">for </span>preprocessor <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.preprocessors {
             <span class="kw">if </span>preprocessor_should_run(<span class="kw-2">&amp;**</span>preprocessor, renderer, <span class="kw-2">&amp;</span><span class="self">self</span>.config) {
                 <span class="macro">debug!</span>(<span class="string">&quot;Running the {} preprocessor.&quot;</span>, preprocessor.name());
                 preprocessed_book = preprocessor.run(<span class="kw-2">&amp;</span>preprocess_ctx, preprocessed_book)<span class="question-mark">?</span>;
             }
         }
+        <span class="prelude-val">Ok</span>((preprocessed_book, preprocess_ctx))
+    }
+
+    <span class="doccomment">/// Run the entire build process for a particular [`Renderer`].
+    </span><span class="kw">pub fn </span>execute_build_process(<span class="kw-2">&amp;</span><span class="self">self</span>, renderer: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Renderer) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>(preprocessed_book, preprocess_ctx) = <span class="self">self</span>.preprocess_book(renderer)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>name = renderer.name();
         <span class="kw">let </span>build_dir = <span class="self">self</span>.build_dir_for(name);
@@ -1124,15 +1146,27 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>chapter_found = <span class="bool-val">false</span>;
 
-        <span class="comment">// FIXME: Is &quot;test&quot; the proper renderer name to use here?
-        </span><span class="kw">let </span>preprocess_context =
-            PreprocessorContext::new(<span class="self">self</span>.root.clone(), <span class="self">self</span>.config.clone(), <span class="string">&quot;test&quot;</span>.to_string());
+        <span class="kw">struct </span>TestRenderer;
+        <span class="kw">impl </span>Renderer <span class="kw">for </span>TestRenderer {
+            <span class="comment">// FIXME: Is &quot;test&quot; the proper renderer name to use here?
+            </span><span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+                <span class="string">&quot;test&quot;
+            </span>}
 
-        <span class="kw">let </span>book = LinkPreprocessor::new().run(<span class="kw-2">&amp;</span>preprocess_context, <span class="self">self</span>.book.clone())<span class="question-mark">?</span>;
-        <span class="comment">// Index Preprocessor is disabled so that chapter paths continue to point to the
-        // actual markdown files.
+            <span class="kw">fn </span>render(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span>RenderContext) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+                <span class="prelude-val">Ok</span>(())
+            }
+        }
 
-        </span><span class="kw">let </span><span class="kw-2">mut </span>failed = <span class="bool-val">false</span>;
+        <span class="comment">// Index Preprocessor is disabled so that chapter paths
+        // continue to point to the actual markdown files.
+        </span><span class="self">self</span>.preprocessors = determine_preprocessors(<span class="kw-2">&amp;</span><span class="self">self</span>.config)<span class="question-mark">?
+            </span>.into_iter()
+            .filter(|pre| pre.name() != IndexPreprocessor::NAME)
+            .collect();
+        <span class="kw">let </span>(book, <span class="kw">_</span>) = <span class="self">self</span>.preprocess_book(<span class="kw-2">&amp;</span>TestRenderer)<span class="question-mark">?</span>;
+
+        <span class="kw">let </span><span class="kw-2">mut </span>failed = <span class="bool-val">false</span>;
         <span class="kw">for </span>item <span class="kw">in </span>book.iter() {
             <span class="kw">if let </span>BookItem::Chapter(<span class="kw-2">ref </span>ch) = <span class="kw-2">*</span>item {
                 <span class="kw">let </span>chapter_path = <span class="kw">match </span>ch.path {

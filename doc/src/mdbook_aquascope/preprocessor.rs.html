@@ -195,6 +195,12 @@
 <a href="#195" id="195">195</a>
 <a href="#196" id="196">196</a>
 <a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Parser for Aquascope code blocks within Markdown.
 
 </span><span class="kw">use </span>std::{
@@ -377,13 +383,19 @@
     content: <span class="kw-2">&amp;</span>str,
   ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;(std::ops::Range&lt;usize&gt;, String)&gt;&gt; {
     <span class="kw">let </span>to_process = AquascopeBlock::parse_all(content);
-    <span class="kw">let </span>replacements = to_process
+    <span class="kw">let </span><span class="kw-2">mut </span>replacements = to_process
       .into_par_iter()
       .map(|(range, block)| {
         <span class="kw">let </span>html = <span class="self">self</span>.process_code(block)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>((range, html))
       })
       .collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>;
+
+    replacements.extend(
+      <span class="kw">crate</span>::permissions::parse_perms(content).collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>,
+    );
+
+    replacements.sort_by_key(|(range, <span class="kw">_</span>)| range.start);
 
     <span class="prelude-val">Ok</span>(replacements)
   }
