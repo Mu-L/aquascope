@@ -508,6 +508,68 @@
 <a href="#508" id="508">508</a>
 <a href="#509" id="509">509</a>
 <a href="#510" id="510">510</a>
+<a href="#511" id="511">511</a>
+<a href="#512" id="512">512</a>
+<a href="#513" id="513">513</a>
+<a href="#514" id="514">514</a>
+<a href="#515" id="515">515</a>
+<a href="#516" id="516">516</a>
+<a href="#517" id="517">517</a>
+<a href="#518" id="518">518</a>
+<a href="#519" id="519">519</a>
+<a href="#520" id="520">520</a>
+<a href="#521" id="521">521</a>
+<a href="#522" id="522">522</a>
+<a href="#523" id="523">523</a>
+<a href="#524" id="524">524</a>
+<a href="#525" id="525">525</a>
+<a href="#526" id="526">526</a>
+<a href="#527" id="527">527</a>
+<a href="#528" id="528">528</a>
+<a href="#529" id="529">529</a>
+<a href="#530" id="530">530</a>
+<a href="#531" id="531">531</a>
+<a href="#532" id="532">532</a>
+<a href="#533" id="533">533</a>
+<a href="#534" id="534">534</a>
+<a href="#535" id="535">535</a>
+<a href="#536" id="536">536</a>
+<a href="#537" id="537">537</a>
+<a href="#538" id="538">538</a>
+<a href="#539" id="539">539</a>
+<a href="#540" id="540">540</a>
+<a href="#541" id="541">541</a>
+<a href="#542" id="542">542</a>
+<a href="#543" id="543">543</a>
+<a href="#544" id="544">544</a>
+<a href="#545" id="545">545</a>
+<a href="#546" id="546">546</a>
+<a href="#547" id="547">547</a>
+<a href="#548" id="548">548</a>
+<a href="#549" id="549">549</a>
+<a href="#550" id="550">550</a>
+<a href="#551" id="551">551</a>
+<a href="#552" id="552">552</a>
+<a href="#553" id="553">553</a>
+<a href="#554" id="554">554</a>
+<a href="#555" id="555">555</a>
+<a href="#556" id="556">556</a>
+<a href="#557" id="557">557</a>
+<a href="#558" id="558">558</a>
+<a href="#559" id="559">559</a>
+<a href="#560" id="560">560</a>
+<a href="#561" id="561">561</a>
+<a href="#562" id="562">562</a>
+<a href="#563" id="563">563</a>
+<a href="#564" id="564">564</a>
+<a href="#565" id="565">565</a>
+<a href="#566" id="566">566</a>
+<a href="#567" id="567">567</a>
+<a href="#568" id="568">568</a>
+<a href="#569" id="569">569</a>
+<a href="#570" id="570">570</a>
+<a href="#571" id="571">571</a>
+<a href="#572" id="572">572</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Core contextual analysis for Aquascope.
 
 </span><span class="kw">pub mod </span>boundaries;
@@ -542,7 +604,7 @@
 <span class="kw">use </span>rustc_data_structures::fx::FxHashMap;
 <span class="kw">use </span>rustc_hir::BodyId;
 <span class="kw">use </span>rustc_middle::ty::TyCtxt;
-<span class="kw">use </span>rustc_span::Span;
+<span class="kw">use </span>rustc_span::{BytePos, Span};
 <span class="kw">use </span>serde::Serialize;
 <span class="kw">pub use </span>stepper::compute_permission_steps;
 <span class="kw">use </span>stepper::PermissionsLineDisplay;
@@ -653,6 +715,85 @@
   </span>}
 }
 
+<span class="kw">pub trait </span>Bounded {
+  <span class="kw">type </span>Bound: Ord + Eq;
+  <span class="kw">fn </span>lo(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Bound;
+  <span class="kw">fn </span>hi(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Bound;
+  <span class="kw">fn </span>to(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self</span>;
+  <span class="kw">fn </span>overlaps(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="self">Self</span>) -&gt; bool;
+}
+
+<span class="kw">impl </span>Bounded <span class="kw">for </span>Span {
+  <span class="kw">type </span>Bound = BytePos;
+  <span class="kw">fn </span>lo(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Bound {
+    Span::lo(<span class="kw-2">*</span><span class="self">self</span>)
+  }
+
+  <span class="kw">fn </span>hi(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Bound {
+    Span::hi(<span class="kw-2">*</span><span class="self">self</span>)
+  }
+
+  <span class="kw">fn </span>overlaps(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="self">Self</span>) -&gt; bool {
+    Span::overlaps(<span class="kw-2">*</span><span class="self">self</span>, other)
+  }
+
+  <span class="kw">fn </span>to(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+    Span::to(<span class="kw-2">*</span><span class="self">self</span>, other)
+  }
+}
+
+<span class="kw">impl </span>Bounded <span class="kw">for </span>Range {
+  <span class="kw">type </span>Bound = usize;
+  <span class="kw">fn </span>lo(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Bound {
+    <span class="self">self</span>.char_start
+  }
+
+  <span class="kw">fn </span>hi(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Bound {
+    <span class="self">self</span>.char_end
+  }
+
+  <span class="kw">fn </span>overlaps(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="self">Self</span>) -&gt; bool {
+    !(<span class="self">self</span>.char_end &lt; other.char_start || other.char_end &lt; <span class="self">self</span>.char_start)
+  }
+
+  <span class="kw">fn </span>to(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+    Range {
+      char_start: std::cmp::min(<span class="self">self</span>.char_start, other.char_start),
+      char_end: std::cmp::max(<span class="self">self</span>.char_end, other.char_end),
+      ..<span class="kw-2">*</span><span class="self">self
+    </span>}
+  }
+}
+
+<span class="kw">pub fn </span>smooth_elements&lt;T&gt;(<span class="kw-2">mut </span>elements: Vec&lt;T&gt;) -&gt; Vec&lt;T&gt;
+<span class="kw">where
+  </span>T: Bounded + std::marker::Copy,
+{
+  <span class="kw">if </span>elements.is_empty() {
+    <span class="kw">return </span>elements;
+  }
+
+  <span class="comment">// First, sort the elements by starting value.
+  </span>elements.sort_by_key(|a| a.lo());
+
+  <span class="kw">let </span><span class="kw-2">mut </span>smoothed_elements = Vec::default();
+  <span class="kw">let </span><span class="kw-2">mut </span>acc = <span class="kw-2">*</span>elements.first().unwrap();
+
+  <span class="kw">for </span>elem <span class="kw">in </span><span class="kw-2">&amp;</span>elements[<span class="number">1 </span>..] {
+    <span class="kw">if </span>acc.overlaps(<span class="kw-2">*</span>elem) || acc.hi() == elem.lo() {
+      acc = acc.to(<span class="kw-2">*</span>elem);
+    } <span class="kw">else </span>{
+      smoothed_elements.push(acc);
+      acc = <span class="kw-2">*</span>elem;
+    }
+  }
+
+  <span class="comment">// don&#39;t forget the last accumulator
+  </span>smoothed_elements.push(acc);
+
+  smoothed_elements
+}
+
 <span class="kw">pub fn </span>compute_permissions&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;tcx</span>&gt;(
   tcx: TyCtxt&lt;<span class="lifetime">&#39;tcx</span>&gt;,
   body_id: BodyId,
@@ -696,6 +837,7 @@
 <span class="attr">#[derive(Clone, Debug, Serialize, TS)]
 #[ts(export)]
 </span><span class="kw">pub struct </span>AnalysisOutput {
+  <span class="kw">pub </span>body_range: Range,
   <span class="kw">pub </span>boundaries: Vec&lt;PermissionsBoundary&gt;,
   <span class="kw">pub </span>steps: Vec&lt;PermissionsLineDisplay&gt;,
   <span class="kw">pub </span>loan_points: LoanPoints,
@@ -705,27 +847,32 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;tcx</span>: <span class="lifetime">&#39;a</span>&gt; AquascopeAnalysis&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;tcx</span>&gt; {
-  <span class="kw">pub fn </span>run(
-    tcx: TyCtxt&lt;<span class="lifetime">&#39;tcx</span>&gt;,
-    body_id: BodyId,
-  ) -&gt; AquascopeResult&lt;AnalysisOutput&gt; {
+  <span class="kw">pub fn </span>new(tcx: TyCtxt&lt;<span class="lifetime">&#39;tcx</span>&gt;, body_id: BodyId) -&gt; <span class="self">Self </span>{
     <span class="kw">let </span>def_id = tcx.hir().body_owner_def_id(body_id);
     <span class="kw">let </span>bwf = get_body_with_borrowck_facts(tcx, def_id);
     <span class="kw">let </span>permissions = compute_permissions(tcx, body_id, bwf);
     <span class="kw">let </span>body = <span class="kw-2">&amp;</span>permissions.body_with_facts.body;
 
+    <span class="kw">let </span>ir_mapper = IRMapper::new(tcx, body, GatherMode::IgnoreCleanup);
+    AquascopeAnalysis {
+      permissions,
+      ir_mapper,
+    }
+  }
+
+  <span class="kw">pub fn </span>run(
+    tcx: TyCtxt&lt;<span class="lifetime">&#39;tcx</span>&gt;,
+    body_id: BodyId,
+  ) -&gt; AquascopeResult&lt;AnalysisOutput&gt; {
+    <span class="kw">let </span>analysis_ctxt = <span class="self">Self</span>::new(tcx, body_id);
+    <span class="kw">let </span>body = <span class="kw-2">&amp;</span>analysis_ctxt.permissions.body_with_facts.body;
+
     <span class="kw">if </span>body.tainted_by_errors.is_some() {
       <span class="kw">let </span>span = body.span;
-      <span class="kw">let </span>source_map = permissions.tcx.sess.source_map();
+      <span class="kw">let </span>source_map = tcx.sess.source_map();
       <span class="kw">let </span>range = CharRange::from_span(span, source_map).unwrap().into();
       <span class="kw">return </span><span class="prelude-val">Err</span>(AquascopeError::BuildError { range });
     }
-
-    <span class="kw">let </span>ir_mapper = IRMapper::new(tcx, body, GatherMode::IgnoreCleanup);
-    <span class="kw">let </span>analysis_ctxt = AquascopeAnalysis {
-      permissions,
-      ir_mapper,
-    };
 
     <span class="kw">crate</span>::analysis::permissions::utils::dump_mir_debug(
       <span class="kw-2">&amp;</span>analysis_ctxt.permissions,
@@ -737,7 +884,10 @@
     <span class="kw">let </span>(loan_points, loan_regions) = analysis_ctxt.construct_loan_info();
     <span class="kw">let </span>(move_points, move_regions) = analysis_ctxt.construct_move_info();
 
+    <span class="kw">let </span>body_range = analysis_ctxt.span_to_range(body.span);
+
     <span class="prelude-val">Ok</span>(AnalysisOutput {
+      body_range,
       boundaries,
       steps,
       loan_points,
@@ -887,7 +1037,7 @@
           .into_iter()
           .filter_map(|span| (lo &lt;= span.lo()).then_some(span))
           .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
-        <span class="kw">let </span>smoothed = <span class="self">Self</span>::smooth_spans(points);
+        <span class="kw">let </span>smoothed = smooth_elements(points);
         <span class="kw">let </span>refined_ranges = smoothed
           .into_iter()
           .map(|span| <span class="self">self</span>.span_to_range(span))
@@ -963,7 +1113,7 @@
       })
       .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-    <span class="self">Self</span>::smooth_spans(spans)
+    smooth_elements(spans)
   }
 
   <span class="kw">fn </span>points_to_spans(
@@ -990,32 +1140,6 @@
     });
 
     spans
-  }
-
-  <span class="kw">fn </span>smooth_spans(<span class="kw-2">mut </span>spans: Vec&lt;Span&gt;) -&gt; Vec&lt;Span&gt; {
-    <span class="kw">if </span>spans.is_empty() {
-      <span class="kw">return </span>spans;
-    }
-
-    <span class="comment">// First, sort the spans by starting value.
-    </span>spans.sort_by_key(|a| a.lo());
-
-    <span class="kw">let </span><span class="kw-2">mut </span>smoothed_spans = Vec::default();
-    <span class="kw">let </span><span class="kw-2">mut </span>acc = <span class="kw-2">*</span>spans.first().unwrap();
-
-    <span class="kw">for </span>span <span class="kw">in </span><span class="kw-2">&amp;</span>spans[<span class="number">1 </span>..] {
-      <span class="kw">if </span>acc.overlaps(<span class="kw-2">*</span>span) || acc.hi() == span.lo() {
-        acc = acc.to(<span class="kw-2">*</span>span);
-      } <span class="kw">else </span>{
-        smoothed_spans.push(acc);
-        acc = <span class="kw-2">*</span>span;
-      }
-    }
-
-    <span class="comment">// don&#39;t forget the last accumulator
-    </span>smoothed_spans.push(acc);
-
-    smoothed_spans
   }
 }
 </code></pre></div>

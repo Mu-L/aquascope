@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/libffi-3.1.0/src/high/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-389f8b4a37bc03c9.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-046227e470cd3629.css"><link rel="stylesheet" disabled href="../../../static.files/dark-800f2ee593c8e6f7.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-9edae3c387f5a5b3.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../libffi/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/libffi-3.2.0/src/high/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-389f8b4a37bc03c9.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../static.files/light-046227e470cd3629.css"><link rel="stylesheet" disabled href="../../../static.files/dark-800f2ee593c8e6f7.css"><link rel="stylesheet" disabled href="../../../static.files/ayu-9edae3c387f5a5b3.css"><script id="default-settings" ></script><script src="../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../libffi/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -565,6 +565,12 @@
 <a href="#565" id="565">565</a>
 <a href="#566" id="566">566</a>
 <a href="#567" id="567">567</a>
+<a href="#568" id="568">568</a>
+<a href="#569" id="569">569</a>
+<a href="#570" id="570">570</a>
+<a href="#571" id="571">571</a>
+<a href="#572" id="572">572</a>
+<a href="#573" id="573">573</a>
 </pre><pre class="rust"><code><span class="doccomment">//! High layer providing automatic marshalling of Rust closures
 //! as C function pointers.
 //!
@@ -766,7 +772,7 @@
                 }
             }
 
-            <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, $( <span class="macro-nonterminal">$T</span>, )* R&gt; <span class="macro-nonterminal">$closure</span>&lt;<span class="lifetime">&#39;a</span>, $( <span class="macro-nonterminal">$T</span>, )* R&gt; {
+            <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, $( <span class="macro-nonterminal">$T</span>, )* R: CType&gt; <span class="macro-nonterminal">$closure</span>&lt;<span class="lifetime">&#39;a</span>, $( <span class="macro-nonterminal">$T</span>, )* R&gt; {
                 <span class="doccomment">/// Gets the C code pointer that is used to invoke the
                 /// closure.
                 </span><span class="kw">pub fn </span>code_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; &amp; <span class="macro-nonterminal">$fnptr </span>&lt;<span class="lifetime">&#39;a</span>, $( <span class="macro-nonterminal">$T</span>, )* R&gt; {
@@ -788,12 +794,14 @@
                 <span class="doccomment">/// Constructs a typed closure callable from C from a CIF
                 /// describing the calling convention for the resulting
                 /// function, a callback for the function to call, and
-                /// userdata to pass to the callback.
+                /// userdata to pass to the callback.  Note that the return
+                /// type of the callback must follow the libffi implicit
+                /// extension rules.
                 </span><span class="kw">pub fn </span>from_parts&lt;U&gt;(cif: <span class="macro-nonterminal">$cif</span>&lt;$( <span class="macro-nonterminal">$T</span>, )* R&gt;,
-                                     callback: <span class="macro-nonterminal">$callback</span>&lt;U, $( <span class="macro-nonterminal">$T</span>, )* R&gt;,
+                                     callback: <span class="macro-nonterminal">$callback</span>&lt;U, $( <span class="macro-nonterminal">$T</span>, )* R::RetType&gt;,
                                      userdata: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>U) -&gt; <span class="self">Self
                 </span>{
-                    <span class="kw">let </span>callback: middle::Callback&lt;U, R&gt;
+                    <span class="kw">let </span>callback: middle::Callback&lt;U, R::RetType&gt;
                         = <span class="kw">unsafe </span>{ mem::transmute(callback) };
                     <span class="kw">let </span>closure
                         = middle::Closure::new(cif.untyped,
@@ -806,7 +814,7 @@
                 }
             }
 
-            <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, $( <span class="macro-nonterminal">$T</span>: Copy, )* R&gt; <span class="macro-nonterminal">$closure</span>&lt;<span class="lifetime">&#39;a</span>, $( <span class="macro-nonterminal">$T</span>, )* R&gt; {
+            <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, $( <span class="macro-nonterminal">$T</span>: Copy, )* R: CType&gt; <span class="macro-nonterminal">$closure</span>&lt;<span class="lifetime">&#39;a</span>, $( <span class="macro-nonterminal">$T</span>, )* R&gt; {
                 <span class="doccomment">/// Constructs a typed closure callable from C from a CIF
                 /// describing the calling convention for the resulting
                 /// function and the Rust closure to call.
@@ -822,7 +830,7 @@
                 <span class="attr">#[allow(non_snake_case)]
                 </span><span class="kw">extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>static_callback&lt;Callback&gt;
                     (_cif:     <span class="kw-2">&amp;</span>low::ffi_cif,
-                     result:   <span class="kw-2">&amp;mut </span>R,
+                     result:   <span class="kw-2">&amp;mut </span>R::RetType,
                      <span class="kw-2">&amp;</span>($( <span class="kw-2">&amp;</span><span class="macro-nonterminal">$T</span>, )<span class="kw-2">*</span>):
                                <span class="kw-2">&amp;</span>($( <span class="kw-2">&amp;</span><span class="macro-nonterminal">$T</span>, )<span class="kw-2">*</span>),
                      userdata: <span class="kw-2">&amp;</span>Callback)
@@ -830,7 +838,7 @@
                 </span>{
                     <span class="macro">abort_on_panic!</span>(<span class="string">&quot;Cannot panic inside FFI callback&quot;</span>, {
                         <span class="kw">unsafe </span>{
-                            ptr::write(result, userdata($( <span class="macro-nonterminal">$T</span>, )<span class="kw-2">*</span>));
+                            ptr::write(result, userdata($( <span class="macro-nonterminal">$T</span>, )<span class="kw-2">*</span>).into());
                         }
                     });
                 }
@@ -862,7 +870,7 @@
                 }
             }
 
-            <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, $( <span class="macro-nonterminal">$T</span>, )* R&gt; <span class="macro-nonterminal">$closure_mut</span>&lt;<span class="lifetime">&#39;a</span>, $( <span class="macro-nonterminal">$T</span>, )* R&gt; {
+            <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, $( <span class="macro-nonterminal">$T</span>, )* R: CType&gt; <span class="macro-nonterminal">$closure_mut</span>&lt;<span class="lifetime">&#39;a</span>, $( <span class="macro-nonterminal">$T</span>, )* R&gt; {
                 <span class="doccomment">/// Gets the C code pointer that is used to invoke the
                 /// closure.
                 </span><span class="kw">pub fn </span>code_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; &amp; <span class="macro-nonterminal">$fnptr </span>&lt;<span class="lifetime">&#39;a</span>, $( <span class="macro-nonterminal">$T</span>, )* R&gt; {
@@ -874,12 +882,14 @@
                 <span class="doccomment">/// Constructs a typed closure callable from C from a CIF
                 /// describing the calling convention for the resulting
                 /// function, a callback for the function to call, and
-                /// userdata to pass to the callback.
+                /// userdata to pass to the callback.  Note that the return
+                /// type of the callback must follow the libffi implicit
+                /// extension rules.
                 </span><span class="kw">pub fn </span>from_parts&lt;U&gt;(cif:      <span class="macro-nonterminal">$cif</span>&lt;$( <span class="macro-nonterminal">$T</span>, )* R&gt;,
-                                     callback: <span class="macro-nonterminal">$callback_mut</span>&lt;U, $( <span class="macro-nonterminal">$T</span>, )* R&gt;,
+                                     callback: <span class="macro-nonterminal">$callback_mut</span>&lt;U, $( <span class="macro-nonterminal">$T</span>, )* R::RetType&gt;,
                                      userdata: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>U) -&gt; <span class="self">Self
                 </span>{
-                    <span class="kw">let </span>callback: middle::CallbackMut&lt;U, R&gt;
+                    <span class="kw">let </span>callback: middle::CallbackMut&lt;U, R::RetType&gt;
                         = <span class="kw">unsafe </span>{ mem::transmute(callback) };
                     <span class="kw">let </span>closure
                         = middle::Closure::new_mut(cif.untyped,
@@ -892,7 +902,7 @@
                 }
             }
 
-            <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, $( <span class="macro-nonterminal">$T</span>: Copy, )* R&gt; <span class="macro-nonterminal">$closure_mut</span>&lt;<span class="lifetime">&#39;a</span>, $( <span class="macro-nonterminal">$T</span>, )* R&gt; {
+            <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, $( <span class="macro-nonterminal">$T</span>: Copy, )* R: CType&gt; <span class="macro-nonterminal">$closure_mut</span>&lt;<span class="lifetime">&#39;a</span>, $( <span class="macro-nonterminal">$T</span>, )* R&gt; {
                 <span class="doccomment">/// Constructs a typed closure callable from C from a CIF
                 /// describing the calling convention for the resulting
                 /// function and the Rust closure to call.
@@ -909,7 +919,7 @@
                 <span class="attr">#[allow(non_snake_case)]
                 </span><span class="kw">extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>static_callback&lt;Callback&gt;
                     (_cif:     <span class="kw-2">&amp;</span>low::ffi_cif,
-                     result:   <span class="kw-2">&amp;mut </span>R,
+                     result:   <span class="kw-2">&amp;mut </span>R::RetType,
                      <span class="kw-2">&amp;</span>($( <span class="kw-2">&amp;</span><span class="macro-nonterminal">$T</span>, )<span class="kw-2">*</span>):
                                <span class="kw-2">&amp;</span>($( <span class="kw-2">&amp;</span><span class="macro-nonterminal">$T</span>, )<span class="kw-2">*</span>),
                      userdata: <span class="kw-2">&amp;mut </span>Callback)
@@ -917,7 +927,7 @@
                 </span>{
                     <span class="macro">abort_on_panic!</span>(<span class="string">&quot;Cannot panic inside FFI callback&quot;</span>, {
                         <span class="kw">unsafe </span>{
-                            ptr::write(result, userdata($( <span class="macro-nonterminal">$T</span>, )<span class="kw-2">*</span>));
+                            ptr::write(result, userdata($( <span class="macro-nonterminal">$T</span>, )<span class="kw-2">*</span>).into());
                         }
                     });
                 }
@@ -944,7 +954,7 @@
                 }
             }
 
-            <span class="kw">impl</span>&lt;$( <span class="macro-nonterminal">$T</span>: Copy, )* R&gt; <span class="macro-nonterminal">$closure_once</span>&lt;$( <span class="macro-nonterminal">$T</span>, )* R&gt; {
+            <span class="kw">impl</span>&lt;$( <span class="macro-nonterminal">$T</span>: Copy, )* R: CType&gt; <span class="macro-nonterminal">$closure_once</span>&lt;$( <span class="macro-nonterminal">$T</span>, )* R&gt; {
                 <span class="doccomment">/// Constructs a one-shot closure callable from C from a CIF
                 /// describing the calling convention for the resulting
                 /// function and the Rust closure to call.
@@ -960,7 +970,7 @@
                 <span class="attr">#[allow(non_snake_case)]
                 </span><span class="kw">extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>static_callback&lt;Callback&gt;
                     (_cif:     <span class="kw-2">&amp;</span>low::ffi_cif,
-                     result:   <span class="kw-2">&amp;mut </span>R,
+                     result:   <span class="kw-2">&amp;mut </span>R::RetType,
                      <span class="kw-2">&amp;</span>($( <span class="kw-2">&amp;</span><span class="macro-nonterminal">$T</span>, )<span class="kw-2">*</span>):
                                <span class="kw-2">&amp;</span>($( <span class="kw-2">&amp;</span><span class="macro-nonterminal">$T</span>, )<span class="kw-2">*</span>),
                      userdata: <span class="kw-2">&amp;mut </span><span class="prelude-ty">Option</span>&lt;Callback&gt;)
@@ -969,7 +979,7 @@
                     <span class="kw">if let </span><span class="prelude-val">Some</span>(userdata) = userdata.take() {
                         <span class="macro">abort_on_panic!</span>(<span class="string">&quot;Cannot panic inside FFI callback&quot;</span>, {
                             <span class="kw">unsafe </span>{
-                                ptr::write(result, userdata($( <span class="macro-nonterminal">$T</span>, )<span class="kw-2">*</span>));
+                                ptr::write(result, userdata($( <span class="macro-nonterminal">$T</span>, )<span class="kw-2">*</span>).into());
                             }
                         });
                     } <span class="kw">else </span>{
@@ -981,7 +991,7 @@
                 }
             }
 
-            <span class="kw">impl</span>&lt;$( <span class="macro-nonterminal">$T</span>, )* R&gt; <span class="macro-nonterminal">$closure_once</span>&lt;$( <span class="macro-nonterminal">$T</span>, )* R&gt; {
+            <span class="kw">impl</span>&lt;$( <span class="macro-nonterminal">$T</span>, )* R: CType&gt; <span class="macro-nonterminal">$closure_once</span>&lt;$( <span class="macro-nonterminal">$T</span>, )* R&gt; {
                 <span class="doccomment">/// Gets the C code pointer that is used to invoke the
                 /// closure.
                 </span><span class="kw">pub fn </span>code_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; &amp; <span class="macro-nonterminal">$fnptr </span>&lt;<span class="lifetime">&#39;_</span>, $( <span class="macro-nonterminal">$T</span>, )* R&gt; {
@@ -993,14 +1003,16 @@
                 <span class="doccomment">/// Constructs a one-shot closure callable from C from a CIF
                 /// describing the calling convention for the resulting
                 /// function, a callback for the function to call, and
-                /// userdata to pass to the callback.
+                /// userdata to pass to the callback.  Note that the return
+                /// type of the callback must follow the libffi implicit
+                /// extension rules.
                 </span><span class="kw">pub fn </span>from_parts&lt;U: Any&gt;(
                     cif:      <span class="macro-nonterminal">$cif</span>&lt;$( <span class="macro-nonterminal">$T</span>, )* R&gt;,
-                    callback: <span class="macro-nonterminal">$callback_once</span>&lt;U, $( <span class="macro-nonterminal">$T</span>, )* R&gt;,
+                    callback: <span class="macro-nonterminal">$callback_once</span>&lt;U, $( <span class="macro-nonterminal">$T</span>, )* R::RetType&gt;,
                     userdata: U)
                     -&gt; <span class="self">Self
                 </span>{
-                    <span class="kw">let </span>callback: middle::CallbackOnce&lt;U, R&gt;
+                    <span class="kw">let </span>callback: middle::CallbackOnce&lt;U, R::RetType&gt;
                         = <span class="kw">unsafe </span>{ mem::transmute(callback) };
                     <span class="kw">let </span>closure
                         = middle::ClosureOnce::new(cif.untyped,

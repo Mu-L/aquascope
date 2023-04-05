@@ -532,6 +532,50 @@
 <a href="#532" id="532">532</a>
 <a href="#533" id="533">533</a>
 <a href="#534" id="534">534</a>
+<a href="#535" id="535">535</a>
+<a href="#536" id="536">536</a>
+<a href="#537" id="537">537</a>
+<a href="#538" id="538">538</a>
+<a href="#539" id="539">539</a>
+<a href="#540" id="540">540</a>
+<a href="#541" id="541">541</a>
+<a href="#542" id="542">542</a>
+<a href="#543" id="543">543</a>
+<a href="#544" id="544">544</a>
+<a href="#545" id="545">545</a>
+<a href="#546" id="546">546</a>
+<a href="#547" id="547">547</a>
+<a href="#548" id="548">548</a>
+<a href="#549" id="549">549</a>
+<a href="#550" id="550">550</a>
+<a href="#551" id="551">551</a>
+<a href="#552" id="552">552</a>
+<a href="#553" id="553">553</a>
+<a href="#554" id="554">554</a>
+<a href="#555" id="555">555</a>
+<a href="#556" id="556">556</a>
+<a href="#557" id="557">557</a>
+<a href="#558" id="558">558</a>
+<a href="#559" id="559">559</a>
+<a href="#560" id="560">560</a>
+<a href="#561" id="561">561</a>
+<a href="#562" id="562">562</a>
+<a href="#563" id="563">563</a>
+<a href="#564" id="564">564</a>
+<a href="#565" id="565">565</a>
+<a href="#566" id="566">566</a>
+<a href="#567" id="567">567</a>
+<a href="#568" id="568">568</a>
+<a href="#569" id="569">569</a>
+<a href="#570" id="570">570</a>
+<a href="#571" id="571">571</a>
+<a href="#572" id="572">572</a>
+<a href="#573" id="573">573</a>
+<a href="#574" id="574">574</a>
+<a href="#575" id="575">575</a>
+<a href="#576" id="576">576</a>
+<a href="#577" id="577">577</a>
+<a href="#578" id="578">578</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Core datalog analysis for Aquascope.
 //!
 //! The permissions analysis directly translates output facts
@@ -557,9 +601,12 @@
 
 <span class="kw">use super</span>::{
   context::PermissionsCtxt,
+  flow,
   places_conflict::{<span class="self">self</span>, AccessDepth, PlaceConflictBias},
-  AquascopeFacts, Loan, Move, Path, Point,
+  AquascopeFacts, Loan, Move, Path, Point, ENABLE_FLOW_DEFAULT,
+  ENABLE_FLOW_PERMISSIONS,
 };
+<span class="kw">use </span><span class="kw">crate</span>::mir::utils::BodyExt;
 
 <span class="doccomment">/// Aquascope permissions facts output.
 </span><span class="attr">#[derive(Debug)]
@@ -663,7 +710,28 @@
   ///   move_conflicts_with(Move, Path).
   </span><span class="kw">pub</span>(<span class="kw">crate</span>) move_refined: HashMap&lt;T::Point, HashMap&lt;T::Path, Move&gt;&gt;,
 
-  <span class="kw">pub</span>(<span class="kw">crate</span>) move_live_at: HashMap&lt;T::Point, Vec&lt;Move&gt;&gt;,
+  <span class="doccomment">/// The liveness of a [`Move`] on [`Point`] entry.
+  ///
+  /// ```text
+  /// .decl move_live_at(Move, Point)
+  ///
+  /// move_live_at(Move, Point) :-
+  ///   move_out(Move, Point).
+  ///
+  /// move_live_at(Move, Point1) :-
+  ///   move_live_at(Move, Point0),
+  ///   cfg_edge(Point0, Point1),
+  ///   move_conflicts_with(Move, Path0),
+  ///   !conflicted_assign_at_base(Path0, Point).
+  ///
+  /// .decl conflicted_assign_at_base(Path0, Point)
+  ///
+  /// conflicted_assign_at_base(Path0, Point) :-
+  ///   path_assigned_at_base(Path1, Point),
+  ///   places_conflict(Path0, Path1),
+  /// ```
+  ///
+  </span><span class="kw">pub</span>(<span class="kw">crate</span>) move_live_at: HashMap&lt;T::Point, Vec&lt;Move&gt;&gt;,
 }
 
 <span class="kw">impl </span>Default <span class="kw">for </span>Output&lt;AquascopeFacts&gt; {
@@ -681,8 +749,8 @@
 }
 
 <span class="doccomment">/// Populate the [`Output`] facts in the current [`PermissionsCtxt`].
-</span><span class="comment">// TODO(gavinleroy) lots of data is kept around below for clarity,
-// but this could definitely be optimized.
+</span><span class="comment">// TODO(gavinleroy) lots of data is kept around below for clarity, but
+// this could definitely be optimized (for performance and memory consumption).
 </span><span class="attr">#[allow(clippy::similar_names)]
 </span><span class="kw">pub fn </span>derive_permission_facts(ctxt: <span class="kw-2">&amp;mut </span>PermissionsCtxt) {
   <span class="kw">let </span>def_id = ctxt.tcx.hir().body_owner_def_id(ctxt.body_id);
@@ -693,15 +761,7 @@
   // 1. Internal to a local declaration.
   // 2. A path considered moveable by rustc.
   </span><span class="kw">let </span>places = body
-    .local_decls
-    .indices()
-    .flat_map(|local| {
-      Place::from_local(local, tcx).interior_paths(
-        tcx,
-        body,
-        def_id.to_def_id(),
-      )
-    })
+    .all_places(tcx, def_id.to_def_id())
     .chain(ctxt.move_data.move_paths.iter().map(|v| v.place))
     .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
@@ -788,7 +848,6 @@
   // Paths that are partially moved can not have R/O permissions,
   // thus, if a child path is uninitialized (moved or non-initialized),
   // then the parent must also be uninitialized.
-
   </span><span class="kw">let </span><span class="kw-2">mut </span>iteration = Iteration::new();
 
   <span class="kw">let </span>path_maybe_uninitialized_on_entry =
@@ -813,22 +872,34 @@
     |<span class="kw-2">&amp;</span>_point1, <span class="kw-2">&amp;</span>path, <span class="kw-2">&amp;</span>point2| (path, point2),
   ));
 
-  <span class="comment">// FIXME: a lot of these do repeat work. You could rely on datafrog more.
-  </span><span class="kw">while </span>iteration.changed() {
-    <span class="comment">// TODO: write datalog rule
+  <span class="kw">while </span>iteration.changed() {
+    <span class="comment">// move_live_at(Move, Point1) :-
+    //   move_live_at(Move, Point0),
+    //   cfg_edge(Point0, Point1),
+    //   move_conflicts_with(Move, Path0),
+    //   !conflicted_assign_at_base(Path0, Point).
     </span>move_live_at.from_leapjoin(
       <span class="kw-2">&amp;</span>move_live_at,
       (
         cfg_edge.extend_with(|<span class="kw-2">&amp;</span>(_path, point1)| point1),
         ValueFilter::from(|<span class="kw-2">&amp;</span>(movep, _point1), <span class="kw-2">&amp;</span>point2| {
           <span class="kw">let </span>mpath = ctxt.move_to_moveable_path(movep);
-          !ctxt.polonius_input_facts.path_assigned_at_base.iter().any(
+          <span class="kw">let </span>mp = ctxt.moveable_path_to_path(mpath);
+          <span class="kw">let </span>place2 = ctxt.path_to_place(mp);
+
+          <span class="comment">// TODO: we can pull this out into its own rule. I&#39;m
+          //       hesitant to pre-compute everything over the
+          //       entire domain because I&#39;m not sure it&#39;s worth
+          //       the memory footprint.
+          //
+          // conflicted_assign_at_base(Path0, Point) :-
+          //   path_assigned_at_base(Path1, Point),
+          //   places_conflict(Path0, Path1),
+          </span>!ctxt.polonius_input_facts.path_assigned_at_base.iter().any(
             |<span class="kw-2">&amp;</span>(assigned_to, p)| {
               p == point2 &amp;&amp; {
-                <span class="kw">let </span>pp = ctxt.moveable_path_to_path(assigned_to);
-                <span class="kw">let </span>place1 = ctxt.path_to_place(pp);
-                <span class="kw">let </span>pp = ctxt.moveable_path_to_path(mpath);
-                <span class="kw">let </span>place2 = ctxt.path_to_place(pp);
+                <span class="kw">let </span>mp_assigned_to = ctxt.moveable_path_to_path(assigned_to);
+                <span class="kw">let </span>place1 = ctxt.path_to_place(mp_assigned_to);
                 places_conflict::places_conflict(
                   tcx,
                   body,
@@ -858,14 +929,14 @@
     path_maybe_uninitialized_on_entry.complete();
   <span class="kw">let </span>move_live_at = move_live_at.complete();
 
-  <span class="comment">// We need to shift the move liveness by one in the MIR.
+  <span class="comment">// NOTE: We need to shift the move liveness by one in the MIR. Move
+  //       liveness is defined as a move being live *on point entry*,
+  //       but it was computed on point exit.
   </span><span class="kw">let </span>move_live_at: Relation&lt;(Move, Point)&gt; = Relation::from_leapjoin(
     <span class="kw-2">&amp;</span>move_live_at,
     cfg_edge.extend_with(|<span class="kw-2">&amp;</span>(_movep, point1)| point1),
     |<span class="kw-2">&amp;</span>(movep, _point1), <span class="kw-2">&amp;</span>point2| (movep, point2),
   );
-
-  <span class="kw">let </span>loan_to_borrow = |l: Loan| <span class="kw-2">&amp;</span>ctxt.borrow_set[l];
 
   <span class="kw">let </span>is_never_write = |path: Path| {
     <span class="kw">let </span>place = <span class="kw-2">&amp;</span>ctxt.path_to_place(path);
@@ -877,12 +948,19 @@
           <span class="macro">matches!</span>(elem, ProjectionElem::Deref).then_some(prefix)
         })
         .any(|prefix| {
-          <span class="kw">let </span>ty = prefix.ty(<span class="kw-2">&amp;</span>body.local_decls, tcx).ty;
-          <span class="kw">match </span>ty.ref_mutability() {
-            <span class="prelude-val">Some</span>(mutability) =&gt; mutability == Mutability::Not,
-            <span class="comment">// TODO: raw pointers, assume that they are always mutable
-            </span><span class="prelude-val">None </span>=&gt; <span class="bool-val">false</span>,
+          <span class="comment">// For a given path `*x` we could be looking at the prefix of
+          // `x`. This could be a reference, in which case we simply check
+          // the mutability of the type.
+          </span><span class="kw">let </span>ty = prefix.ty(<span class="kw-2">&amp;</span>body.local_decls, tcx).ty;
+          <span class="kw">if let </span><span class="prelude-val">Some</span>(mutability) = ty.ref_mutability() {
+            <span class="kw">return </span>mutability == Mutability::Not;
           }
+
+          <span class="comment">// In the above example of `*x`, example `x` could also be a
+          // `Box`, or for a different base path an array. These cases
+          // would require us to check the mutability binding of the local.
+          </span><span class="kw">let </span>local_place = Place::from_local(prefix.local, tcx);
+          ctxt.is_declared_readonly(<span class="kw-2">&amp;</span>local_place)
         })
     }
   };
@@ -891,7 +969,7 @@
   </span><span class="kw">let </span>loan_conflicts_with: Relation&lt;(Loan, Path)&gt; = Relation::from_iter(
     ctxt.polonius_input_facts.loan_issued_at.iter().flat_map(
       |(_origin, loan, _point)| {
-        <span class="kw">let </span>borrow = loan_to_borrow(<span class="kw-2">*</span>loan);
+        <span class="kw">let </span>borrow = ctxt.loan_to_borrow(<span class="kw-2">*</span>loan);
         places.iter().filter_map(|place| {
           <span class="kw">super</span>::places_conflict::borrow_conflicts_with_place(
             tcx,
@@ -1034,6 +1112,11 @@
   <span class="kw">let </span>def_id = def_id.to_def_id();
   <span class="kw">let </span>param_env = tcx.param_env_reveal_all_normalized(def_id);
 
+  <span class="comment">// This should always be true for the current analysis of aquascope
+  </span><span class="kw">let </span>locals_are_invalidated_at_exit = def_id.as_local().map_or(<span class="bool-val">false</span>, |did| {
+    tcx.hir().body_owner_kind(did).is_fn_or_closure()
+  });
+
   <span class="kw">let </span><span class="kw-2">mut </span>ctxt = PermissionsCtxt {
     tcx,
     permissions_output: Output::default(),
@@ -1044,10 +1127,12 @@
     body_with_facts,
     borrow_set,
     move_data,
+    locals_are_invalidated_at_exit,
     param_env,
     loan_regions: <span class="prelude-val">None</span>,
     place_data: IndexVec::new(),
     rev_lookup: HashMap::default(),
+    region_flows: <span class="prelude-val">None</span>,
   };
 
   derive_permission_facts(<span class="kw-2">&amp;mut </span>ctxt);
@@ -1060,9 +1145,12 @@
     timer.elapsed()
   );
 
-  ctxt.borrow_set.location_map.iter().for_each(|(_k, bd)| {
-    <span class="macro">log::debug!</span>(<span class="string">&quot;Borrow Data {:?}&quot;</span>, bd);
-  });
+  <span class="kw">if </span>ENABLE_FLOW_PERMISSIONS
+    .copied()
+    .unwrap_or(ENABLE_FLOW_DEFAULT)
+  {
+    flow::compute_flows(<span class="kw-2">&amp;mut </span>ctxt);
+  }
 
   ctxt
 }

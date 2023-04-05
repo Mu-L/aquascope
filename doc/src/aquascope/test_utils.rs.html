@@ -574,9 +574,6 @@
 <a href="#574" id="574">574</a>
 <a href="#575" id="575">575</a>
 <a href="#576" id="576">576</a>
-<a href="#577" id="577">577</a>
-<a href="#578" id="578">578</a>
-<a href="#579" id="579">579</a>
 </pre><pre class="rust"><code><span class="kw">use </span>std::{collections::HashMap, fs, io, panic, path::Path, process::Command};
 
 <span class="kw">use </span>anyhow::{bail, Context, <span class="prelude-ty">Result</span>};
@@ -587,8 +584,9 @@
     utils::{BodyExt, OperandExt},
   },
   source_map::{<span class="self">self</span>, Spanner, ToSpan},
-  test_utils::{DUMMY_CHAR_RANGE, DUMMY_FILE, DUMMY_FILE_NAME},
+  test_utils::{DUMMY_FILE, DUMMY_FILE_NAME},
 };
+<span class="kw">use </span>fluid_let::fluid_set;
 <span class="kw">use </span>itertools::Itertools;
 <span class="kw">use </span>rustc_borrowck::BodyWithBorrowckFacts;
 <span class="kw">use </span>rustc_hir::{BodyId, ItemKind};
@@ -601,10 +599,12 @@
 <span class="kw">use crate</span>::{
   analysis::{
     <span class="self">self</span>,
-    boundaries::PermissionsBoundary,
-    ir_mapper::{GatherMode, IRMapper},
-    permissions::Permissions,
-    stepper::PermissionsDataDiff,
+    boundaries::{compute_permission_boundaries, PermissionsBoundary},
+    permissions::{Permissions, ENABLE_FLOW_PERMISSIONS},
+    stepper::{
+      <span class="self">self</span>, compute_permission_steps, PermIncludeMode, PermissionsDataDiff,
+    },
+    AquascopeAnalysis,
   },
   errors,
   interpreter::{<span class="self">self</span>, MTrace},
@@ -648,6 +648,13 @@
 // to a place string and corresponding permissions.
 </span><span class="kw">type </span>PermMap =
   HashMap&lt;(source_map::BytePos, source_map::BytePos), (String, Permissions)&gt;;
+
+<span class="kw">static </span>CFG_HASH: <span class="kw-2">&amp;</span>str = <span class="string">&quot;////!&quot;</span>;
+
+<span class="attr">#[derive(Debug, Default)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TestFileConfig {
+  show_flows: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+}
 
 <span class="kw">fn </span>split_test_source(
   source: <span class="kw">impl </span>AsRef&lt;str&gt;,
@@ -749,20 +756,34 @@
   <span class="prelude-val">Ok</span>((clean, map))
 }
 
-<span class="kw">pub fn </span>load_test_from_file(path: <span class="kw-2">&amp;</span>Path) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>load_test_from_file(
+  path: <span class="kw-2">&amp;</span>Path,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(String, TestFileConfig)&gt; {
   <span class="macro">log::info!</span>(
     <span class="string">&quot;Loading test from {}&quot;</span>,
     path.file_name().unwrap().to_string_lossy()
   );
   <span class="kw">let </span>c = fs::read(path)
     .with_context(|| <span class="macro">format!</span>(<span class="string">&quot;failed to load test from {path:?}&quot;</span>))<span class="question-mark">?</span>;
-  String::from_utf8(c)
-    .with_context(|| <span class="macro">format!</span>(<span class="string">&quot;UTF8 parse error in file: {path:?}&quot;</span>))
+  <span class="kw">let </span>source = String::from_utf8(c)
+    .with_context(|| <span class="macro">format!</span>(<span class="string">&quot;UTF8 parse error in file: {path:?}&quot;</span>))<span class="question-mark">?</span>;
+
+  <span class="kw">let </span><span class="kw-2">mut </span>cfg = TestFileConfig::default();
+
+  <span class="comment">// TODO: Add a more expressive way to add test annotations.
+  //       We can share some functionality with the mdbook-aquascope parser.
+  </span><span class="kw">for </span>line <span class="kw">in </span>source.lines() {
+    <span class="kw">if </span>line.starts_with(CFG_HASH) &amp;&amp; line.contains(<span class="string">&quot;show-flows&quot;</span>) {
+      cfg.show_flows = <span class="prelude-val">Some</span>(<span class="bool-val">true</span>);
+    }
+  }
+
+  <span class="prelude-val">Ok</span>((source, cfg))
 }
 
 <span class="kw">pub fn </span>test_refinements_in_file(path: <span class="kw-2">&amp;</span>Path) {
   <span class="kw">let </span>inner = || -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-    <span class="kw">let </span>input = load_test_from_file(path)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(input, <span class="kw">_</span>) = load_test_from_file(path)<span class="question-mark">?</span>;
     <span class="kw">let </span>(clean_input, <span class="kw">_</span>) = parse_test_source(<span class="kw-2">&amp;</span>input, (<span class="string">&quot;`[&quot;</span>, <span class="string">&quot;]`&quot;</span>))<span class="question-mark">?</span>;
 
     compile_normal(clean_input, |tcx| {
@@ -852,39 +873,34 @@
   inner().unwrap()
 }
 
+<span class="kw">fn </span>analysis_snapshot_tag(ctxt: <span class="kw-2">&amp;</span>AquascopeAnalysis) -&gt; String {
+  <span class="kw">let </span>owner = ctxt
+    .permissions
+    .tcx
+    .hir()
+    .body_owner(ctxt.permissions.body_id);
+  ctxt
+    .permissions
+    .tcx
+    .hir()
+    .opt_name(owner)
+    .map_or_else(|| String::from(<span class="string">&quot;&lt;anon body&gt;&quot;</span>), |n| String::from(n.as_str()))
+}
+
 <span class="kw">pub fn </span>test_boundaries_in_file(
   path: <span class="kw-2">&amp;</span>Path,
   assert_snap: <span class="kw">impl </span>Fn(String, Vec&lt;PermissionsBoundary&gt;) + Send + Sync + Copy,
 ) {
-  <span class="kw">use </span>analysis::boundaries::compute_boundaries;
-
   <span class="kw">let </span>inner = || -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-    <span class="kw">let </span>source = load_test_from_file(path)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(source, cfg) = load_test_from_file(path)<span class="question-mark">?</span>;
     compile_normal(source, <span class="kw">move </span>|tcx| {
-      for_each_body(tcx, |body_id, body_with_facts| {
-        <span class="kw">let </span>ctxt =
-          <span class="kw-2">&amp;</span>analysis::compute_permissions(tcx, body_id, body_with_facts);
-        <span class="kw">let </span>ir_mapper = IRMapper::new(
-          tcx,
-          <span class="kw-2">&amp;</span>ctxt.body_with_facts.body,
-          GatherMode::IgnoreCleanup,
-        );
+      for_each_body(tcx, |body_id, _body_with_facts| {
+        <span class="macro">fluid_set!</span>(ENABLE_FLOW_PERMISSIONS, cfg.show_flows.unwrap_or(<span class="bool-val">false</span>));
+        <span class="kw">let </span>ctxt = AquascopeAnalysis::new(tcx, body_id);
         <span class="comment">// Required to give the snapshot a more specific internal name.
-        </span><span class="kw">let </span>owner = ctxt.tcx.hir().body_owner(ctxt.body_id);
-        <span class="kw">let </span>tag = ctxt.tcx.hir().opt_name(owner).map_or_else(
-          || String::from(<span class="string">&quot;&lt;anon body&gt;&quot;</span>),
-          |n| String::from(n.as_str()),
-        );
-        <span class="kw">let </span>source_map = tcx.sess.source_map();
-        <span class="kw">let </span>boundaries = compute_boundaries(ctxt, <span class="kw-2">&amp;</span>ir_mapper, |span| {
-          DUMMY_CHAR_RANGE.with(|dummy_char_range| {
-            source_map::CharRange::from_span(span, source_map)
-              .ok()
-              .unwrap_or(<span class="kw-2">*</span>dummy_char_range)
-              .into()
-          })
-        })
-        .expect(<span class="string">&quot;Permission boundaries failed in test&quot;</span>);
+        </span><span class="kw">let </span>tag = analysis_snapshot_tag(<span class="kw-2">&amp;</span>ctxt);
+        <span class="kw">let </span>boundaries = compute_permission_boundaries(<span class="kw-2">&amp;</span>ctxt)
+          .expect(<span class="string">&quot;Permission boundaries failed in test&quot;</span>);
 
         assert_snap(tag, boundaries);
       })
@@ -903,40 +919,17 @@
     + Sync
     + Copy,
 ) {
-  <span class="kw">use </span>analysis::stepper::{find_steps, PermIncludeMode};
-  <span class="kw">let </span>inner = || -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-    <span class="kw">let </span>source = load_test_from_file(path)<span class="question-mark">?</span>;
-    compile_normal(source, <span class="kw">move </span>|tcx| {
-      for_each_body(tcx, |body_id, body_with_facts| {
-        <span class="kw">let </span>ctxt =
-          <span class="kw-2">&amp;</span>analysis::compute_permissions(tcx, body_id, body_with_facts);
-        <span class="kw">let </span>ir_mapper = IRMapper::new(
-          tcx,
-          <span class="kw-2">&amp;</span>ctxt.body_with_facts.body,
-          GatherMode::IgnoreCleanup,
-        );
-        <span class="comment">// Required to give the snapshot a more specific internal name.
-        </span><span class="kw">let </span>owner = ctxt.tcx.hir().body_owner(ctxt.body_id);
-        <span class="kw">let </span>tag = ctxt.tcx.hir().opt_name(owner).map_or_else(
-          || String::from(<span class="string">&quot;&lt;anon body&gt;&quot;</span>),
-          |n| String::from(n.as_str()),
-        );
+  <span class="kw">use </span>stepper::INCLUDE_MODE;
 
-        <span class="kw">let </span>source_map = tcx.sess.source_map();
-        <span class="kw">let </span>body_steps = find_steps::compute_permission_steps(
-          ctxt,
-          <span class="kw-2">&amp;</span>ir_mapper,
-          PermIncludeMode::Changes,
-          |span| {
-            DUMMY_CHAR_RANGE.with(|dummy_char_range| {
-              source_map::CharRange::from_span(span, source_map)
-                .ok()
-                .unwrap_or(<span class="kw-2">*</span>dummy_char_range)
-                .into()
-            })
-          },
-        )
-        .unwrap();
+  <span class="kw">let </span>inner = || -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    <span class="kw">let </span>(source, <span class="kw">_</span>) = load_test_from_file(path)<span class="question-mark">?</span>;
+    compile_normal(source, <span class="kw">move </span>|tcx| {
+      for_each_body(tcx, |body_id, _body_with_facts| {
+        <span class="kw">let </span>ctxt = AquascopeAnalysis::new(tcx, body_id);
+        <span class="kw">let </span>tag = analysis_snapshot_tag(<span class="kw-2">&amp;</span>ctxt);
+        <span class="macro">fluid_set!</span>(INCLUDE_MODE, PermIncludeMode::Changes);
+        <span class="kw">let </span>body_steps = compute_permission_steps(<span class="kw-2">&amp;</span>ctxt)
+          .expect(<span class="string">&quot;Permission steps failed in test&quot;</span>);
 
         <span class="comment">// NOTE: we normalize the permission steps to be
         // - usize: the line number of the corresponding statement.
@@ -950,7 +943,8 @@
               end: source_map::CharPos(pss.location.char_end),
               filename: FilenameIndex::from_usize(pss.location.filename),
             };
-            <span class="kw">let </span>span = char_range.to_span(ctxt.tcx).unwrap();
+            <span class="kw">let </span>span = char_range.to_span(ctxt.permissions.tcx).unwrap();
+            <span class="kw">let </span>source_map = tcx.sess.source_map();
             <span class="kw">let </span>line_num = source_map.lookup_line(span.hi()).unwrap().line;
             <span class="comment">// FIXME: we shouldn&#39;t flatten the tables together, this was only a
             // quick fix for the tests.
@@ -978,7 +972,7 @@
   run_insta: <span class="kw">impl </span>Fn(String, MTrace&lt;<span class="kw">crate</span>::Range&gt;) + Sync,
 ) {
   <span class="kw">let </span>main = || -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-    <span class="kw">let </span>input = load_test_from_file(path)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(input, <span class="kw">_</span>) = load_test_from_file(path)<span class="question-mark">?</span>;
     <span class="kw">let </span>args = <span class="macro">format!</span>(
       <span class="string">&quot;--crate-type bin --sysroot {}&quot;</span>,
       aquascope_workspace_utils::miri_sysroot()<span class="question-mark">?</span>.display()

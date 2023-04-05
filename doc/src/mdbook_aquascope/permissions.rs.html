@@ -78,7 +78,7 @@
 </span><span class="kw">use </span>anyhow::{bail, <span class="prelude-ty">Result</span>};
 <span class="kw">use </span>regex::Regex;
 
-<span class="kw">const </span>VALID_PERMISSIONS: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str] = <span class="kw-2">&amp;</span>[<span class="string">&quot;read&quot;</span>, <span class="string">&quot;write&quot;</span>, <span class="string">&quot;own&quot;</span>];
+<span class="kw">const </span>VALID_PERMISSIONS: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str] = <span class="kw-2">&amp;</span>[<span class="string">&quot;read&quot;</span>, <span class="string">&quot;write&quot;</span>, <span class="string">&quot;own&quot;</span>, <span class="string">&quot;flow&quot;</span>];
 
 <span class="kw">pub type </span>Replacement = (std::ops::Range&lt;usize&gt;, String);
 

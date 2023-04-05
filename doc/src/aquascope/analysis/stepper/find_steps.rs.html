@@ -1203,6 +1203,10 @@
 <a href="#1203" id="1203">1203</a>
 <a href="#1204" id="1204">1204</a>
 <a href="#1205" id="1205">1205</a>
+<a href="#1206" id="1206">1206</a>
+<a href="#1207" id="1207">1207</a>
+<a href="#1208" id="1208">1208</a>
+<a href="#1209" id="1209">1209</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Core analysis for creating permission steps.
 //!
 //! # Overview
@@ -1417,14 +1421,14 @@
 };
 
 <span class="kw">pub fn </span>compute_permission_steps&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;tcx</span>&gt;(
-  ctxt: <span class="kw-2">&amp;</span>PermissionsCtxt&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;tcx</span>&gt;,
-  ir_mapper: <span class="kw-2">&amp;</span>IRMapper&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;tcx</span>&gt;,
-  mode: PermIncludeMode,
-  span_to_range: <span class="kw">impl </span>Fn(Span) -&gt; Range,
+  analysis: <span class="kw-2">&amp;</span>AquascopeAnalysis&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;tcx</span>&gt;,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;PermissionsLineDisplay&gt;&gt;
 <span class="kw">where
   </span><span class="lifetime">&#39;tcx</span>: <span class="lifetime">&#39;a</span>,
 {
+  <span class="kw">let </span>mode = INCLUDE_MODE.copied().unwrap_or(PermIncludeMode::Changes);
+  <span class="kw">let </span>ctxt = <span class="kw-2">&amp;</span>analysis.permissions;
+  <span class="kw">let </span>ir_mapper = <span class="kw-2">&amp;</span>analysis.ir_mapper;
   <span class="kw">let </span>body = <span class="kw-2">&amp;</span>ctxt.body_with_facts.body;
   <span class="kw">let </span>_basic_blocks = body.basic_blocks.indices();
   <span class="kw">let </span><span class="kw-2">mut </span>hir_visitor = HirStepPoints::make(ctxt, ir_mapper)<span class="question-mark">?</span>;
@@ -1444,10 +1448,9 @@
   }
 
   <span class="prelude-val">Ok</span>(prettify_permission_steps(
-    ctxt,
+    analysis,
     hir_visitor.finalize_diffs(),
     mode,
-    span_to_range,
   ))
 }
 
@@ -1456,14 +1459,14 @@
 // - Remove all tables which are empty
 // - Convert Spans to Ranges
 </span><span class="kw">fn </span>prettify_permission_steps&lt;<span class="lifetime">&#39;tcx</span>&gt;(
-  ctxt: <span class="kw-2">&amp;</span>PermissionsCtxt&lt;<span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;tcx</span>&gt;,
+  analysis: <span class="kw-2">&amp;</span>AquascopeAnalysis&lt;<span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;tcx</span>&gt;,
   perm_steps: HashMap&lt;
     Span,
     (MirSegment, HashMap&lt;Place&lt;<span class="lifetime">&#39;tcx</span>&gt;, PermissionsDataDiff&gt;),
   &gt;,
   mode: PermIncludeMode,
-  span_to_range: <span class="kw">impl </span>Fn(Span) -&gt; Range,
 ) -&gt; Vec&lt;PermissionsLineDisplay&gt; {
+  <span class="kw">let </span>ctxt = <span class="kw-2">&amp;</span>analysis.permissions;
   <span class="kw">let </span>tcx = ctxt.tcx;
   <span class="kw">let </span>body = <span class="kw-2">&amp;</span>ctxt.body_with_facts.body;
 
@@ -1512,7 +1515,7 @@
           || first_error_span_opt
             .is_some_and(|err_span| err_span.hi() &lt; span.lo()))
         {
-          <span class="kw">let </span>range = span_to_range(span);
+          <span class="kw">let </span>range = analysis.span_to_range(span);
           acc.entry(range).or_default().push((segment, entries));
         }
 
@@ -1541,20 +1544,9 @@
         v.sort_by_key(|(place, <span class="kw">_</span>)| (place.local.as_usize(), place.projection))
       }
 
-      <span class="comment">// Conforming to the above HACK this just takes any (from, to) pair.
-      </span><span class="kw">let </span>(from, to) = entries.first().map_or_else(
-        || (Range::default(), Range::default()),
-        |(MirSegment { from, to }, <span class="kw">_</span>)| {
-          <span class="kw">let </span>from = span_to_range(ctxt.location_to_span(<span class="kw-2">*</span>from));
-          <span class="kw">let </span>to = span_to_range(ctxt.location_to_span(<span class="kw-2">*</span>to));
-          (from, to)
-        },
-      );
-
-      <span class="comment">// let mut state = entries
+      <span class="comment">// let state = entries
       //   .into_iter()
       //   .map(|(MirSegment { from, to }, diffs)| {
-
       //     let state = diffs
       //       .into_iter()
       //       .map(|(place, diff)| {
@@ -1562,15 +1554,23 @@
       //         (s, diff)
       //       })
       //       .collect::&lt;Vec&lt;_&gt;&gt;();
-
-      //     from = span_to_range(ctxt.location_to_span(from));
-      //     to = span_to_range(ctxt.location_to_span(to));
-
+      //     let from = analysis.span_to_range(ctxt.location_to_span(from));
+      //     let to = analysis.span_to_range(ctxt.location_to_span(to));
       //     PermissionsStepTable { from, to, state }
       //   })
       //   .collect::&lt;Vec&lt;_&gt;&gt;();
 
-      </span><span class="kw">let </span><span class="kw-2">mut </span>master_table: Vec&lt;(Place&lt;<span class="lifetime">&#39;tcx</span>&gt;, PermissionsDataDiff)&gt; =
+      // Conforming to the above HACK this just takes any (from, to) pair.
+      </span><span class="kw">let </span>(from, to) = entries.first().map_or_else(
+        || (Range::default(), Range::default()),
+        |(MirSegment { from, to }, <span class="kw">_</span>)| {
+          <span class="kw">let </span>from = analysis.span_to_range(ctxt.location_to_span(<span class="kw-2">*</span>from));
+          <span class="kw">let </span>to = analysis.span_to_range(ctxt.location_to_span(<span class="kw-2">*</span>to));
+          (from, to)
+        },
+      );
+
+      <span class="kw">let </span><span class="kw-2">mut </span>master_table: Vec&lt;(Place&lt;<span class="lifetime">&#39;tcx</span>&gt;, PermissionsDataDiff)&gt; =
         Vec::default();
 
       <span class="kw">let </span>is_symmetric_diff =
@@ -1603,10 +1603,15 @@
           <span class="kw">if let </span><span class="prelude-val">Some</span>(idx) = i_opt {
             <span class="kw">let </span>(<span class="kw">_</span>, old_diff) = <span class="kw-2">&amp;</span>master_table[idx];
             <span class="kw">if </span>is_symmetric_diff(<span class="kw-2">&amp;</span>diff, old_diff) {
+              <span class="macro">log::debug!</span>(
+                <span class="string">&quot;REMOVING place {place:?} with diff {diff:?} into the MT.&quot;
+              </span>);
               master_table.remove(idx);
               <span class="kw">continue</span>;
             }
           }
+
+          <span class="macro">log::debug!</span>(<span class="string">&quot;ADDING place {place:?} with diff {diff:?} into the MT.&quot;</span>);
           master_table.push((place, diff));
         }
       }
@@ -2073,13 +2078,16 @@
               </span><span class="kw">for </span>subtree <span class="kw">in </span>joins.iter() {
                 <span class="kw">let </span><span class="kw-2">mut </span>temp = HashMap::default();
                 diff_subtree(ctxt, subtree, <span class="kw-2">&amp;mut </span>temp, attached_at);
+
                 <span class="comment">// HACK: remove any differences that were attached to this span.
                 </span>temp.remove(span);
+
                 <span class="comment">// HACK: manually remove any attached places which got added.
                 </span><span class="kw">for </span>(<span class="kw">_</span>, (<span class="kw">_</span>, diffs)) <span class="kw">in </span>temp.iter_mut() {
                   diffs
                     .drain_filter(|place, <span class="kw">_</span>| attached_here.contains_key(place));
                 }
+
                 joined_diff.extend(temp);
               }
 

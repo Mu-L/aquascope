@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["GatherDepth",""],["GatherMode",""]],"struct":[["HirNodeLocations",""],["IRMapper",""],["MirOrderedLocations",""]]};
+window.SIDEBAR_ITEMS = {"enum":[["GatherDepth",""],["GatherMode",""]],"struct":[["HirNodeLocations",""],["IRMapper",""]]};

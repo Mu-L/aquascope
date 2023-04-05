@@ -700,7 +700,7 @@
 /// are disjoint (and therefore, do not overlap).
 </span><span class="attr">#[allow(dead_code)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>PlaceConflictBias {
+</span><span class="kw">pub enum </span>PlaceConflictBias {
   Overlap,
   NoOverlap,
 }
@@ -709,7 +709,7 @@
 /// This is used to check for places conflicting outside of the borrow checking code (such as in
 /// dataflow).
 </span><span class="attr">#[allow(dead_code)]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>places_conflict&lt;<span class="lifetime">&#39;tcx</span>&gt;(
+</span><span class="kw">pub fn </span>places_conflict&lt;<span class="lifetime">&#39;tcx</span>&gt;(
   tcx: TyCtxt&lt;<span class="lifetime">&#39;tcx</span>&gt;,
   body: <span class="kw-2">&amp;</span>Body&lt;<span class="lifetime">&#39;tcx</span>&gt;,
   borrow_place: Place&lt;<span class="lifetime">&#39;tcx</span>&gt;,
@@ -733,7 +733,7 @@
 /// access depth. The `bias` parameter is used to determine how the unknowable (comparing runtime
 /// array indices, for example) should be interpreted - this depends on what the caller wants in
 /// order to make the conservative choice and preserve soundness.
-</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>borrow_conflicts_with_place&lt;<span class="lifetime">&#39;tcx</span>&gt;(
+</span><span class="kw">pub fn </span>borrow_conflicts_with_place&lt;<span class="lifetime">&#39;tcx</span>&gt;(
   tcx: TyCtxt&lt;<span class="lifetime">&#39;tcx</span>&gt;,
   body: <span class="kw-2">&amp;</span>Body&lt;<span class="lifetime">&#39;tcx</span>&gt;,
   borrow_place: Place&lt;<span class="lifetime">&#39;tcx</span>&gt;,
