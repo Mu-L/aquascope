@@ -1,3 +1,0 @@
-(function() {var implementors = {
-"aquascope_front":[["impl <a class=\"trait\" href=\"rustc_plugin/trait.RustcPlugin.html\" title=\"trait rustc_plugin::RustcPlugin\">RustcPlugin</a> for <a class=\"struct\" href=\"aquascope_front/plugin/struct.AquascopePlugin.html\" title=\"struct aquascope_front::plugin::AquascopePlugin\">AquascopePlugin</a>"]]
-};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

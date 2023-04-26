@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["Type","Represents a C type statically associated with a Rust type."]],"trait":[["CType","Types that we can automatically marshall to/from C."]]};
+window.SIDEBAR_ITEMS = {"struct":["Type"],"trait":["CType"]};

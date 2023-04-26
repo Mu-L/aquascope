@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":[["STRUCT","Indicates a structure type."]]};
+window.SIDEBAR_ITEMS = {"constant":["STRUCT"]};

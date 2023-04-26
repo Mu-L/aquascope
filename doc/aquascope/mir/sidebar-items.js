@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":[["utils","A smattering of utilities not yet (or that won’t ever be) upstreamed to Flowistry."]]};

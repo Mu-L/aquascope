@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/miri-8f8b361f28c5a248/98ad06d/src/shims/windows/dlsym.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>dlsym.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-389f8b4a37bc03c9.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-046227e470cd3629.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-800f2ee593c8e6f7.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-9edae3c387f5a5b3.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../../miri/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/miri-8f8b361f28c5a248/35d6927/src/shims/windows/dlsym.rs`."><title>dlsym.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-63a85fc7cf22dee2.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="miri" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (9df3a39fb 2023-04-11)" data-search-js="search-bc5a112813b5d712.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-1159a395118aa44e.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../miri/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -80,77 +80,7 @@
 <a href="#80" id="80">80</a>
 <a href="#81" id="81">81</a>
 <a href="#82" id="82">82</a>
-<a href="#83" id="83">83</a>
-<a href="#84" id="84">84</a>
-<a href="#85" id="85">85</a>
-<a href="#86" id="86">86</a>
-<a href="#87" id="87">87</a>
-<a href="#88" id="88">88</a>
-<a href="#89" id="89">89</a>
-<a href="#90" id="90">90</a>
-<a href="#91" id="91">91</a>
-<a href="#92" id="92">92</a>
-<a href="#93" id="93">93</a>
-<a href="#94" id="94">94</a>
-<a href="#95" id="95">95</a>
-<a href="#96" id="96">96</a>
-<a href="#97" id="97">97</a>
-<a href="#98" id="98">98</a>
-<a href="#99" id="99">99</a>
-<a href="#100" id="100">100</a>
-<a href="#101" id="101">101</a>
-<a href="#102" id="102">102</a>
-<a href="#103" id="103">103</a>
-<a href="#104" id="104">104</a>
-<a href="#105" id="105">105</a>
-<a href="#106" id="106">106</a>
-<a href="#107" id="107">107</a>
-<a href="#108" id="108">108</a>
-<a href="#109" id="109">109</a>
-<a href="#110" id="110">110</a>
-<a href="#111" id="111">111</a>
-<a href="#112" id="112">112</a>
-<a href="#113" id="113">113</a>
-<a href="#114" id="114">114</a>
-<a href="#115" id="115">115</a>
-<a href="#116" id="116">116</a>
-<a href="#117" id="117">117</a>
-<a href="#118" id="118">118</a>
-<a href="#119" id="119">119</a>
-<a href="#120" id="120">120</a>
-<a href="#121" id="121">121</a>
-<a href="#122" id="122">122</a>
-<a href="#123" id="123">123</a>
-<a href="#124" id="124">124</a>
-<a href="#125" id="125">125</a>
-<a href="#126" id="126">126</a>
-<a href="#127" id="127">127</a>
-<a href="#128" id="128">128</a>
-<a href="#129" id="129">129</a>
-<a href="#130" id="130">130</a>
-<a href="#131" id="131">131</a>
-<a href="#132" id="132">132</a>
-<a href="#133" id="133">133</a>
-<a href="#134" id="134">134</a>
-<a href="#135" id="135">135</a>
-<a href="#136" id="136">136</a>
-<a href="#137" id="137">137</a>
-<a href="#138" id="138">138</a>
-<a href="#139" id="139">139</a>
-<a href="#140" id="140">140</a>
-<a href="#141" id="141">141</a>
-<a href="#142" id="142">142</a>
-<a href="#143" id="143">143</a>
-<a href="#144" id="144">144</a>
-<a href="#145" id="145">145</a>
-<a href="#146" id="146">146</a>
-<a href="#147" id="147">147</a>
-<a href="#148" id="148">148</a>
-<a href="#149" id="149">149</a>
-<a href="#150" id="150">150</a>
-<a href="#151" id="151">151</a>
-</pre><pre class="rust"><code><span class="kw">use </span>rustc_middle::mir;
-<span class="kw">use </span>rustc_target::abi::Size;
+</pre></div><pre class="rust"><code><span class="kw">use </span>rustc_middle::mir;
 <span class="kw">use </span>rustc_target::spec::abi::Abi;
 
 <span class="kw">use </span>log::trace;
@@ -162,7 +92,6 @@
 
 <span class="attr">#[derive(Debug, Copy, Clone)]
 </span><span class="kw">pub enum </span>Dlsym {
-    NtWriteFile,
     SetThreadDescription,
     WaitOnAddress,
     WakeByAddressSingle,
@@ -174,7 +103,6 @@
     </span><span class="kw">pub fn </span>from_str&lt;<span class="lifetime">&#39;tcx</span>&gt;(name: <span class="kw-2">&amp;</span>str) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, <span class="prelude-ty">Option</span>&lt;Dlsym&gt;&gt; {
         <span class="prelude-val">Ok</span>(<span class="kw">match </span>name {
             <span class="string">&quot;GetSystemTimePreciseAsFileTime&quot; </span>=&gt; <span class="prelude-val">None</span>,
-            <span class="string">&quot;NtWriteFile&quot; </span>=&gt; <span class="prelude-val">Some</span>(Dlsym::NtWriteFile),
             <span class="string">&quot;SetThreadDescription&quot; </span>=&gt; <span class="prelude-val">Some</span>(Dlsym::SetThreadDescription),
             <span class="string">&quot;WaitOnAddress&quot; </span>=&gt; <span class="prelude-val">Some</span>(Dlsym::WaitOnAddress),
             <span class="string">&quot;WakeByAddressSingle&quot; </span>=&gt; <span class="prelude-val">Some</span>(Dlsym::WakeByAddressSingle),
@@ -200,72 +128,6 @@
         this.check_abi(abi, Abi::System { unwind: <span class="bool-val">false </span>})<span class="question-mark">?</span>;
 
         <span class="kw">match </span>dlsym {
-            Dlsym::NtWriteFile =&gt; {
-                <span class="kw">if </span>!this.frame_in_std() {
-                    <span class="macro">throw_unsup_format!</span>(
-                        <span class="string">&quot;`NtWriteFile` support is crude and just enough for stdout to work&quot;
-                    </span>);
-                }
-
-                <span class="kw">let </span>[
-                    handle,
-                    _event,
-                    _apc_routine,
-                    _apc_context,
-                    io_status_block,
-                    buf,
-                    n,
-                    byte_offset,
-                    _key,
-                ] = check_arg_count(args)<span class="question-mark">?</span>;
-                <span class="kw">let </span>handle = this.read_scalar(handle)<span class="question-mark">?</span>.to_machine_isize(this)<span class="question-mark">?</span>;
-                <span class="kw">let </span>buf = this.read_pointer(buf)<span class="question-mark">?</span>;
-                <span class="kw">let </span>n = this.read_scalar(n)<span class="question-mark">?</span>.to_u32()<span class="question-mark">?</span>;
-                <span class="kw">let </span>byte_offset = this.read_scalar(byte_offset)<span class="question-mark">?</span>.to_machine_usize(this)<span class="question-mark">?</span>; <span class="comment">// is actually a pointer
-                </span><span class="kw">let </span>io_status_block = this.deref_operand(io_status_block)<span class="question-mark">?</span>;
-
-                <span class="kw">if </span>byte_offset != <span class="number">0 </span>{
-                    <span class="macro">throw_unsup_format!</span>(
-                        <span class="string">&quot;`NtWriteFile` `ByteOffset` paremeter is non-null, which is unsupported&quot;
-                    </span>);
-                }
-
-                <span class="kw">let </span>written = <span class="kw">if </span>handle == -<span class="number">11 </span>|| handle == -<span class="number">12 </span>{
-                    <span class="comment">// stdout/stderr
-                    </span><span class="kw">use </span>std::io::{<span class="self">self</span>, Write};
-
-                    <span class="kw">let </span>buf_cont =
-                        this.read_bytes_ptr_strip_provenance(buf, Size::from_bytes(u64::from(n)))<span class="question-mark">?</span>;
-                    <span class="kw">let </span>res = <span class="kw">if </span>this.machine.mute_stdout_stderr {
-                        <span class="prelude-val">Ok</span>(buf_cont.len())
-                    } <span class="kw">else if </span>handle == -<span class="number">11 </span>{
-                        io::stdout().write(buf_cont)
-                    } <span class="kw">else </span>{
-                        io::stderr().write(buf_cont)
-                    };
-                    <span class="comment">// We write at most `n` bytes, which is a `u32`, so we cannot have written more than that.
-                    </span>res.ok().map(|n| u32::try_from(n).unwrap())
-                } <span class="kw">else </span>{
-                    <span class="macro">throw_unsup_format!</span>(
-                        <span class="string">&quot;on Windows, writing to anything except stdout/stderr is not supported&quot;
-                    </span>)
-                };
-                <span class="comment">// We have to put the result into io_status_block.
-                </span><span class="kw">if let </span><span class="prelude-val">Some</span>(n) = written {
-                    <span class="kw">let </span>io_status_information =
-                        this.mplace_field_named(<span class="kw-2">&amp;</span>io_status_block, <span class="string">&quot;Information&quot;</span>)<span class="question-mark">?</span>;
-                    this.write_scalar(
-                        Scalar::from_machine_usize(n.into(), this),
-                        <span class="kw-2">&amp;</span>io_status_information.into(),
-                    )<span class="question-mark">?</span>;
-                }
-                <span class="comment">// Return whether this was a success. &gt;= 0 is success.
-                // For the error code we arbitrarily pick 0xC0000185, STATUS_IO_DEVICE_ERROR.
-                </span>this.write_scalar(
-                    Scalar::from_u32(<span class="kw">if </span>written.is_some() { <span class="number">0 </span>} <span class="kw">else </span>{ <span class="number">0xC0000185u32 </span>}),
-                    dest,
-                )<span class="question-mark">?</span>;
-            }
             Dlsym::SetThreadDescription =&gt; {
                 <span class="kw">let </span>[handle, name] = check_arg_count(args)<span class="question-mark">?</span>;
 
@@ -300,5 +162,4 @@
         <span class="prelude-val">Ok</span>(())
     }
 }
-</code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="miri" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (b28d30e1e 2022-12-06)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</code></pre></div></section></main></body></html>

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":[["plugin",""]]};
+window.SIDEBAR_ITEMS = {"mod":["plugin"]};

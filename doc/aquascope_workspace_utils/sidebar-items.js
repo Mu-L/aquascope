@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["miri_sysroot",""],["toolchain",""]]};
+window.SIDEBAR_ITEMS = {"fn":["miri_sysroot","toolchain"]};

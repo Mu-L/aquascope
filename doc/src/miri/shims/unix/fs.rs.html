@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/miri-8f8b361f28c5a248/98ad06d/src/shims/unix/fs.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>fs.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-389f8b4a37bc03c9.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-046227e470cd3629.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-800f2ee593c8e6f7.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-9edae3c387f5a5b3.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../../miri/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/miri-8f8b361f28c5a248/35d6927/src/shims/unix/fs.rs`."><title>fs.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-63a85fc7cf22dee2.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="miri" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (9df3a39fb 2023-04-11)" data-search-js="search-bc5a112813b5d712.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-1159a395118aa44e.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../miri/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1970,7 +1970,38 @@
 <a href="#1970" id="1970">1970</a>
 <a href="#1971" id="1971">1971</a>
 <a href="#1972" id="1972">1972</a>
-</pre><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+<a href="#1973" id="1973">1973</a>
+<a href="#1974" id="1974">1974</a>
+<a href="#1975" id="1975">1975</a>
+<a href="#1976" id="1976">1976</a>
+<a href="#1977" id="1977">1977</a>
+<a href="#1978" id="1978">1978</a>
+<a href="#1979" id="1979">1979</a>
+<a href="#1980" id="1980">1980</a>
+<a href="#1981" id="1981">1981</a>
+<a href="#1982" id="1982">1982</a>
+<a href="#1983" id="1983">1983</a>
+<a href="#1984" id="1984">1984</a>
+<a href="#1985" id="1985">1985</a>
+<a href="#1986" id="1986">1986</a>
+<a href="#1987" id="1987">1987</a>
+<a href="#1988" id="1988">1988</a>
+<a href="#1989" id="1989">1989</a>
+<a href="#1990" id="1990">1990</a>
+<a href="#1991" id="1991">1991</a>
+<a href="#1992" id="1992">1992</a>
+<a href="#1993" id="1993">1993</a>
+<a href="#1994" id="1994">1994</a>
+<a href="#1995" id="1995">1995</a>
+<a href="#1996" id="1996">1996</a>
+<a href="#1997" id="1997">1997</a>
+<a href="#1998" id="1998">1998</a>
+<a href="#1999" id="1999">1999</a>
+<a href="#2000" id="2000">2000</a>
+<a href="#2001" id="2001">2001</a>
+<a href="#2002" id="2002">2002</a>
+<a href="#2003" id="2003">2003</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::collections::BTreeMap;
 <span class="kw">use </span>std::convert::TryInto;
 <span class="kw">use </span>std::fs::{
@@ -1991,17 +2022,13 @@
 <span class="kw">use </span>shims::time::system_time_to_duration;
 
 <span class="attr">#[derive(Debug)]
-</span><span class="kw">struct </span>FileHandle {
+</span><span class="kw">pub struct </span>FileHandle {
     file: File,
     writable: bool,
 }
 
-<span class="kw">trait </span>FileDescriptor: std::fmt::Debug {
+<span class="kw">pub trait </span>FileDescriptor: std::fmt::Debug + helpers::AsAny {
     <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str;
-
-    <span class="kw">fn </span>as_file_handle&lt;<span class="lifetime">&#39;tcx</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, <span class="kw-2">&amp;</span>FileHandle&gt; {
-        <span class="macro">throw_unsup_format!</span>(<span class="string">&quot;{} cannot be used as FileHandle&quot;</span>, <span class="self">self</span>.name());
-    }
 
     <span class="kw">fn </span>read&lt;<span class="lifetime">&#39;tcx</span>&gt;(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
@@ -2036,7 +2063,9 @@
 
     <span class="kw">fn </span>dup(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;Box&lt;<span class="kw">dyn </span>FileDescriptor&gt;&gt;;
 
-    <span class="kw">fn </span>is_tty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool;
+    <span class="kw">fn </span>is_tty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
 
     <span class="attr">#[cfg(unix)]
     </span><span class="kw">fn </span>as_unix_host_fd(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i32&gt; {
@@ -2048,10 +2077,6 @@
     <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
         <span class="string">&quot;FILE&quot;
     </span>}
-
-    <span class="kw">fn </span>as_file_handle&lt;<span class="lifetime">&#39;tcx</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, <span class="kw-2">&amp;</span>FileHandle&gt; {
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>)
-    }
 
     <span class="kw">fn </span>read&lt;<span class="lifetime">&#39;tcx</span>&gt;(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
@@ -2238,15 +2263,11 @@
     <span class="kw">fn </span>dup(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;Box&lt;<span class="kw">dyn </span>FileDescriptor&gt;&gt; {
         <span class="prelude-val">Ok</span>(Box::new(NullOutput))
     }
-
-    <span class="kw">fn </span>is_tty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="bool-val">false
-    </span>}
 }
 
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>FileHandler {
-    handles: BTreeMap&lt;i32, Box&lt;<span class="kw">dyn </span>FileDescriptor&gt;&gt;,
+    <span class="kw">pub </span>handles: BTreeMap&lt;i32, Box&lt;<span class="kw">dyn </span>FileDescriptor&gt;&gt;,
 }
 
 <span class="kw">impl </span>VisitTags <span class="kw">for </span>FileHandler {
@@ -2269,7 +2290,7 @@
         FileHandler { handles }
     }
 
-    <span class="kw">fn </span>insert_fd(<span class="kw-2">&amp;mut </span><span class="self">self</span>, file_handle: Box&lt;<span class="kw">dyn </span>FileDescriptor&gt;) -&gt; i32 {
+    <span class="kw">pub fn </span>insert_fd(<span class="kw-2">&amp;mut </span><span class="self">self</span>, file_handle: Box&lt;<span class="kw">dyn </span>FileDescriptor&gt;) -&gt; i32 {
         <span class="self">self</span>.insert_fd_with_min_fd(file_handle, <span class="number">0</span>)
     }
 
@@ -2348,17 +2369,6 @@
         <span class="prelude-val">Ok</span>(<span class="number">0</span>)
     }
 
-    <span class="doccomment">/// Function used when a handle is not found inside `FileHandler`. It returns `Ok(-1)`and sets
-    /// the last OS error to `libc::EBADF` (invalid file descriptor). This function uses
-    /// `T: From&lt;i32&gt;` instead of `i32` directly because some fs functions return different integer
-    /// types (like `read`, that returns an `i64`).
-    </span><span class="kw">fn </span>handle_not_found&lt;T: From&lt;i32&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, T&gt; {
-        <span class="kw">let </span>this = <span class="self">self</span>.eval_context_mut();
-        <span class="kw">let </span>ebadf = this.eval_libc(<span class="string">&quot;EBADF&quot;</span>)<span class="question-mark">?</span>;
-        this.set_last_error(ebadf)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>((-<span class="number">1</span>).into())
-    }
-
     <span class="kw">fn </span>file_type_to_d_type(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         file_type: std::io::Result&lt;FileType&gt;,
@@ -2367,11 +2377,11 @@
         <span class="kw">match </span>file_type {
             <span class="prelude-val">Ok</span>(file_type) =&gt; {
                 <span class="kw">if </span>file_type.is_dir() {
-                    <span class="prelude-val">Ok</span>(this.eval_libc(<span class="string">&quot;DT_DIR&quot;</span>)<span class="question-mark">?</span>.to_u8()<span class="question-mark">?</span>.into())
+                    <span class="prelude-val">Ok</span>(this.eval_libc(<span class="string">&quot;DT_DIR&quot;</span>).to_u8()<span class="question-mark">?</span>.into())
                 } <span class="kw">else if </span>file_type.is_file() {
-                    <span class="prelude-val">Ok</span>(this.eval_libc(<span class="string">&quot;DT_REG&quot;</span>)<span class="question-mark">?</span>.to_u8()<span class="question-mark">?</span>.into())
+                    <span class="prelude-val">Ok</span>(this.eval_libc(<span class="string">&quot;DT_REG&quot;</span>).to_u8()<span class="question-mark">?</span>.into())
                 } <span class="kw">else if </span>file_type.is_symlink() {
-                    <span class="prelude-val">Ok</span>(this.eval_libc(<span class="string">&quot;DT_LNK&quot;</span>)<span class="question-mark">?</span>.to_u8()<span class="question-mark">?</span>.into())
+                    <span class="prelude-val">Ok</span>(this.eval_libc(<span class="string">&quot;DT_LNK&quot;</span>).to_u8()<span class="question-mark">?</span>.into())
                 } <span class="kw">else </span>{
                     <span class="comment">// Certain file types are only supported when the host is a Unix system.
                     // (i.e. devices and sockets) If it is, check those cases, if not, fall back to
@@ -2381,19 +2391,19 @@
                     </span>{
                         <span class="kw">use </span>std::os::unix::fs::FileTypeExt;
                         <span class="kw">if </span>file_type.is_block_device() {
-                            <span class="prelude-val">Ok</span>(this.eval_libc(<span class="string">&quot;DT_BLK&quot;</span>)<span class="question-mark">?</span>.to_u8()<span class="question-mark">?</span>.into())
+                            <span class="prelude-val">Ok</span>(this.eval_libc(<span class="string">&quot;DT_BLK&quot;</span>).to_u8()<span class="question-mark">?</span>.into())
                         } <span class="kw">else if </span>file_type.is_char_device() {
-                            <span class="prelude-val">Ok</span>(this.eval_libc(<span class="string">&quot;DT_CHR&quot;</span>)<span class="question-mark">?</span>.to_u8()<span class="question-mark">?</span>.into())
+                            <span class="prelude-val">Ok</span>(this.eval_libc(<span class="string">&quot;DT_CHR&quot;</span>).to_u8()<span class="question-mark">?</span>.into())
                         } <span class="kw">else if </span>file_type.is_fifo() {
-                            <span class="prelude-val">Ok</span>(this.eval_libc(<span class="string">&quot;DT_FIFO&quot;</span>)<span class="question-mark">?</span>.to_u8()<span class="question-mark">?</span>.into())
+                            <span class="prelude-val">Ok</span>(this.eval_libc(<span class="string">&quot;DT_FIFO&quot;</span>).to_u8()<span class="question-mark">?</span>.into())
                         } <span class="kw">else if </span>file_type.is_socket() {
-                            <span class="prelude-val">Ok</span>(this.eval_libc(<span class="string">&quot;DT_SOCK&quot;</span>)<span class="question-mark">?</span>.to_u8()<span class="question-mark">?</span>.into())
+                            <span class="prelude-val">Ok</span>(this.eval_libc(<span class="string">&quot;DT_SOCK&quot;</span>).to_u8()<span class="question-mark">?</span>.into())
                         } <span class="kw">else </span>{
-                            <span class="prelude-val">Ok</span>(this.eval_libc(<span class="string">&quot;DT_UNKNOWN&quot;</span>)<span class="question-mark">?</span>.to_u8()<span class="question-mark">?</span>.into())
+                            <span class="prelude-val">Ok</span>(this.eval_libc(<span class="string">&quot;DT_UNKNOWN&quot;</span>).to_u8()<span class="question-mark">?</span>.into())
                         }
                     }
                     <span class="attr">#[cfg(not(unix))]
-                    </span><span class="prelude-val">Ok</span>(this.eval_libc(<span class="string">&quot;DT_UNKNOWN&quot;</span>)<span class="question-mark">?</span>.to_u8()<span class="question-mark">?</span>.into())
+                    </span><span class="prelude-val">Ok</span>(this.eval_libc(<span class="string">&quot;DT_UNKNOWN&quot;</span>).to_u8()<span class="question-mark">?</span>.into())
                 }
             }
             <span class="prelude-val">Err</span>(e) =&gt;
@@ -2504,9 +2514,9 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>options = OpenOptions::new();
 
-        <span class="kw">let </span>o_rdonly = this.eval_libc_i32(<span class="string">&quot;O_RDONLY&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">let </span>o_wronly = this.eval_libc_i32(<span class="string">&quot;O_WRONLY&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">let </span>o_rdwr = this.eval_libc_i32(<span class="string">&quot;O_RDWR&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>o_rdonly = this.eval_libc_i32(<span class="string">&quot;O_RDONLY&quot;</span>);
+        <span class="kw">let </span>o_wronly = this.eval_libc_i32(<span class="string">&quot;O_WRONLY&quot;</span>);
+        <span class="kw">let </span>o_rdwr = this.eval_libc_i32(<span class="string">&quot;O_RDWR&quot;</span>);
         <span class="comment">// The first two bits of the flag correspond to the access mode in linux, macOS and
         // windows. We need to check that in fact the access mode flags for the current target
         // only use these two bits, otherwise we are in an unsupported target and should error.
@@ -2533,18 +2543,18 @@
         // options.
         </span><span class="kw">let </span><span class="kw-2">mut </span>mirror = access_mode;
 
-        <span class="kw">let </span>o_append = this.eval_libc_i32(<span class="string">&quot;O_APPEND&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">if </span>flag &amp; o_append != <span class="number">0 </span>{
+        <span class="kw">let </span>o_append = this.eval_libc_i32(<span class="string">&quot;O_APPEND&quot;</span>);
+        <span class="kw">if </span>flag &amp; o_append == o_append {
             options.append(<span class="bool-val">true</span>);
             mirror |= o_append;
         }
-        <span class="kw">let </span>o_trunc = this.eval_libc_i32(<span class="string">&quot;O_TRUNC&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">if </span>flag &amp; o_trunc != <span class="number">0 </span>{
+        <span class="kw">let </span>o_trunc = this.eval_libc_i32(<span class="string">&quot;O_TRUNC&quot;</span>);
+        <span class="kw">if </span>flag &amp; o_trunc == o_trunc {
             options.truncate(<span class="bool-val">true</span>);
             mirror |= o_trunc;
         }
-        <span class="kw">let </span>o_creat = this.eval_libc_i32(<span class="string">&quot;O_CREAT&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">if </span>flag &amp; o_creat != <span class="number">0 </span>{
+        <span class="kw">let </span>o_creat = this.eval_libc_i32(<span class="string">&quot;O_CREAT&quot;</span>);
+        <span class="kw">if </span>flag &amp; o_creat == o_creat {
             <span class="comment">// Get the mode.  On macOS, the argument type `mode_t` is actually `u16`, but
             // C integer promotion rules mean that on the ABI level, it gets passed as `u32`
             // (see https://github.com/rust-lang/rust/issues/71915).
@@ -2563,19 +2573,28 @@
 
             mirror |= o_creat;
 
-            <span class="kw">let </span>o_excl = this.eval_libc_i32(<span class="string">&quot;O_EXCL&quot;</span>)<span class="question-mark">?</span>;
-            <span class="kw">if </span>flag &amp; o_excl != <span class="number">0 </span>{
+            <span class="kw">let </span>o_excl = this.eval_libc_i32(<span class="string">&quot;O_EXCL&quot;</span>);
+            <span class="kw">if </span>flag &amp; o_excl == o_excl {
                 mirror |= o_excl;
                 options.create_new(<span class="bool-val">true</span>);
             } <span class="kw">else </span>{
                 options.create(<span class="bool-val">true</span>);
             }
         }
-        <span class="kw">let </span>o_cloexec = this.eval_libc_i32(<span class="string">&quot;O_CLOEXEC&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">if </span>flag &amp; o_cloexec != <span class="number">0 </span>{
+        <span class="kw">let </span>o_cloexec = this.eval_libc_i32(<span class="string">&quot;O_CLOEXEC&quot;</span>);
+        <span class="kw">if </span>flag &amp; o_cloexec == o_cloexec {
             <span class="comment">// We do not need to do anything for this flag because `std` already sets it.
             // (Technically we do not support *not* setting this flag, but we ignore that.)
             </span>mirror |= o_cloexec;
+        }
+        <span class="kw">if </span>this.tcx.sess.target.os == <span class="string">&quot;linux&quot; </span>{
+            <span class="kw">let </span>o_tmpfile = this.eval_libc_i32(<span class="string">&quot;O_TMPFILE&quot;</span>);
+            <span class="kw">if </span>flag &amp; o_tmpfile == o_tmpfile {
+                <span class="comment">// if the flag contains `O_TMPFILE` then we return a graceful error
+                </span><span class="kw">let </span>eopnotsupp = this.eval_libc(<span class="string">&quot;EOPNOTSUPP&quot;</span>);
+                this.set_last_error(eopnotsupp)<span class="question-mark">?</span>;
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(-<span class="number">1</span>);
+            }
         }
         <span class="comment">// If `flag` is not equal to `mirror`, there is an unsupported option enabled in `flag`,
         // then we throw an error.
@@ -2612,27 +2631,20 @@
         <span class="kw">let </span>fd = this.read_scalar(<span class="kw-2">&amp;</span>args[<span class="number">0</span>])<span class="question-mark">?</span>.to_i32()<span class="question-mark">?</span>;
         <span class="kw">let </span>cmd = this.read_scalar(<span class="kw-2">&amp;</span>args[<span class="number">1</span>])<span class="question-mark">?</span>.to_i32()<span class="question-mark">?</span>;
 
-        <span class="comment">// Reject if isolation is enabled.
-        </span><span class="kw">if let </span>IsolatedOp::Reject(reject_with) = this.machine.isolated_op {
-            this.reject_in_isolation(<span class="string">&quot;`fcntl`&quot;</span>, reject_with)<span class="question-mark">?</span>;
-            this.set_last_error_from_io_error(ErrorKind::PermissionDenied)<span class="question-mark">?</span>;
-            <span class="kw">return </span><span class="prelude-val">Ok</span>(-<span class="number">1</span>);
-        }
-
         <span class="comment">// We only support getting the flags for a descriptor.
-        </span><span class="kw">if </span>cmd == this.eval_libc_i32(<span class="string">&quot;F_GETFD&quot;</span>)<span class="question-mark">? </span>{
+        </span><span class="kw">if </span>cmd == this.eval_libc_i32(<span class="string">&quot;F_GETFD&quot;</span>) {
             <span class="comment">// Currently this is the only flag that `F_GETFD` returns. It is OK to just return the
             // `FD_CLOEXEC` value without checking if the flag is set for the file because `std`
             // always sets this flag when opening a file. However we still need to check that the
             // file itself is open.
             </span><span class="kw">if </span>this.machine.file_handler.handles.contains_key(<span class="kw-2">&amp;</span>fd) {
-                <span class="prelude-val">Ok</span>(this.eval_libc_i32(<span class="string">&quot;FD_CLOEXEC&quot;</span>)<span class="question-mark">?</span>)
+                <span class="prelude-val">Ok</span>(this.eval_libc_i32(<span class="string">&quot;FD_CLOEXEC&quot;</span>))
             } <span class="kw">else </span>{
                 this.handle_not_found()
             }
-        } <span class="kw">else if </span>cmd == this.eval_libc_i32(<span class="string">&quot;F_DUPFD&quot;</span>)<span class="question-mark">?
-            </span>|| cmd == this.eval_libc_i32(<span class="string">&quot;F_DUPFD_CLOEXEC&quot;</span>)<span class="question-mark">?
-        </span>{
+        } <span class="kw">else if </span>cmd == this.eval_libc_i32(<span class="string">&quot;F_DUPFD&quot;</span>)
+            || cmd == this.eval_libc_i32(<span class="string">&quot;F_DUPFD_CLOEXEC&quot;</span>)
+        {
             <span class="comment">// Note that we always assume the FD_CLOEXEC flag is set for every open file, in part
             // because exec() isn&#39;t supported. The F_DUPFD and F_DUPFD_CLOEXEC commands only
             // differ in whether the FD_CLOEXEC flag is pre-set on the new file descriptor,
@@ -2660,10 +2672,22 @@
                 }
                 <span class="prelude-val">None </span>=&gt; this.handle_not_found(),
             }
-        } <span class="kw">else if </span>this.tcx.sess.target.os == <span class="string">&quot;macos&quot; </span>&amp;&amp; cmd == this.eval_libc_i32(<span class="string">&quot;F_FULLFSYNC&quot;</span>)<span class="question-mark">? </span>{
+        } <span class="kw">else if </span>this.tcx.sess.target.os == <span class="string">&quot;macos&quot; </span>&amp;&amp; cmd == this.eval_libc_i32(<span class="string">&quot;F_FULLFSYNC&quot;</span>) {
+            <span class="comment">// Reject if isolation is enabled.
+            </span><span class="kw">if let </span>IsolatedOp::Reject(reject_with) = this.machine.isolated_op {
+                this.reject_in_isolation(<span class="string">&quot;`fcntl`&quot;</span>, reject_with)<span class="question-mark">?</span>;
+                this.set_last_error_from_io_error(ErrorKind::PermissionDenied)<span class="question-mark">?</span>;
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(-<span class="number">1</span>);
+            }
+
             <span class="kw">if let </span><span class="prelude-val">Some</span>(file_descriptor) = this.machine.file_handler.handles.get(<span class="kw-2">&amp;</span>fd) {
                 <span class="comment">// FIXME: Support fullfsync for all FDs
-                </span><span class="kw">let </span>FileHandle { file, writable } = file_descriptor.as_file_handle()<span class="question-mark">?</span>;
+                </span><span class="kw">let </span>FileHandle { file, writable } =
+                    file_descriptor.as_any().downcast_ref::&lt;FileHandle&gt;().ok_or_else(|| {
+                        <span class="macro">err_unsup_format!</span>(
+                            <span class="string">&quot;`F_FULLFSYNC` is only supported on file-backed file descriptors&quot;
+                        </span>)
+                    })<span class="question-mark">?</span>;
                 <span class="kw">let </span>io_result = maybe_sync_file(file, <span class="kw-2">*</span>writable, File::sync_all);
                 this.try_unwrap_io_result(io_result)
             } <span class="kw">else </span>{
@@ -2689,6 +2713,17 @@
         ))
     }
 
+    <span class="doccomment">/// Function used when a handle is not found inside `FileHandler`. It returns `Ok(-1)`and sets
+    /// the last OS error to `libc::EBADF` (invalid file descriptor). This function uses
+    /// `T: From&lt;i32&gt;` instead of `i32` directly because some fs functions return different integer
+    /// types (like `read`, that returns an `i64`).
+    </span><span class="kw">fn </span>handle_not_found&lt;T: From&lt;i32&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, T&gt; {
+        <span class="kw">let </span>this = <span class="self">self</span>.eval_context_mut();
+        <span class="kw">let </span>ebadf = this.eval_libc(<span class="string">&quot;EBADF&quot;</span>);
+        this.set_last_error(ebadf)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>((-<span class="number">1</span>).into())
+    }
+
     <span class="kw">fn </span>read(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         fd: i32,
@@ -2712,7 +2747,7 @@
         <span class="comment">// We cap the number of read bytes to the largest value that we are able to fit in both the
         // host&#39;s and target&#39;s `isize`. This saves us from having to handle overflows later.
         </span><span class="kw">let </span>count = count
-            .min(u64::try_from(this.machine_isize_max()).unwrap())
+            .min(u64::try_from(this.target_isize_max()).unwrap())
             .min(u64::try_from(isize::MAX).unwrap());
         <span class="kw">let </span>communicate = this.machine.communicate();
 
@@ -2765,7 +2800,7 @@
         <span class="comment">// We cap the number of written bytes to the largest value that we are able to fit in both the
         // host&#39;s and target&#39;s `isize`. This saves us from having to handle overflows later.
         </span><span class="kw">let </span>count = count
-            .min(u64::try_from(this.machine_isize_max()).unwrap())
+            .min(u64::try_from(this.target_isize_max()).unwrap())
             .min(u64::try_from(isize::MAX).unwrap());
         <span class="kw">let </span>communicate = this.machine.communicate();
 
@@ -2793,14 +2828,14 @@
         <span class="kw">let </span>offset = this.read_scalar(offset_op)<span class="question-mark">?</span>.to_i64()<span class="question-mark">?</span>;
         <span class="kw">let </span>whence = this.read_scalar(whence_op)<span class="question-mark">?</span>.to_i32()<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>seek_from = <span class="kw">if </span>whence == this.eval_libc_i32(<span class="string">&quot;SEEK_SET&quot;</span>)<span class="question-mark">? </span>{
+        <span class="kw">let </span>seek_from = <span class="kw">if </span>whence == this.eval_libc_i32(<span class="string">&quot;SEEK_SET&quot;</span>) {
             SeekFrom::Start(u64::try_from(offset).unwrap())
-        } <span class="kw">else if </span>whence == this.eval_libc_i32(<span class="string">&quot;SEEK_CUR&quot;</span>)<span class="question-mark">? </span>{
+        } <span class="kw">else if </span>whence == this.eval_libc_i32(<span class="string">&quot;SEEK_CUR&quot;</span>) {
             SeekFrom::Current(offset)
-        } <span class="kw">else if </span>whence == this.eval_libc_i32(<span class="string">&quot;SEEK_END&quot;</span>)<span class="question-mark">? </span>{
+        } <span class="kw">else if </span>whence == this.eval_libc_i32(<span class="string">&quot;SEEK_END&quot;</span>) {
             SeekFrom::End(offset)
         } <span class="kw">else </span>{
-            <span class="kw">let </span>einval = this.eval_libc(<span class="string">&quot;EINVAL&quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>einval = this.eval_libc(<span class="string">&quot;EINVAL&quot;</span>);
             this.set_last_error(einval)<span class="question-mark">?</span>;
             <span class="kw">return </span><span class="prelude-val">Ok</span>(Scalar::from_i64(-<span class="number">1</span>));
         };
@@ -2879,7 +2914,7 @@
         <span class="comment">// Reject if isolation is enabled.
         </span><span class="kw">if let </span>IsolatedOp::Reject(reject_with) = this.machine.isolated_op {
             this.reject_in_isolation(<span class="string">&quot;`stat`&quot;</span>, reject_with)<span class="question-mark">?</span>;
-            <span class="kw">let </span>eacc = this.eval_libc(<span class="string">&quot;EACCES&quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>eacc = this.eval_libc(<span class="string">&quot;EACCES&quot;</span>);
             this.set_last_error(eacc)<span class="question-mark">?</span>;
             <span class="kw">return </span><span class="prelude-val">Ok</span>(Scalar::from_i32(-<span class="number">1</span>));
         }
@@ -2908,7 +2943,7 @@
         <span class="comment">// Reject if isolation is enabled.
         </span><span class="kw">if let </span>IsolatedOp::Reject(reject_with) = this.machine.isolated_op {
             this.reject_in_isolation(<span class="string">&quot;`lstat`&quot;</span>, reject_with)<span class="question-mark">?</span>;
-            <span class="kw">let </span>eacc = this.eval_libc(<span class="string">&quot;EACCES&quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>eacc = this.eval_libc(<span class="string">&quot;EACCES&quot;</span>);
             this.set_last_error(eacc)<span class="question-mark">?</span>;
             <span class="kw">return </span><span class="prelude-val">Ok</span>(Scalar::from_i32(-<span class="number">1</span>));
         }
@@ -2966,7 +3001,7 @@
 
         <span class="comment">// If the statxbuf or pathname pointers are null, the function fails with `EFAULT`.
         </span><span class="kw">if </span>this.ptr_is_null(statxbuf_ptr)<span class="question-mark">? </span>|| this.ptr_is_null(pathname_ptr)<span class="question-mark">? </span>{
-            <span class="kw">let </span>efault = this.eval_libc(<span class="string">&quot;EFAULT&quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>efault = this.eval_libc(<span class="string">&quot;EFAULT&quot;</span>);
             this.set_last_error(efault)<span class="question-mark">?</span>;
             <span class="kw">return </span><span class="prelude-val">Ok</span>(-<span class="number">1</span>);
         }
@@ -2977,13 +3012,14 @@
         // as `isize`s instead of having the proper types. Thus, we have to recover the layout of
         // `statxbuf_op` by using the `libc::statx` struct type.
         </span><span class="kw">let </span>statxbuf = {
-            <span class="kw">let </span>statx_layout = this.libc_ty_layout(<span class="string">&quot;statx&quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>statx_layout = this.libc_ty_layout(<span class="string">&quot;statx&quot;</span>);
             MPlaceTy::from_aligned_ptr(statxbuf_ptr, statx_layout)
         };
 
         <span class="kw">let </span>path = this.read_path_from_c_str(pathname_ptr)<span class="question-mark">?</span>.into_owned();
         <span class="comment">// See &lt;https://github.com/rust-lang/rust/pull/79196&gt; for a discussion of argument sizes.
-        </span><span class="kw">let </span>empty_path_flag = flags &amp; this.eval_libc(<span class="string">&quot;AT_EMPTY_PATH&quot;</span>)<span class="question-mark">?</span>.to_i32()<span class="question-mark">? </span>!= <span class="number">0</span>;
+        </span><span class="kw">let </span>at_ampty_path = this.eval_libc_i32(<span class="string">&quot;AT_EMPTY_PATH&quot;</span>);
+        <span class="kw">let </span>empty_path_flag = flags &amp; at_ampty_path == at_ampty_path;
         <span class="comment">// We only support:
         // * interpreting `path` as an absolute directory,
         // * interpreting `path` as a path relative to `dirfd` when the latter is `AT_FDCWD`, or
@@ -2992,8 +3028,8 @@
         // Other behaviors cannot be tested from `libstd` and thus are not implemented. If you
         // found this error, please open an issue reporting it.
         </span><span class="kw">if </span>!(path.is_absolute()
-            || dirfd == this.eval_libc_i32(<span class="string">&quot;AT_FDCWD&quot;</span>)<span class="question-mark">?
-            </span>|| (path.as_os_str().is_empty() &amp;&amp; empty_path_flag))
+            || dirfd == this.eval_libc_i32(<span class="string">&quot;AT_FDCWD&quot;</span>)
+            || (path.as_os_str().is_empty() &amp;&amp; empty_path_flag))
         {
             <span class="macro">throw_unsup_format!</span>(
                 <span class="string">&quot;using statx is only supported with absolute paths, relative paths with the file \
@@ -3005,17 +3041,17 @@
         <span class="comment">// Reject if isolation is enabled.
         </span><span class="kw">if let </span>IsolatedOp::Reject(reject_with) = this.machine.isolated_op {
             this.reject_in_isolation(<span class="string">&quot;`statx`&quot;</span>, reject_with)<span class="question-mark">?</span>;
-            <span class="kw">let </span>ecode = <span class="kw">if </span>path.is_absolute() || dirfd == this.eval_libc_i32(<span class="string">&quot;AT_FDCWD&quot;</span>)<span class="question-mark">? </span>{
+            <span class="kw">let </span>ecode = <span class="kw">if </span>path.is_absolute() || dirfd == this.eval_libc_i32(<span class="string">&quot;AT_FDCWD&quot;</span>) {
                 <span class="comment">// since `path` is provided, either absolute or
                 // relative to CWD, `EACCES` is the most relevant.
-                </span>this.eval_libc(<span class="string">&quot;EACCES&quot;</span>)<span class="question-mark">?
-            </span>} <span class="kw">else </span>{
+                </span>this.eval_libc(<span class="string">&quot;EACCES&quot;</span>)
+            } <span class="kw">else </span>{
                 <span class="comment">// `dirfd` is set to target file, and `path` is empty
                 // (or we would have hit the `throw_unsup_format`
                 // above). `EACCES` would violate the spec.
                 </span><span class="macro">assert!</span>(empty_path_flag);
-                this.eval_libc(<span class="string">&quot;EBADF&quot;</span>)<span class="question-mark">?
-            </span>};
+                this.eval_libc(<span class="string">&quot;EBADF&quot;</span>)
+            };
             this.set_last_error(ecode)<span class="question-mark">?</span>;
             <span class="kw">return </span><span class="prelude-val">Ok</span>(-<span class="number">1</span>);
         }
@@ -3024,12 +3060,11 @@
         // However `statx` is allowed to return information that was not requested or to not
         // return information that was requested. This `mask` represents the information we can
         // actually provide for any target.
-        </span><span class="kw">let </span><span class="kw-2">mut </span>mask =
-            this.eval_libc(<span class="string">&quot;STATX_TYPE&quot;</span>)<span class="question-mark">?</span>.to_u32()<span class="question-mark">? </span>| this.eval_libc(<span class="string">&quot;STATX_SIZE&quot;</span>)<span class="question-mark">?</span>.to_u32()<span class="question-mark">?</span>;
+        </span><span class="kw">let </span><span class="kw-2">mut </span>mask = this.eval_libc_u32(<span class="string">&quot;STATX_TYPE&quot;</span>) | this.eval_libc_u32(<span class="string">&quot;STATX_SIZE&quot;</span>);
 
         <span class="comment">// If the `AT_SYMLINK_NOFOLLOW` flag is set, we query the file&#39;s metadata without following
         // symbolic links.
-        </span><span class="kw">let </span>follow_symlink = flags &amp; this.eval_libc(<span class="string">&quot;AT_SYMLINK_NOFOLLOW&quot;</span>)<span class="question-mark">?</span>.to_i32()<span class="question-mark">? </span>== <span class="number">0</span>;
+        </span><span class="kw">let </span>follow_symlink = flags &amp; this.eval_libc_i32(<span class="string">&quot;AT_SYMLINK_NOFOLLOW&quot;</span>) == <span class="number">0</span>;
 
         <span class="comment">// If the path is empty, and the AT_EMPTY_PATH flag is set, we query the open file
         // represented by dirfd, whether it&#39;s a directory or otherwise.
@@ -3058,7 +3093,7 @@
         </span><span class="kw">let </span>(access_sec, access_nsec) = metadata
             .accessed
             .map(|tup| {
-                mask |= this.eval_libc(<span class="string">&quot;STATX_ATIME&quot;</span>)<span class="question-mark">?</span>.to_u32()<span class="question-mark">?</span>;
+                mask |= this.eval_libc_u32(<span class="string">&quot;STATX_ATIME&quot;</span>);
                 InterpResult::Ok(tup)
             })
             .unwrap_or_else(|| <span class="prelude-val">Ok</span>((<span class="number">0</span>, <span class="number">0</span>)))<span class="question-mark">?</span>;
@@ -3066,7 +3101,7 @@
         <span class="kw">let </span>(created_sec, created_nsec) = metadata
             .created
             .map(|tup| {
-                mask |= this.eval_libc(<span class="string">&quot;STATX_BTIME&quot;</span>)<span class="question-mark">?</span>.to_u32()<span class="question-mark">?</span>;
+                mask |= this.eval_libc_u32(<span class="string">&quot;STATX_BTIME&quot;</span>);
                 InterpResult::Ok(tup)
             })
             .unwrap_or_else(|| <span class="prelude-val">Ok</span>((<span class="number">0</span>, <span class="number">0</span>)))<span class="question-mark">?</span>;
@@ -3074,7 +3109,7 @@
         <span class="kw">let </span>(modified_sec, modified_nsec) = metadata
             .modified
             .map(|tup| {
-                mask |= this.eval_libc(<span class="string">&quot;STATX_MTIME&quot;</span>)<span class="question-mark">?</span>.to_u32()<span class="question-mark">?</span>;
+                mask |= this.eval_libc_u32(<span class="string">&quot;STATX_MTIME&quot;</span>);
                 InterpResult::Ok(tup)
             })
             .unwrap_or_else(|| <span class="prelude-val">Ok</span>((<span class="number">0</span>, <span class="number">0</span>)))<span class="question-mark">?</span>;
@@ -3147,7 +3182,7 @@
         <span class="kw">let </span>newpath_ptr = this.read_pointer(newpath_op)<span class="question-mark">?</span>;
 
         <span class="kw">if </span>this.ptr_is_null(oldpath_ptr)<span class="question-mark">? </span>|| this.ptr_is_null(newpath_ptr)<span class="question-mark">? </span>{
-            <span class="kw">let </span>efault = this.eval_libc(<span class="string">&quot;EFAULT&quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>efault = this.eval_libc(<span class="string">&quot;EFAULT&quot;</span>);
             this.set_last_error(efault)<span class="question-mark">?</span>;
             <span class="kw">return </span><span class="prelude-val">Ok</span>(-<span class="number">1</span>);
         }
@@ -3234,7 +3269,7 @@
         <span class="comment">// Reject if isolation is enabled.
         </span><span class="kw">if let </span>IsolatedOp::Reject(reject_with) = this.machine.isolated_op {
             this.reject_in_isolation(<span class="string">&quot;`opendir`&quot;</span>, reject_with)<span class="question-mark">?</span>;
-            <span class="kw">let </span>eacc = this.eval_libc(<span class="string">&quot;EACCES&quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>eacc = this.eval_libc(<span class="string">&quot;EACCES&quot;</span>);
             this.set_last_error(eacc)<span class="question-mark">?</span>;
             <span class="kw">return </span><span class="prelude-val">Ok</span>(Scalar::null_ptr(this));
         }
@@ -3248,7 +3283,7 @@
                 <span class="comment">// The libc API for opendir says that this method returns a pointer to an opaque
                 // structure, but we are returning an ID number. Thus, pass it as a scalar of
                 // pointer width.
-                </span><span class="prelude-val">Ok</span>(Scalar::from_machine_usize(id, this))
+                </span><span class="prelude-val">Ok</span>(Scalar::from_target_usize(id, this))
             }
             <span class="prelude-val">Err</span>(e) =&gt; {
                 this.set_last_error_from_io_error(e.kind())<span class="question-mark">?</span>;
@@ -3265,12 +3300,12 @@
 
         this.assert_target_os(<span class="string">&quot;linux&quot;</span>, <span class="string">&quot;readdir64&quot;</span>);
 
-        <span class="kw">let </span>dirp = this.read_scalar(dirp_op)<span class="question-mark">?</span>.to_machine_usize(this)<span class="question-mark">?</span>;
+        <span class="kw">let </span>dirp = this.read_target_usize(dirp_op)<span class="question-mark">?</span>;
 
         <span class="comment">// Reject if isolation is enabled.
         </span><span class="kw">if let </span>IsolatedOp::Reject(reject_with) = this.machine.isolated_op {
             this.reject_in_isolation(<span class="string">&quot;`readdir`&quot;</span>, reject_with)<span class="question-mark">?</span>;
-            <span class="kw">let </span>eacc = this.eval_libc(<span class="string">&quot;EBADF&quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>eacc = this.eval_libc(<span class="string">&quot;EBADF&quot;</span>);
             this.set_last_error(eacc)<span class="question-mark">?</span>;
             <span class="kw">return </span><span class="prelude-val">Ok</span>(Scalar::null_ptr(this));
         }
@@ -3299,7 +3334,7 @@
                 </span><span class="kw">let </span>name_bytes = os_str_to_bytes(<span class="kw-2">&amp;</span>name)<span class="question-mark">?</span>;
                 <span class="kw">let </span>name_len = u64::try_from(name_bytes.len()).unwrap();
 
-                <span class="kw">let </span>dirent64_layout = this.libc_ty_layout(<span class="string">&quot;dirent64&quot;</span>)<span class="question-mark">?</span>;
+                <span class="kw">let </span>dirent64_layout = this.libc_ty_layout(<span class="string">&quot;dirent64&quot;</span>);
                 <span class="kw">let </span>d_name_offset = dirent64_layout.fields.offset(<span class="number">4 </span><span class="comment">/* d_name */</span>).bytes();
                 <span class="kw">let </span>size = d_name_offset.checked_add(name_len).unwrap();
 
@@ -3357,7 +3392,7 @@
 
         this.assert_target_os(<span class="string">&quot;macos&quot;</span>, <span class="string">&quot;readdir_r&quot;</span>);
 
-        <span class="kw">let </span>dirp = this.read_scalar(dirp_op)<span class="question-mark">?</span>.to_machine_usize(this)<span class="question-mark">?</span>;
+        <span class="kw">let </span>dirp = this.read_target_usize(dirp_op)<span class="question-mark">?</span>;
 
         <span class="comment">// Reject if isolation is enabled.
         </span><span class="kw">if let </span>IsolatedOp::Reject(reject_with) = this.machine.isolated_op {
@@ -3450,7 +3485,7 @@
     <span class="kw">fn </span>closedir(<span class="kw-2">&amp;mut </span><span class="self">self</span>, dirp_op: <span class="kw-2">&amp;</span>OpTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, i32&gt; {
         <span class="kw">let </span>this = <span class="self">self</span>.eval_context_mut();
 
-        <span class="kw">let </span>dirp = this.read_scalar(dirp_op)<span class="question-mark">?</span>.to_machine_usize(this)<span class="question-mark">?</span>;
+        <span class="kw">let </span>dirp = this.read_target_usize(dirp_op)<span class="question-mark">?</span>;
 
         <span class="comment">// Reject if isolation is enabled.
         </span><span class="kw">if let </span>IsolatedOp::Reject(reject_with) = this.machine.isolated_op {
@@ -3488,19 +3523,24 @@
         <span class="prelude-val">Ok</span>(Scalar::from_i32(
             <span class="kw">if let </span><span class="prelude-val">Some</span>(file_descriptor) = this.machine.file_handler.handles.get_mut(<span class="kw-2">&amp;</span>fd) {
                 <span class="comment">// FIXME: Support ftruncate64 for all FDs
-                </span><span class="kw">let </span>FileHandle { file, writable } = file_descriptor.as_file_handle()<span class="question-mark">?</span>;
+                </span><span class="kw">let </span>FileHandle { file, writable } =
+                    file_descriptor.as_any().downcast_ref::&lt;FileHandle&gt;().ok_or_else(|| {
+                        <span class="macro">err_unsup_format!</span>(
+                            <span class="string">&quot;`ftruncate64` is only supported on file-backed file descriptors&quot;
+                        </span>)
+                    })<span class="question-mark">?</span>;
                 <span class="kw">if </span><span class="kw-2">*</span>writable {
                     <span class="kw">if let </span><span class="prelude-val">Ok</span>(length) = length.try_into() {
                         <span class="kw">let </span>result = file.set_len(length);
                         this.try_unwrap_io_result(result.map(|<span class="kw">_</span>| <span class="number">0i32</span>))<span class="question-mark">?
                     </span>} <span class="kw">else </span>{
-                        <span class="kw">let </span>einval = this.eval_libc(<span class="string">&quot;EINVAL&quot;</span>)<span class="question-mark">?</span>;
+                        <span class="kw">let </span>einval = this.eval_libc(<span class="string">&quot;EINVAL&quot;</span>);
                         this.set_last_error(einval)<span class="question-mark">?</span>;
                         -<span class="number">1
                     </span>}
                 } <span class="kw">else </span>{
                     <span class="comment">// The file is not writable
-                    </span><span class="kw">let </span>einval = this.eval_libc(<span class="string">&quot;EINVAL&quot;</span>)<span class="question-mark">?</span>;
+                    </span><span class="kw">let </span>einval = this.eval_libc(<span class="string">&quot;EINVAL&quot;</span>);
                     this.set_last_error(einval)<span class="question-mark">?</span>;
                     -<span class="number">1
                 </span>}
@@ -3529,7 +3569,10 @@
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(file_descriptor) = this.machine.file_handler.handles.get(<span class="kw-2">&amp;</span>fd) {
             <span class="comment">// FIXME: Support fsync for all FDs
-            </span><span class="kw">let </span>FileHandle { file, writable } = file_descriptor.as_file_handle()<span class="question-mark">?</span>;
+            </span><span class="kw">let </span>FileHandle { file, writable } =
+                file_descriptor.as_any().downcast_ref::&lt;FileHandle&gt;().ok_or_else(|| {
+                    <span class="macro">err_unsup_format!</span>(<span class="string">&quot;`fsync` is only supported on file-backed file descriptors&quot;</span>)
+                })<span class="question-mark">?</span>;
             <span class="kw">let </span>io_result = maybe_sync_file(file, <span class="kw-2">*</span>writable, File::sync_all);
             this.try_unwrap_io_result(io_result)
         } <span class="kw">else </span>{
@@ -3551,7 +3594,12 @@
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(file_descriptor) = this.machine.file_handler.handles.get(<span class="kw-2">&amp;</span>fd) {
             <span class="comment">// FIXME: Support fdatasync for all FDs
-            </span><span class="kw">let </span>FileHandle { file, writable } = file_descriptor.as_file_handle()<span class="question-mark">?</span>;
+            </span><span class="kw">let </span>FileHandle { file, writable } =
+                file_descriptor.as_any().downcast_ref::&lt;FileHandle&gt;().ok_or_else(|| {
+                    <span class="macro">err_unsup_format!</span>(
+                        <span class="string">&quot;`fdatasync` is only supported on file-backed file descriptors&quot;
+                    </span>)
+                })<span class="question-mark">?</span>;
             <span class="kw">let </span>io_result = maybe_sync_file(file, <span class="kw-2">*</span>writable, File::sync_data);
             this.try_unwrap_io_result(io_result)
         } <span class="kw">else </span>{
@@ -3574,15 +3622,15 @@
         <span class="kw">let </span>flags = this.read_scalar(flags_op)<span class="question-mark">?</span>.to_i32()<span class="question-mark">?</span>;
 
         <span class="kw">if </span>offset &lt; <span class="number">0 </span>|| nbytes &lt; <span class="number">0 </span>{
-            <span class="kw">let </span>einval = this.eval_libc(<span class="string">&quot;EINVAL&quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>einval = this.eval_libc(<span class="string">&quot;EINVAL&quot;</span>);
             this.set_last_error(einval)<span class="question-mark">?</span>;
             <span class="kw">return </span><span class="prelude-val">Ok</span>(Scalar::from_i32(-<span class="number">1</span>));
         }
-        <span class="kw">let </span>allowed_flags = this.eval_libc_i32(<span class="string">&quot;SYNC_FILE_RANGE_WAIT_BEFORE&quot;</span>)<span class="question-mark">?
-            </span>| this.eval_libc_i32(<span class="string">&quot;SYNC_FILE_RANGE_WRITE&quot;</span>)<span class="question-mark">?
-            </span>| this.eval_libc_i32(<span class="string">&quot;SYNC_FILE_RANGE_WAIT_AFTER&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>allowed_flags = this.eval_libc_i32(<span class="string">&quot;SYNC_FILE_RANGE_WAIT_BEFORE&quot;</span>)
+            | this.eval_libc_i32(<span class="string">&quot;SYNC_FILE_RANGE_WRITE&quot;</span>)
+            | this.eval_libc_i32(<span class="string">&quot;SYNC_FILE_RANGE_WAIT_AFTER&quot;</span>);
         <span class="kw">if </span>flags &amp; allowed_flags != flags {
-            <span class="kw">let </span>einval = this.eval_libc(<span class="string">&quot;EINVAL&quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>einval = this.eval_libc(<span class="string">&quot;EINVAL&quot;</span>);
             this.set_last_error(einval)<span class="question-mark">?</span>;
             <span class="kw">return </span><span class="prelude-val">Ok</span>(Scalar::from_i32(-<span class="number">1</span>));
         }
@@ -3596,7 +3644,12 @@
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(file_descriptor) = this.machine.file_handler.handles.get(<span class="kw-2">&amp;</span>fd) {
             <span class="comment">// FIXME: Support sync_data_range for all FDs
-            </span><span class="kw">let </span>FileHandle { file, writable } = file_descriptor.as_file_handle()<span class="question-mark">?</span>;
+            </span><span class="kw">let </span>FileHandle { file, writable } =
+                file_descriptor.as_any().downcast_ref::&lt;FileHandle&gt;().ok_or_else(|| {
+                    <span class="macro">err_unsup_format!</span>(
+                        <span class="string">&quot;`sync_data_range` is only supported on file-backed file descriptors&quot;
+                    </span>)
+                })<span class="question-mark">?</span>;
             <span class="kw">let </span>io_result = maybe_sync_file(file, <span class="kw-2">*</span>writable, File::sync_data);
             <span class="prelude-val">Ok</span>(Scalar::from_i32(this.try_unwrap_io_result(io_result)<span class="question-mark">?</span>))
         } <span class="kw">else </span>{
@@ -3614,12 +3667,12 @@
 
         <span class="kw">let </span>pathname = this.read_path_from_c_str(this.read_pointer(pathname_op)<span class="question-mark">?</span>)<span class="question-mark">?</span>;
         <span class="kw">let </span>buf = this.read_pointer(buf_op)<span class="question-mark">?</span>;
-        <span class="kw">let </span>bufsize = this.read_scalar(bufsize_op)<span class="question-mark">?</span>.to_machine_usize(this)<span class="question-mark">?</span>;
+        <span class="kw">let </span>bufsize = this.read_target_usize(bufsize_op)<span class="question-mark">?</span>;
 
         <span class="comment">// Reject if isolation is enabled.
         </span><span class="kw">if let </span>IsolatedOp::Reject(reject_with) = this.machine.isolated_op {
             this.reject_in_isolation(<span class="string">&quot;`readlink`&quot;</span>, reject_with)<span class="question-mark">?</span>;
-            <span class="kw">let </span>eacc = this.eval_libc(<span class="string">&quot;EACCES&quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>eacc = this.eval_libc(<span class="string">&quot;EACCES&quot;</span>);
             this.set_last_error(eacc)<span class="question-mark">?</span>;
             <span class="kw">return </span><span class="prelude-val">Ok</span>(-<span class="number">1</span>);
         }
@@ -3630,7 +3683,7 @@
                 <span class="comment">// &#39;readlink&#39; truncates the resolved path if the provided buffer is not large
                 // enough, and does *not* add a null terminator. That means we cannot use the usual
                 // `write_path_to_c_str` and have to re-implement parts of it ourselves.
-                </span><span class="kw">let </span>resolved = this.convert_path_separator(
+                </span><span class="kw">let </span>resolved = this.convert_path(
                     Cow::Borrowed(resolved.as_ref()),
                     <span class="kw">crate</span>::shims::os_str::PathConversion::HostToTarget,
                 );
@@ -3664,7 +3717,7 @@
             }
         }
         <span class="comment">// Fallback when the FD was not found or isolation is enabled.
-        </span><span class="kw">let </span>enotty = this.eval_libc(<span class="string">&quot;ENOTTY&quot;</span>)<span class="question-mark">?</span>;
+        </span><span class="kw">let </span>enotty = this.eval_libc(<span class="string">&quot;ENOTTY&quot;</span>);
         this.set_last_error(enotty)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(Scalar::from_i32(<span class="number">0</span>))
     }
@@ -3683,17 +3736,17 @@
         <span class="comment">// Reject if isolation is enabled.
         </span><span class="kw">if let </span>IsolatedOp::Reject(reject_with) = this.machine.isolated_op {
             this.reject_in_isolation(<span class="string">&quot;`realpath`&quot;</span>, reject_with)<span class="question-mark">?</span>;
-            <span class="kw">let </span>eacc = this.eval_libc(<span class="string">&quot;EACCES&quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>eacc = this.eval_libc(<span class="string">&quot;EACCES&quot;</span>);
             this.set_last_error(eacc)<span class="question-mark">?</span>;
-            <span class="kw">return </span><span class="prelude-val">Ok</span>(Scalar::from_machine_usize(<span class="number">0</span>, this));
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(Scalar::from_target_usize(<span class="number">0</span>, this));
         }
 
         <span class="kw">let </span>result = std::fs::canonicalize(pathname);
         <span class="kw">match </span>result {
             <span class="prelude-val">Ok</span>(resolved) =&gt; {
                 <span class="kw">let </span>path_max = this
-                    .eval_libc_i32(<span class="string">&quot;PATH_MAX&quot;</span>)<span class="question-mark">?
-                    </span>.try_into()
+                    .eval_libc_i32(<span class="string">&quot;PATH_MAX&quot;</span>)
+                    .try_into()
                     .expect(<span class="string">&quot;PATH_MAX does not fit in u64&quot;</span>);
                 <span class="kw">let </span>dest = <span class="kw">if </span>this.ptr_is_null(processed_ptr)<span class="question-mark">? </span>{
                     <span class="comment">// POSIX says behavior when passing a null pointer is implementation-defined,
@@ -3714,9 +3767,9 @@
                         <span class="comment">// Note that we do not explicitly handle `FILENAME_MAX`
                         // (different from `PATH_MAX` above) as it is Linux-specific and
                         // seems like a bit of a mess anyway: &lt;https://eklitzke.org/path-max-is-tricky&gt;.
-                        </span><span class="kw">let </span>enametoolong = this.eval_libc(<span class="string">&quot;ENAMETOOLONG&quot;</span>)<span class="question-mark">?</span>;
+                        </span><span class="kw">let </span>enametoolong = this.eval_libc(<span class="string">&quot;ENAMETOOLONG&quot;</span>);
                         this.set_last_error(enametoolong)<span class="question-mark">?</span>;
-                        <span class="kw">return </span><span class="prelude-val">Ok</span>(Scalar::from_machine_usize(<span class="number">0</span>, this));
+                        <span class="kw">return </span><span class="prelude-val">Ok</span>(Scalar::from_target_usize(<span class="number">0</span>, this));
                     }
                     processed_ptr
                 };
@@ -3725,7 +3778,7 @@
             }
             <span class="prelude-val">Err</span>(e) =&gt; {
                 this.set_last_error_from_io_error(e.kind())<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(Scalar::from_machine_usize(<span class="number">0</span>, this))
+                <span class="prelude-val">Ok</span>(Scalar::from_target_usize(<span class="number">0</span>, this))
             }
         }
     }
@@ -3747,7 +3800,7 @@
         //   * The value of `TMP_MAX` is at least 25.
         //   * On XSI-conformant systems, the value of `TMP_MAX` is at least 10000.
         // See &lt;https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/stdio.h.html&gt;.
-        </span><span class="kw">let </span>max_attempts = this.eval_libc(<span class="string">&quot;TMP_MAX&quot;</span>)<span class="question-mark">?</span>.to_u32()<span class="question-mark">?</span>;
+        </span><span class="kw">let </span>max_attempts = this.eval_libc_u32(<span class="string">&quot;TMP_MAX&quot;</span>);
 
         <span class="comment">// Get the raw bytes from the template -- as a byte slice, this is a string in the target
         // (and the target is unix, so a byte slice is the right representation).
@@ -3758,7 +3811,7 @@
         <span class="comment">// Reject if isolation is enabled.
         </span><span class="kw">if let </span>IsolatedOp::Reject(reject_with) = this.machine.isolated_op {
             this.reject_in_isolation(<span class="string">&quot;`mkstemp`&quot;</span>, reject_with)<span class="question-mark">?</span>;
-            <span class="kw">let </span>eacc = this.eval_libc(<span class="string">&quot;EACCES&quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>eacc = this.eval_libc(<span class="string">&quot;EACCES&quot;</span>);
             this.set_last_error(eacc)<span class="question-mark">?</span>;
             <span class="kw">return </span><span class="prelude-val">Ok</span>(-<span class="number">1</span>);
         }
@@ -3776,7 +3829,7 @@
 
         <span class="comment">// If we don&#39;t find the suffix, it is an error.
         </span><span class="kw">if </span>last_six_char_bytes != suffix_bytes {
-            <span class="kw">let </span>einval = this.eval_libc(<span class="string">&quot;EINVAL&quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>einval = this.eval_libc(<span class="string">&quot;EINVAL&quot;</span>);
             this.set_last_error(einval)<span class="question-mark">?</span>;
             <span class="kw">return </span><span class="prelude-val">Ok</span>(-<span class="number">1</span>);
         }
@@ -3852,7 +3905,7 @@
         }
 
         <span class="comment">// We ran out of attempts to create the file, return an error.
-        </span><span class="kw">let </span>eexist = this.eval_libc(<span class="string">&quot;EEXIST&quot;</span>)<span class="question-mark">?</span>;
+        </span><span class="kw">let </span>eexist = this.eval_libc(<span class="string">&quot;EEXIST&quot;</span>);
         this.set_last_error(eexist)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(-<span class="number">1</span>)
     }
@@ -3900,7 +3953,16 @@
     ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, <span class="prelude-ty">Option</span>&lt;FileMetadata&gt;&gt; {
         <span class="kw">let </span>option = ecx.machine.file_handler.handles.get(<span class="kw-2">&amp;</span>fd);
         <span class="kw">let </span>file = <span class="kw">match </span>option {
-            <span class="prelude-val">Some</span>(file_descriptor) =&gt; <span class="kw-2">&amp;</span>file_descriptor.as_file_handle()<span class="question-mark">?</span>.file,
+            <span class="prelude-val">Some</span>(file_descriptor) =&gt;
+                <span class="kw-2">&amp;</span>file_descriptor
+                    .as_any()
+                    .downcast_ref::&lt;FileHandle&gt;()
+                    .ok_or_else(|| {
+                        <span class="macro">err_unsup_format!</span>(
+                            <span class="string">&quot;obtaining metadata is only supported on file-backed file descriptors&quot;
+                        </span>)
+                    })<span class="question-mark">?
+                    </span>.file,
             <span class="prelude-val">None </span>=&gt; <span class="kw">return </span>ecx.handle_not_found().map(|<span class="kw">_</span>: i32| <span class="prelude-val">None</span>),
         };
         <span class="kw">let </span>metadata = file.metadata();
@@ -3930,7 +3992,7 @@
             <span class="string">&quot;S_IFLNK&quot;
         </span>};
 
-        <span class="kw">let </span>mode = ecx.eval_libc(mode_name)<span class="question-mark">?</span>;
+        <span class="kw">let </span>mode = ecx.eval_libc(mode_name);
 
         <span class="kw">let </span>size = metadata.len();
 
@@ -3942,5 +4004,4 @@
         </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(FileMetadata { mode, size, created, accessed, modified }))
     }
 }
-</code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="miri" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (b28d30e1e 2022-12-06)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</code></pre></div></section></main></body></html>

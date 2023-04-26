@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/miri-8f8b361f28c5a248/98ad06d/src/machine.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>machine.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-389f8b4a37bc03c9.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../static.files/light-046227e470cd3629.css"><link rel="stylesheet" disabled href="../../static.files/dark-800f2ee593c8e6f7.css"><link rel="stylesheet" disabled href="../../static.files/ayu-9edae3c387f5a5b3.css"><script id="default-settings" ></script><script src="../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../miri/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/miri-8f8b361f28c5a248/35d6927/src/machine.rs`."><title>machine.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-63a85fc7cf22dee2.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="miri" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (9df3a39fb 2023-04-11)" data-search-js="search-bc5a112813b5d712.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-1159a395118aa44e.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../miri/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1178,7 +1178,71 @@
 <a href="#1178" id="1178">1178</a>
 <a href="#1179" id="1179">1179</a>
 <a href="#1180" id="1180">1180</a>
-</pre><pre class="rust"><code><span class="doccomment">//! Global machine state as well as implementation of the interpreter engine
+<a href="#1181" id="1181">1181</a>
+<a href="#1182" id="1182">1182</a>
+<a href="#1183" id="1183">1183</a>
+<a href="#1184" id="1184">1184</a>
+<a href="#1185" id="1185">1185</a>
+<a href="#1186" id="1186">1186</a>
+<a href="#1187" id="1187">1187</a>
+<a href="#1188" id="1188">1188</a>
+<a href="#1189" id="1189">1189</a>
+<a href="#1190" id="1190">1190</a>
+<a href="#1191" id="1191">1191</a>
+<a href="#1192" id="1192">1192</a>
+<a href="#1193" id="1193">1193</a>
+<a href="#1194" id="1194">1194</a>
+<a href="#1195" id="1195">1195</a>
+<a href="#1196" id="1196">1196</a>
+<a href="#1197" id="1197">1197</a>
+<a href="#1198" id="1198">1198</a>
+<a href="#1199" id="1199">1199</a>
+<a href="#1200" id="1200">1200</a>
+<a href="#1201" id="1201">1201</a>
+<a href="#1202" id="1202">1202</a>
+<a href="#1203" id="1203">1203</a>
+<a href="#1204" id="1204">1204</a>
+<a href="#1205" id="1205">1205</a>
+<a href="#1206" id="1206">1206</a>
+<a href="#1207" id="1207">1207</a>
+<a href="#1208" id="1208">1208</a>
+<a href="#1209" id="1209">1209</a>
+<a href="#1210" id="1210">1210</a>
+<a href="#1211" id="1211">1211</a>
+<a href="#1212" id="1212">1212</a>
+<a href="#1213" id="1213">1213</a>
+<a href="#1214" id="1214">1214</a>
+<a href="#1215" id="1215">1215</a>
+<a href="#1216" id="1216">1216</a>
+<a href="#1217" id="1217">1217</a>
+<a href="#1218" id="1218">1218</a>
+<a href="#1219" id="1219">1219</a>
+<a href="#1220" id="1220">1220</a>
+<a href="#1221" id="1221">1221</a>
+<a href="#1222" id="1222">1222</a>
+<a href="#1223" id="1223">1223</a>
+<a href="#1224" id="1224">1224</a>
+<a href="#1225" id="1225">1225</a>
+<a href="#1226" id="1226">1226</a>
+<a href="#1227" id="1227">1227</a>
+<a href="#1228" id="1228">1228</a>
+<a href="#1229" id="1229">1229</a>
+<a href="#1230" id="1230">1230</a>
+<a href="#1231" id="1231">1231</a>
+<a href="#1232" id="1232">1232</a>
+<a href="#1233" id="1233">1233</a>
+<a href="#1234" id="1234">1234</a>
+<a href="#1235" id="1235">1235</a>
+<a href="#1236" id="1236">1236</a>
+<a href="#1237" id="1237">1237</a>
+<a href="#1238" id="1238">1238</a>
+<a href="#1239" id="1239">1239</a>
+<a href="#1240" id="1240">1240</a>
+<a href="#1241" id="1241">1241</a>
+<a href="#1242" id="1242">1242</a>
+<a href="#1243" id="1243">1243</a>
+<a href="#1244" id="1244">1244</a>
+</pre></div><pre class="rust"><code><span class="doccomment">//! Global machine state as well as implementation of the interpreter engine
 //! `Machine` trait.
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -1189,6 +1253,7 @@
 <span class="kw">use </span>rand::SeedableRng;
 
 <span class="kw">use </span>rustc_ast::ast::Mutability;
+<span class="kw">use </span>rustc_const_eval::const_eval::CheckAlignment;
 <span class="kw">use </span>rustc_data_structures::fx::{FxHashMap, FxHashSet};
 <span class="attr">#[allow(unused)]
 </span><span class="kw">use </span>rustc_data_structures::static_assert_size;
@@ -1202,7 +1267,7 @@
 };
 <span class="kw">use </span>rustc_span::def_id::{CrateNum, DefId};
 <span class="kw">use </span>rustc_span::Symbol;
-<span class="kw">use </span>rustc_target::abi::Size;
+<span class="kw">use </span>rustc_target::abi::{Align, Size};
 <span class="kw">use </span>rustc_target::spec::abi::Abi;
 
 <span class="kw">use crate</span>::{
@@ -1211,14 +1276,13 @@
     <span class="kw-2">*</span>,
 };
 
-<span class="comment">// Some global facts about the emulated machine.
-</span><span class="kw">pub const </span>PAGE_SIZE: u64 = <span class="number">4 </span>* <span class="number">1024</span>; <span class="comment">// FIXME: adjust to target architecture
-</span><span class="kw">pub const </span>STACK_ADDR: u64 = <span class="number">32 </span>* PAGE_SIZE; <span class="comment">// not really about the &quot;stack&quot;, but where we start assigning integer addresses to allocations
-</span><span class="kw">pub const </span>STACK_SIZE: u64 = <span class="number">16 </span>* PAGE_SIZE; <span class="comment">// whatever
+<span class="doccomment">/// The number of the available real-time signal with the lowest priority.
+/// Dummy constant related to epoll, must be between 32 and 64.
+</span><span class="kw">pub const </span>SIGRTMAX: i32 = <span class="number">42</span>;
 
-</span><span class="doccomment">/// Extra data stored with each stack frame
+<span class="doccomment">/// Extra data stored with each stack frame
 </span><span class="kw">pub struct </span>FrameExtra&lt;<span class="lifetime">&#39;tcx</span>&gt; {
-    <span class="doccomment">/// Extra data for Stacked Borrows.
+    <span class="doccomment">/// Extra data for the Borrow Tracker.
     </span><span class="kw">pub </span>borrow_tracker: <span class="prelude-ty">Option</span>&lt;borrow_tracker::FrameState&gt;,
 
     <span class="doccomment">/// If this is Some(), then this is a special &quot;catch unwind&quot; frame (the frame of `try_fn`
@@ -1326,7 +1390,7 @@
 </span><span class="kw">pub enum </span>Provenance {
     Concrete {
         alloc_id: AllocId,
-        <span class="doccomment">/// Stacked Borrows tag.
+        <span class="doccomment">/// Borrow Tracker tag.
         </span>tag: BorTag,
     },
     Wildcard,
@@ -1375,7 +1439,7 @@
                 } <span class="kw">else </span>{
                     <span class="macro">write!</span>(f, <span class="string">&quot;[{alloc_id:?}]&quot;</span>)<span class="question-mark">?</span>;
                 }
-                <span class="comment">// Print Stacked Borrows tag.
+                <span class="comment">// Print Borrow Tracker tag.
                 </span><span class="macro">write!</span>(f, <span class="string">&quot;{tag:?}&quot;</span>)<span class="question-mark">?</span>;
             }
             Provenance::Wildcard =&gt; {
@@ -1649,11 +1713,16 @@
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) since_gc: u32,
     <span class="doccomment">/// The number of CPUs to be reported by miri.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) num_cpus: u32,
+    <span class="doccomment">/// Determines Miri&#39;s page size and associated values
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) page_size: u64,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) stack_addr: u64,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) stack_size: u64,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt; MiriMachine&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt; {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(config: <span class="kw-2">&amp;</span>MiriConfig, layout_cx: LayoutCx&lt;<span class="lifetime">&#39;tcx</span>, TyCtxt&lt;<span class="lifetime">&#39;tcx</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>local_crates = helpers::get_local_crates(layout_cx.tcx);
+        <span class="kw">let </span>tcx = layout_cx.tcx;
+        <span class="kw">let </span>local_crates = helpers::get_local_crates(tcx);
         <span class="kw">let </span>layouts =
             PrimitiveLayouts::new(layout_cx).expect(<span class="string">&quot;Couldn&#39;t get layouts of primitive types&quot;</span>);
         <span class="kw">let </span>profiler = config.measureme_out.as_ref().map(|out| {
@@ -1662,11 +1731,36 @@
         <span class="kw">let </span>rng = StdRng::seed_from_u64(config.seed.unwrap_or(<span class="number">0</span>));
         <span class="kw">let </span>borrow_tracker = config.borrow_tracker.map(|bt| bt.instanciate_global_state(config));
         <span class="kw">let </span>data_race = config.data_race_detector.then(|| data_race::GlobalState::new(config));
+        <span class="comment">// Determinine page size, stack address, and stack size.
+        // These values are mostly meaningless, but the stack address is also where we start
+        // allocating physical integer addresses for all allocations.
+        </span><span class="kw">let </span>page_size = <span class="kw">if let </span><span class="prelude-val">Some</span>(page_size) = config.page_size {
+            page_size
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>target = <span class="kw-2">&amp;</span>tcx.sess.target;
+            <span class="kw">match </span>target.arch.as_ref() {
+                <span class="string">&quot;wasm32&quot; </span>| <span class="string">&quot;wasm64&quot; </span>=&gt; <span class="number">64 </span>* <span class="number">1024</span>, <span class="comment">// https://webassembly.github.io/spec/core/exec/runtime.html#memory-instances
+                </span><span class="string">&quot;aarch64&quot; </span>=&gt;
+                    <span class="kw">if </span>target.options.vendor.as_ref() == <span class="string">&quot;apple&quot; </span>{
+                        <span class="comment">// No &quot;definitive&quot; source, but see:
+                        // https://www.wwdcnotes.com/notes/wwdc20/10214/
+                        // https://github.com/ziglang/zig/issues/11308 etc.
+                        </span><span class="number">16 </span>* <span class="number">1024
+                    </span>} <span class="kw">else </span>{
+                        <span class="number">4 </span>* <span class="number">1024
+                    </span>},
+                <span class="kw">_ </span>=&gt; <span class="number">4 </span>* <span class="number">1024</span>,
+            }
+        };
+        <span class="comment">// On 16bit targets, 32 pages is more than the entire address space!
+        </span><span class="kw">let </span>stack_addr = <span class="kw">if </span>tcx.pointer_size().bits() &lt; <span class="number">32 </span>{ page_size } <span class="kw">else </span>{ page_size * <span class="number">32 </span>};
+        <span class="kw">let </span>stack_size =
+            <span class="kw">if </span>tcx.pointer_size().bits() &lt; <span class="number">32 </span>{ page_size * <span class="number">4 </span>} <span class="kw">else </span>{ page_size * <span class="number">16 </span>};
         MiriMachine {
-            tcx: layout_cx.tcx,
+            tcx,
             borrow_tracker,
             data_race,
-            intptrcast: RefCell::new(intptrcast::GlobalStateInner::new(config)),
+            intptrcast: RefCell::new(intptrcast::GlobalStateInner::new(config, stack_addr)),
             <span class="comment">// `env_vars` depends on a full interpreter so we cannot properly initialize it yet.
             </span>env_vars: EnvVars::default(),
             main_fn_ret_place: <span class="prelude-val">None</span>,
@@ -1728,6 +1822,9 @@
             gc_interval: config.gc_interval,
             since_gc: <span class="number">0</span>,
             num_cpus: config.num_cpus,
+            page_size,
+            stack_addr,
+            stack_size,
         }
     }
 
@@ -1872,6 +1969,9 @@
             gc_interval: <span class="kw">_</span>,
             since_gc: <span class="kw">_</span>,
             num_cpus: <span class="kw">_</span>,
+            page_size: <span class="kw">_</span>,
+            stack_addr: <span class="kw">_</span>,
+            stack_size: <span class="kw">_</span>,
         } = <span class="self">self</span>;
 
         threads.visit_tags(visit);
@@ -1921,10 +2021,11 @@
 
     <span class="kw">type </span>Provenance = Provenance;
     <span class="kw">type </span>ProvenanceExtra = ProvenanceExtra;
+    <span class="kw">type </span>Bytes = Box&lt;[u8]&gt;;
 
     <span class="kw">type </span>MemoryMap = MonoHashMap&lt;
         AllocId,
-        (MemoryKind&lt;MiriMemoryKind&gt;, Allocation&lt;Provenance, <span class="self">Self</span>::AllocExtra&gt;),
+        (MemoryKind&lt;MiriMemoryKind&gt;, Allocation&lt;Provenance, <span class="self">Self</span>::AllocExtra, <span class="self">Self</span>::Bytes&gt;),
     &gt;;
 
     <span class="kw">const </span>GLOBAL_KIND: <span class="prelude-ty">Option</span>&lt;MiriMemoryKind&gt; = <span class="prelude-val">Some</span>(MiriMemoryKind::Global);
@@ -1932,8 +2033,12 @@
     <span class="kw">const </span>PANIC_ON_ALLOC_FAIL: bool = <span class="bool-val">false</span>;
 
     <span class="attr">#[inline(always)]
-    </span><span class="kw">fn </span>enforce_alignment(ecx: <span class="kw-2">&amp;</span>MiriInterpCx&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt;) -&gt; bool {
-        ecx.machine.check_alignment != AlignmentCheck::None
+    </span><span class="kw">fn </span>enforce_alignment(ecx: <span class="kw-2">&amp;</span>MiriInterpCx&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt;) -&gt; CheckAlignment {
+        <span class="kw">if </span>ecx.machine.check_alignment == AlignmentCheck::None {
+            CheckAlignment::No
+        } <span class="kw">else </span>{
+            CheckAlignment::Error
+        }
     }
 
     <span class="attr">#[inline(always)]
@@ -1941,8 +2046,17 @@
         ecx.machine.check_alignment == AlignmentCheck::Int
     }
 
+    <span class="kw">fn </span>alignment_check_failed(
+        _ecx: <span class="kw-2">&amp;</span>InterpCx&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>, <span class="self">Self</span>&gt;,
+        has: Align,
+        required: Align,
+        _check: CheckAlignment,
+    ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, ()&gt; {
+        <span class="macro">throw_ub!</span>(AlignmentCheckFailed { has, required })
+    }
+
     <span class="attr">#[inline(always)]
-    </span><span class="kw">fn </span>enforce_validity(ecx: <span class="kw-2">&amp;</span>MiriInterpCx&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt;) -&gt; bool {
+    </span><span class="kw">fn </span>enforce_validity(ecx: <span class="kw-2">&amp;</span>MiriInterpCx&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt;, _layout: TyAndLayout&lt;<span class="lifetime">&#39;tcx</span>&gt;) -&gt; bool {
         ecx.machine.validate
     }
 
@@ -1952,8 +2066,8 @@
     }
 
     <span class="attr">#[inline(always)]
-    </span><span class="kw">fn </span>checked_binop_checks_overflow(ecx: <span class="kw-2">&amp;</span>MiriInterpCx&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt;) -&gt; bool {
-        ecx.tcx.sess.overflow_checks()
+    </span><span class="kw">fn </span>ignore_optional_overflow_checks(ecx: <span class="kw-2">&amp;</span>MiriInterpCx&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt;) -&gt; bool {
+        !ecx.tcx.sess.overflow_checks()
     }
 
     <span class="attr">#[inline(always)]
@@ -1964,7 +2078,7 @@
         args: <span class="kw-2">&amp;</span>[OpTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;],
         dest: <span class="kw-2">&amp;</span>PlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
         ret: <span class="prelude-ty">Option</span>&lt;mir::BasicBlock&gt;,
-        unwind: StackPopUnwind,
+        unwind: mir::UnwindAction,
     ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;mir </span>mir::Body&lt;<span class="lifetime">&#39;tcx</span>&gt;, ty::Instance&lt;<span class="lifetime">&#39;tcx</span>&gt;)&gt;&gt; {
         ecx.find_mir_or_eval_fn(instance, abi, args, dest, ret, unwind)
     }
@@ -1977,7 +2091,7 @@
         args: <span class="kw-2">&amp;</span>[OpTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;],
         dest: <span class="kw-2">&amp;</span>PlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
         ret: <span class="prelude-ty">Option</span>&lt;mir::BasicBlock&gt;,
-        _unwind: StackPopUnwind,
+        _unwind: mir::UnwindAction,
     ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
         ecx.call_dlsym(fn_val, abi, args, dest, ret)
     }
@@ -1989,7 +2103,7 @@
         args: <span class="kw-2">&amp;</span>[OpTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;],
         dest: <span class="kw-2">&amp;</span>PlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
         ret: <span class="prelude-ty">Option</span>&lt;mir::BasicBlock&gt;,
-        unwind: StackPopUnwind,
+        unwind: mir::UnwindAction,
     ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
         ecx.call_intrinsic(instance, args, dest, ret, unwind)
     }
@@ -1998,7 +2112,7 @@
     </span><span class="kw">fn </span>assert_panic(
         ecx: <span class="kw-2">&amp;mut </span>MiriInterpCx&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt;,
         msg: <span class="kw-2">&amp;</span>mir::AssertMessage&lt;<span class="lifetime">&#39;tcx</span>&gt;,
-        unwind: <span class="prelude-ty">Option</span>&lt;mir::BasicBlock&gt;,
+        unwind: mir::UnwindAction,
     ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
         ecx.assert_panic(msg, unwind)
     }
@@ -2038,8 +2152,8 @@
                 <span class="macro">panic!</span>(<span class="string">&quot;extern_statics cannot contain wildcards&quot;</span>)
             };
             <span class="kw">let </span>(shim_size, shim_align, _kind) = ecx.get_alloc_info(alloc_id);
-            <span class="kw">let </span>extern_decl_layout =
-                ecx.tcx.layout_of(ty::ParamEnv::empty().and(ecx.tcx.type_of(def_id))).unwrap();
+            <span class="kw">let </span>def_ty = ecx.tcx.type_of(def_id).subst_identity();
+            <span class="kw">let </span>extern_decl_layout = ecx.tcx.layout_of(ty::ParamEnv::empty().and(def_ty)).unwrap();
             <span class="kw">if </span>extern_decl_layout.size != shim_size || extern_decl_layout.align.abi != shim_align {
                 <span class="macro">throw_unsup_format!</span>(
                     <span class="string">&quot;`extern` static `{name}` from crate `{krate}` has been declared \
@@ -2093,6 +2207,7 @@
                 <span class="kw-2">&amp;</span>ecx.machine.threads,
                 alloc.size(),
                 kind,
+                ecx.machine.current_span(),
             )
         });
         <span class="kw">let </span>buffer_alloc = ecx.machine.weak_memory.then(weak_memory::AllocState::new_allocation);
@@ -2107,7 +2222,7 @@
     <span class="kw">fn </span>adjust_alloc_base_pointer(
         ecx: <span class="kw-2">&amp;</span>MiriInterpCx&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt;,
         ptr: Pointer&lt;AllocId&gt;,
-    ) -&gt; Pointer&lt;Provenance&gt; {
+    ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, Pointer&lt;Provenance&gt;&gt; {
         <span class="kw">if </span><span class="macro">cfg!</span>(debug_assertions) {
             <span class="comment">// The machine promises to never call us on thread-local or extern statics.
             </span><span class="kw">let </span>alloc_id = ptr.provenance;
@@ -2121,17 +2236,17 @@
                 <span class="kw">_ </span>=&gt; {}
             }
         }
-        <span class="kw">let </span>absolute_addr = intptrcast::GlobalStateInner::rel_ptr_to_addr(ecx, ptr);
+        <span class="kw">let </span>absolute_addr = intptrcast::GlobalStateInner::rel_ptr_to_addr(ecx, ptr)<span class="question-mark">?</span>;
         <span class="kw">let </span>tag = <span class="kw">if let </span><span class="prelude-val">Some</span>(borrow_tracker) = <span class="kw-2">&amp;</span>ecx.machine.borrow_tracker {
             borrow_tracker.borrow_mut().base_ptr_tag(ptr.provenance, <span class="kw-2">&amp;</span>ecx.machine)
         } <span class="kw">else </span>{
             <span class="comment">// Value does not matter, SB is disabled
             </span>BorTag::default()
         };
-        Pointer::new(
+        <span class="prelude-val">Ok</span>(Pointer::new(
             Provenance::Concrete { alloc_id: ptr.provenance, tag },
             Size::from_bytes(absolute_addr),
-        )
+        ))
     }
 
     <span class="attr">#[inline(always)]
@@ -2235,13 +2350,26 @@
     }
 
     <span class="attr">#[inline(always)]
-    </span><span class="kw">fn </span>retag(
+    </span><span class="kw">fn </span>retag_ptr_value(
+        ecx: <span class="kw-2">&amp;mut </span>InterpCx&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>, <span class="self">Self</span>&gt;,
+        kind: mir::RetagKind,
+        val: <span class="kw-2">&amp;</span>ImmTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
+    ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, ImmTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;&gt; {
+        <span class="kw">if </span>ecx.machine.borrow_tracker.is_some() {
+            ecx.retag_ptr_value(kind, val)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Ok</span>(val.clone())
+        }
+    }
+
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>retag_place_contents(
         ecx: <span class="kw-2">&amp;mut </span>InterpCx&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>, <span class="self">Self</span>&gt;,
         kind: mir::RetagKind,
         place: <span class="kw-2">&amp;</span>PlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
     ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
         <span class="kw">if </span>ecx.machine.borrow_tracker.is_some() {
-            ecx.retag(kind, place)<span class="question-mark">?</span>;
+            ecx.retag_place_contents(kind, place)<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
     }
@@ -2358,5 +2486,4 @@
         res
     }
 }
-</code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="miri" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (b28d30e1e 2022-12-06)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</code></pre></div></section></main></body></html>

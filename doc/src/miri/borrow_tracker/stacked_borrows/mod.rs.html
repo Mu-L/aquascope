@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/miri-8f8b361f28c5a248/98ad06d/src/borrow_tracker/stacked_borrows/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-389f8b4a37bc03c9.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-046227e470cd3629.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-800f2ee593c8e6f7.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-9edae3c387f5a5b3.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../../miri/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/miri-8f8b361f28c5a248/35d6927/src/borrow_tracker/stacked_borrows/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-63a85fc7cf22dee2.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="miri" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (9df3a39fb 2023-04-11)" data-search-js="search-bc5a112813b5d712.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-1159a395118aa44e.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../miri/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1008,32 +1008,93 @@
 <a href="#1008" id="1008">1008</a>
 <a href="#1009" id="1009">1009</a>
 <a href="#1010" id="1010">1010</a>
-</pre><pre class="rust"><code><span class="doccomment">//! Implements &quot;Stacked Borrows&quot;.  See &lt;https://github.com/rust-lang/unsafe-code-guidelines/blob/master/wip/stacked-borrows.md&gt;
+<a href="#1011" id="1011">1011</a>
+<a href="#1012" id="1012">1012</a>
+<a href="#1013" id="1013">1013</a>
+<a href="#1014" id="1014">1014</a>
+<a href="#1015" id="1015">1015</a>
+<a href="#1016" id="1016">1016</a>
+<a href="#1017" id="1017">1017</a>
+<a href="#1018" id="1018">1018</a>
+<a href="#1019" id="1019">1019</a>
+<a href="#1020" id="1020">1020</a>
+<a href="#1021" id="1021">1021</a>
+<a href="#1022" id="1022">1022</a>
+<a href="#1023" id="1023">1023</a>
+<a href="#1024" id="1024">1024</a>
+<a href="#1025" id="1025">1025</a>
+<a href="#1026" id="1026">1026</a>
+<a href="#1027" id="1027">1027</a>
+<a href="#1028" id="1028">1028</a>
+<a href="#1029" id="1029">1029</a>
+<a href="#1030" id="1030">1030</a>
+<a href="#1031" id="1031">1031</a>
+<a href="#1032" id="1032">1032</a>
+<a href="#1033" id="1033">1033</a>
+<a href="#1034" id="1034">1034</a>
+<a href="#1035" id="1035">1035</a>
+<a href="#1036" id="1036">1036</a>
+<a href="#1037" id="1037">1037</a>
+<a href="#1038" id="1038">1038</a>
+<a href="#1039" id="1039">1039</a>
+<a href="#1040" id="1040">1040</a>
+<a href="#1041" id="1041">1041</a>
+<a href="#1042" id="1042">1042</a>
+<a href="#1043" id="1043">1043</a>
+<a href="#1044" id="1044">1044</a>
+<a href="#1045" id="1045">1045</a>
+<a href="#1046" id="1046">1046</a>
+<a href="#1047" id="1047">1047</a>
+<a href="#1048" id="1048">1048</a>
+<a href="#1049" id="1049">1049</a>
+<a href="#1050" id="1050">1050</a>
+<a href="#1051" id="1051">1051</a>
+<a href="#1052" id="1052">1052</a>
+<a href="#1053" id="1053">1053</a>
+<a href="#1054" id="1054">1054</a>
+<a href="#1055" id="1055">1055</a>
+<a href="#1056" id="1056">1056</a>
+<a href="#1057" id="1057">1057</a>
+<a href="#1058" id="1058">1058</a>
+<a href="#1059" id="1059">1059</a>
+<a href="#1060" id="1060">1060</a>
+<a href="#1061" id="1061">1061</a>
+<a href="#1062" id="1062">1062</a>
+<a href="#1063" id="1063">1063</a>
+<a href="#1064" id="1064">1064</a>
+<a href="#1065" id="1065">1065</a>
+<a href="#1066" id="1066">1066</a>
+<a href="#1067" id="1067">1067</a>
+<a href="#1068" id="1068">1068</a>
+</pre></div><pre class="rust"><code><span class="doccomment">//! Implements &quot;Stacked Borrows&quot;.  See &lt;https://github.com/rust-lang/unsafe-code-guidelines/blob/master/wip/stacked-borrows.md&gt;
 //! for further information.
 
-</span><span class="kw">use </span>log::trace;
+</span><span class="kw">pub mod </span>diagnostics;
+<span class="kw">mod </span>item;
+<span class="kw">mod </span>stack;
+
+<span class="kw">use </span>log::trace;
 <span class="kw">use </span>std::cmp;
-<span class="kw">use </span>std::fmt::{<span class="self">self</span>, Write};
+<span class="kw">use </span>std::fmt::Write;
 
 <span class="kw">use </span>rustc_data_structures::fx::FxHashSet;
 <span class="kw">use </span>rustc_middle::mir::{Mutability, RetagKind};
 <span class="kw">use </span>rustc_middle::ty::{
     <span class="self">self</span>,
     layout::{HasParamEnv, LayoutOf},
+    Ty,
 };
 <span class="kw">use </span>rustc_target::abi::{Abi, Size};
 
 <span class="kw">use </span><span class="kw">crate</span>::borrow_tracker::{
     stacked_borrows::diagnostics::{AllocHistory, DiagnosticCx, DiagnosticCxBuilder, TagHistory},
-    AccessKind, GlobalStateInner, ProtectorKind, RetagCause, RetagFields,
+    AccessKind, GlobalStateInner, ProtectorKind, RetagFields,
 };
 <span class="kw">use crate</span>::<span class="kw-2">*</span>;
 
-<span class="kw">mod </span>item;
+<span class="kw">use </span>diagnostics::RetagCause;
 <span class="kw">pub use </span>item::{Item, Permission};
-<span class="kw">mod </span>stack;
 <span class="kw">pub use </span>stack::Stack;
-<span class="kw">pub mod </span>diagnostics;
 
 <span class="kw">pub type </span>AllocState = Stacks;
 
@@ -1050,30 +1111,127 @@
     </span>modified_since_last_gc: bool,
 }
 
-<span class="doccomment">/// Indicates which kind of reference is being created.
-/// Used by high-level `reborrow` to compute which permissions to grant to the
-/// new pointer.
-</span><span class="attr">#[derive(Copy, Clone, Hash, PartialEq, Eq)]
-</span><span class="kw">enum </span>RefKind {
-    <span class="doccomment">/// `Box`.
-    </span>Box,
-    <span class="doccomment">/// `&amp;mut`.
-    </span>Unique { two_phase: bool },
-    <span class="doccomment">/// `&amp;` with or without interior mutability.
-    </span>Shared,
-    <span class="doccomment">/// `*mut`/`*const` (raw pointers).
-    </span>Raw { mutable: bool },
+<span class="doccomment">/// Indicates which permissions to grant to the retagged pointer.
+</span><span class="attr">#[derive(Clone, Debug)]
+</span><span class="kw">enum </span>NewPermission {
+    Uniform {
+        perm: Permission,
+        access: <span class="prelude-ty">Option</span>&lt;AccessKind&gt;,
+        protector: <span class="prelude-ty">Option</span>&lt;ProtectorKind&gt;,
+    },
+    FreezeSensitive {
+        freeze_perm: Permission,
+        freeze_access: <span class="prelude-ty">Option</span>&lt;AccessKind&gt;,
+        freeze_protector: <span class="prelude-ty">Option</span>&lt;ProtectorKind&gt;,
+        nonfreeze_perm: Permission,
+        nonfreeze_access: <span class="prelude-ty">Option</span>&lt;AccessKind&gt;,
+        <span class="comment">// nonfreeze_protector must always be None
+    </span>},
 }
 
-<span class="kw">impl </span>fmt::Display <span class="kw">for </span>RefKind {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+<span class="kw">impl </span>NewPermission {
+    <span class="doccomment">/// A key function: determine the permissions to grant at a retag for the given kind of
+    /// reference/pointer.
+    </span><span class="kw">fn </span>from_ref_ty&lt;<span class="lifetime">&#39;tcx</span>&gt;(
+        ty: Ty&lt;<span class="lifetime">&#39;tcx</span>&gt;,
+        kind: RetagKind,
+        cx: <span class="kw-2">&amp;</span><span class="kw">crate</span>::MiriInterpCx&lt;<span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;tcx</span>&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>protector = (kind == RetagKind::FnEntry).then_some(ProtectorKind::StrongProtector);
+        <span class="kw">match </span>ty.kind() {
+            ty::Ref(<span class="kw">_</span>, pointee, Mutability::Mut) =&gt; {
+                <span class="kw">if </span>kind == RetagKind::TwoPhase {
+                    <span class="comment">// We mostly just give up on 2phase-borrows, and treat these exactly like raw pointers.
+                    </span><span class="macro">assert!</span>(protector.is_none()); <span class="comment">// RetagKind can&#39;t be both FnEntry and TwoPhase.
+                    </span>NewPermission::Uniform {
+                        perm: Permission::SharedReadWrite,
+                        access: <span class="prelude-val">None</span>,
+                        protector: <span class="prelude-val">None</span>,
+                    }
+                } <span class="kw">else if </span>pointee.is_unpin(<span class="kw-2">*</span>cx.tcx, cx.param_env()) {
+                    <span class="comment">// A regular full mutable reference. On `FnEntry` this is `noalias` and `dereferenceable`.
+                    </span>NewPermission::Uniform {
+                        perm: Permission::Unique,
+                        access: <span class="prelude-val">Some</span>(AccessKind::Write),
+                        protector,
+                    }
+                } <span class="kw">else </span>{
+                    <span class="comment">// `!Unpin` dereferences do not get `noalias` nor `dereferenceable`.
+                    </span>NewPermission::Uniform {
+                        perm: Permission::SharedReadWrite,
+                        access: <span class="prelude-val">None</span>,
+                        protector: <span class="prelude-val">None</span>,
+                    }
+                }
+            }
+            ty::RawPtr(ty::TypeAndMut { mutbl: Mutability::Mut, .. }) =&gt; {
+                <span class="macro">assert!</span>(protector.is_none()); <span class="comment">// RetagKind can&#39;t be both FnEntry and Raw.
+                // Mutable raw pointer. No access, not protected.
+                </span>NewPermission::Uniform {
+                    perm: Permission::SharedReadWrite,
+                    access: <span class="prelude-val">None</span>,
+                    protector: <span class="prelude-val">None</span>,
+                }
+            }
+            ty::Ref(<span class="kw">_</span>, _pointee, Mutability::Not) =&gt; {
+                <span class="comment">// Shared references. If frozen, these get `noalias` and `dereferenceable`; otherwise neither.
+                </span>NewPermission::FreezeSensitive {
+                    freeze_perm: Permission::SharedReadOnly,
+                    freeze_access: <span class="prelude-val">Some</span>(AccessKind::Read),
+                    freeze_protector: protector,
+                    nonfreeze_perm: Permission::SharedReadWrite,
+                    <span class="comment">// Inside UnsafeCell, this does *not* count as an access, as there
+                    // might actually be mutable references further up the stack that
+                    // we have to keep alive.
+                    </span>nonfreeze_access: <span class="prelude-val">None</span>,
+                    <span class="comment">// We do not protect inside UnsafeCell.
+                    // This fixes https://github.com/rust-lang/rust/issues/55005.
+                </span>}
+            }
+            ty::RawPtr(ty::TypeAndMut { mutbl: Mutability::Not, .. }) =&gt; {
+                <span class="macro">assert!</span>(protector.is_none()); <span class="comment">// RetagKind can&#39;t be both FnEntry and Raw.
+                // `*const T`, when freshly created, are read-only in the frozen part.
+                </span>NewPermission::FreezeSensitive {
+                    freeze_perm: Permission::SharedReadOnly,
+                    freeze_access: <span class="prelude-val">Some</span>(AccessKind::Read),
+                    freeze_protector: <span class="prelude-val">None</span>,
+                    nonfreeze_perm: Permission::SharedReadWrite,
+                    nonfreeze_access: <span class="prelude-val">None</span>,
+                }
+            }
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
+        }
+    }
+
+    <span class="kw">fn </span>from_box_ty&lt;<span class="lifetime">&#39;tcx</span>&gt;(
+        ty: Ty&lt;<span class="lifetime">&#39;tcx</span>&gt;,
+        kind: RetagKind,
+        cx: <span class="kw-2">&amp;</span><span class="kw">crate</span>::MiriInterpCx&lt;<span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;tcx</span>&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="comment">// `ty` is not the `Box` but the field of the Box with this pointer (due to allocator handling).
+        </span><span class="kw">let </span>pointee = ty.builtin_deref(<span class="bool-val">true</span>).unwrap().ty;
+        <span class="kw">if </span>pointee.is_unpin(<span class="kw-2">*</span>cx.tcx, cx.param_env()) {
+            <span class="comment">// A regular box. On `FnEntry` this is `noalias`, but not `dereferenceable` (hence only
+            // a weak protector).
+            </span>NewPermission::Uniform {
+                perm: Permission::Unique,
+                access: <span class="prelude-val">Some</span>(AccessKind::Write),
+                protector: (kind == RetagKind::FnEntry).then_some(ProtectorKind::WeakProtector),
+            }
+        } <span class="kw">else </span>{
+            <span class="comment">// `!Unpin` boxes do not get `noalias` nor `dereferenceable`.
+            </span>NewPermission::Uniform {
+                perm: Permission::SharedReadWrite,
+                access: <span class="prelude-val">None</span>,
+                protector: <span class="prelude-val">None</span>,
+            }
+        }
+    }
+
+    <span class="kw">fn </span>protector(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ProtectorKind&gt; {
         <span class="kw">match </span><span class="self">self </span>{
-            RefKind::Box =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Box&quot;</span>),
-            RefKind::Unique { two_phase: <span class="bool-val">false </span>} =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;unique reference&quot;</span>),
-            RefKind::Unique { two_phase: <span class="bool-val">true </span>} =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;unique reference (two-phase)&quot;</span>),
-            RefKind::Shared =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;shared reference&quot;</span>),
-            RefKind::Raw { mutable: <span class="bool-val">true </span>} =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;raw (mutable) pointer&quot;</span>),
-            RefKind::Raw { mutable: <span class="bool-val">false </span>} =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;raw (constant) pointer&quot;</span>),
+            NewPermission::Uniform { protector, .. } =&gt; <span class="kw-2">*</span>protector,
+            NewPermission::FreezeSensitive { freeze_protector, .. } =&gt; <span class="kw-2">*</span>freeze_protector,
         }
     }
 }
@@ -1528,11 +1686,10 @@
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         place: <span class="kw-2">&amp;</span>MPlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
         size: Size,
-        kind: RefKind,
+        new_perm: NewPermission,
+        new_tag: BorTag,
         retag_cause: RetagCause, <span class="comment">// What caused this retag, for diagnostics only
-        </span>new_tag: BorTag,
-        protect: <span class="prelude-ty">Option</span>&lt;ProtectorKind&gt;,
-    ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, <span class="prelude-ty">Option</span>&lt;AllocId&gt;&gt; {
+    </span>) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, <span class="prelude-ty">Option</span>&lt;AllocId&gt;&gt; {
         <span class="kw">let </span>this = <span class="self">self</span>.eval_context_mut();
 
         <span class="comment">// It is crucial that this gets called on all code paths, to ensure we track tag creation.
@@ -1542,20 +1699,16 @@
             <span class="kw">let </span>global = this.machine.borrow_tracker.as_ref().unwrap().borrow();
             <span class="kw">let </span>ty = place.layout.ty;
             <span class="kw">if </span>global.tracked_pointer_tags.contains(<span class="kw-2">&amp;</span>new_tag) {
-                <span class="kw">let </span><span class="kw-2">mut </span>kind_str = <span class="macro">format!</span>(<span class="string">&quot;{kind}&quot;</span>);
-                <span class="kw">match </span>kind {
-                    RefKind::Unique { two_phase: <span class="bool-val">false </span>}
-                        <span class="kw">if </span>!ty.is_unpin(<span class="kw-2">*</span>this.tcx, this.param_env()) =&gt;
-                    {
-                        <span class="macro">write!</span>(kind_str, <span class="string">&quot; (!Unpin pointee type {ty})&quot;</span>).unwrap()
-                    },
-                    RefKind::Shared
-                        <span class="kw">if </span>!ty.is_freeze(<span class="kw-2">*</span>this.tcx, this.param_env()) =&gt;
-                    {
-                        <span class="macro">write!</span>(kind_str, <span class="string">&quot; (!Freeze pointee type {ty})&quot;</span>).unwrap()
-                    },
-                    <span class="kw">_ </span>=&gt; <span class="macro">write!</span>(kind_str, <span class="string">&quot; (pointee type {ty})&quot;</span>).unwrap(),
-                };
+                <span class="kw">let </span><span class="kw-2">mut </span>kind_str = String::new();
+                <span class="kw">match </span>new_perm {
+                    NewPermission::Uniform { perm, .. } =&gt;
+                        <span class="macro">write!</span>(kind_str, <span class="string">&quot;{perm:?} permission&quot;</span>).unwrap(),
+                    NewPermission::FreezeSensitive { freeze_perm, .. } <span class="kw">if </span>ty.is_freeze(<span class="kw-2">*</span>this.tcx, this.param_env()) =&gt;
+                        <span class="macro">write!</span>(kind_str, <span class="string">&quot;{freeze_perm:?} permission&quot;</span>).unwrap(),
+                    NewPermission::FreezeSensitive { freeze_perm, nonfreeze_perm, .. }  =&gt;
+                        <span class="macro">write!</span>(kind_str, <span class="string">&quot;{freeze_perm:?}/{nonfreeze_perm:?} permission for frozen/non-frozen parts&quot;</span>).unwrap(),
+                }
+                <span class="macro">write!</span>(kind_str, <span class="string">&quot; (pointee type {ty})&quot;</span>).unwrap();
                 this.emit_diagnostic(NonHaltingDiagnostic::CreatedPointerTag(
                     new_tag.inner(),
                     <span class="prelude-val">Some</span>(kind_str),
@@ -1589,7 +1742,7 @@
                     );
                     <span class="kw">let </span><span class="kw-2">mut </span>dcx = dcx.build(<span class="kw-2">&amp;mut </span>stacked_borrows.history, base_offset);
                     dcx.log_creation();
-                    <span class="kw">if </span>protect.is_some() {
+                    <span class="kw">if </span>new_perm.protector().is_some() {
                         dcx.log_protector();
                     }
                 },
@@ -1602,8 +1755,7 @@
 
         <span class="kw">if </span>size == Size::ZERO {
             <span class="macro">trace!</span>(
-                <span class="string">&quot;reborrow of size 0: {} reference {:?} derived from {:?} (pointee {})&quot;</span>,
-                kind,
+                <span class="string">&quot;reborrow of size 0: reference {:?} derived from {:?} (pointee {})&quot;</span>,
                 new_tag,
                 place.ptr,
                 place.layout.ty,
@@ -1633,15 +1785,14 @@
             <span class="macro">throw_ub!</span>(PointerOutOfBounds {
                 alloc_id,
                 alloc_size,
-                ptr_offset: this.machine_usize_to_isize(base_offset.bytes()),
+                ptr_offset: this.target_usize_to_isize(base_offset.bytes()),
                 ptr_size: size,
                 msg: CheckInAllocMsg::InboundsTest
             });
         }
 
         <span class="macro">trace!</span>(
-            <span class="string">&quot;reborrow: {} reference {:?} derived from {:?} (pointee {}): {:?}, size {}&quot;</span>,
-            kind,
+            <span class="string">&quot;reborrow: reference {:?} derived from {:?} (pointee {}): {:?}, size {}&quot;</span>,
             new_tag,
             orig_tag,
             place.layout.ty,
@@ -1649,7 +1800,7 @@
             size.bytes()
         );
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(protect) = protect {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(protect) = new_perm.protector() {
             <span class="comment">// See comment in `Stack::item_invalidated` for why we store the tag twice.
             </span>this.frame_mut().extra.borrow_tracker.as_mut().unwrap().protected_tags.push(new_tag);
             this.machine
@@ -1661,30 +1812,45 @@
                 .insert(new_tag, protect);
         }
 
-        <span class="comment">// Update the stacks.
-        // Make sure that raw pointers and mutable shared references are reborrowed &quot;weak&quot;:
-        // There could be existing unique pointers reborrowed from them that should remain valid!
-        </span><span class="kw">let </span>(perm, access) = <span class="kw">match </span>kind {
-            RefKind::Unique { two_phase } =&gt; {
-                <span class="comment">// Permission is Unique only if the type is `Unpin` and this is not twophase
-                </span><span class="kw">if </span>!two_phase &amp;&amp; place.layout.ty.is_unpin(<span class="kw-2">*</span>this.tcx, this.param_env()) {
-                    (Permission::Unique, <span class="prelude-val">Some</span>(AccessKind::Write))
-                } <span class="kw">else </span>{
-                    <span class="comment">// FIXME: We emit `dereferenceable` for `!Unpin` mutable references, so we
-                    // should do fake accesses here. But then we run into
-                    // &lt;https://github.com/rust-lang/unsafe-code-guidelines/issues/381&gt;, so for now
-                    // we don&#39;t do that.
-                    </span>(Permission::SharedReadWrite, <span class="prelude-val">None</span>)
+        <span class="comment">// Update the stacks, according to the new permission information we are given.
+        </span><span class="kw">match </span>new_perm {
+            NewPermission::Uniform { perm, access, protector } =&gt; {
+                <span class="macro">assert!</span>(perm != Permission::SharedReadOnly);
+                <span class="comment">// Here we can avoid `borrow()` calls because we have mutable references.
+                // Note that this asserts that the allocation is mutable -- but since we are creating a
+                // mutable pointer, that seems reasonable.
+                </span><span class="kw">let </span>(alloc_extra, machine) = this.get_alloc_extra_mut(alloc_id)<span class="question-mark">?</span>;
+                <span class="kw">let </span>stacked_borrows = alloc_extra.borrow_tracker_sb_mut().get_mut();
+                <span class="kw">let </span>item = Item::new(new_tag, perm, protector.is_some());
+                <span class="kw">let </span>range = alloc_range(base_offset, size);
+                <span class="kw">let </span>global = machine.borrow_tracker.as_ref().unwrap().borrow();
+                <span class="kw">let </span>dcx = DiagnosticCxBuilder::retag(
+                    machine,
+                    retag_cause,
+                    new_tag,
+                    orig_tag,
+                    alloc_range(base_offset, size),
+                );
+                stacked_borrows.for_each(range, dcx, |stack, dcx, exposed_tags| {
+                    stack.grant(orig_tag, item, access, <span class="kw-2">&amp;</span>global, dcx, exposed_tags)
+                })<span class="question-mark">?</span>;
+                drop(global);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(access) = access {
+                    <span class="macro">assert_eq!</span>(access, AccessKind::Write);
+                    <span class="comment">// Make sure the data race model also knows about this.
+                    </span><span class="kw">if let </span><span class="prelude-val">Some</span>(data_race) = alloc_extra.data_race.as_mut() {
+                        data_race.write(alloc_id, range, machine)<span class="question-mark">?</span>;
+                    }
                 }
             }
-            RefKind::Box =&gt; (Permission::Unique, <span class="prelude-val">Some</span>(AccessKind::Write)),
-            RefKind::Raw { mutable: <span class="bool-val">true </span>} =&gt; {
-                <span class="comment">// Creating a raw ptr does not count as an access
-                </span>(Permission::SharedReadWrite, <span class="prelude-val">None</span>)
-            }
-            RefKind::Shared | RefKind::Raw { mutable: <span class="bool-val">false </span>} =&gt; {
-                <span class="comment">// Shared references and *const are a whole different kind of game, the
-                // permission is not uniform across the entire range!
+            NewPermission::FreezeSensitive {
+                freeze_perm,
+                freeze_access,
+                freeze_protector,
+                nonfreeze_perm,
+                nonfreeze_access,
+            } =&gt; {
+                <span class="comment">// The permission is not uniform across the entire range!
                 // We need a frozen-sensitive reborrow.
                 // We have to use shared references to alloc/memory_extra here since
                 // `visit_freeze_sensitive` needs to access the global state.
@@ -1694,22 +1860,12 @@
                     <span class="comment">// Adjust range.
                     </span>range.start += base_offset;
                     <span class="comment">// We are only ever `SharedReadOnly` inside the frozen bits.
-                    </span><span class="kw">let </span>(perm, access) = <span class="kw">if </span>frozen {
-                        (Permission::SharedReadOnly, <span class="prelude-val">Some</span>(AccessKind::Read))
+                    </span><span class="kw">let </span>(perm, access, protector) = <span class="kw">if </span>frozen {
+                        (freeze_perm, freeze_access, freeze_protector)
                     } <span class="kw">else </span>{
-                        <span class="comment">// Inside UnsafeCell, this does *not* count as an access, as there
-                        // might actually be mutable references further up the stack that
-                        // we have to keep alive.
-                        </span>(Permission::SharedReadWrite, <span class="prelude-val">None</span>)
+                        (nonfreeze_perm, nonfreeze_access, <span class="prelude-val">None</span>)
                     };
-                    <span class="kw">let </span>protected = <span class="kw">if </span>frozen {
-                        protect.is_some()
-                    } <span class="kw">else </span>{
-                        <span class="comment">// We do not protect inside UnsafeCell.
-                        // This fixes https://github.com/rust-lang/rust/issues/55005.
-                        </span><span class="bool-val">false
-                    </span>};
-                    <span class="kw">let </span>item = Item::new(new_tag, perm, protected);
+                    <span class="kw">let </span>item = Item::new(new_tag, perm, protector.is_some());
                     <span class="kw">let </span>global = this.machine.borrow_tracker.as_ref().unwrap().borrow();
                     <span class="kw">let </span>dcx = DiagnosticCxBuilder::retag(
                         <span class="kw-2">&amp;</span>this.machine,
@@ -1731,34 +1887,6 @@
                     }
                     <span class="prelude-val">Ok</span>(())
                 })<span class="question-mark">?</span>;
-                <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(alloc_id));
-            }
-        };
-
-        <span class="comment">// Here we can avoid `borrow()` calls because we have mutable references.
-        // Note that this asserts that the allocation is mutable -- but since we are creating a
-        // mutable pointer, that seems reasonable.
-        </span><span class="kw">let </span>(alloc_extra, machine) = this.get_alloc_extra_mut(alloc_id)<span class="question-mark">?</span>;
-        <span class="kw">let </span>stacked_borrows = alloc_extra.borrow_tracker_sb_mut().get_mut();
-        <span class="kw">let </span>item = Item::new(new_tag, perm, protect.is_some());
-        <span class="kw">let </span>range = alloc_range(base_offset, size);
-        <span class="kw">let </span>global = machine.borrow_tracker.as_ref().unwrap().borrow();
-        <span class="kw">let </span>dcx = DiagnosticCxBuilder::retag(
-            machine,
-            retag_cause,
-            new_tag,
-            orig_tag,
-            alloc_range(base_offset, size),
-        );
-        stacked_borrows.for_each(range, dcx, |stack, dcx, exposed_tags| {
-            stack.grant(orig_tag, item, access, <span class="kw-2">&amp;</span>global, dcx, exposed_tags)
-        })<span class="question-mark">?</span>;
-        drop(global);
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(access) = access {
-            <span class="macro">assert_eq!</span>(access, AccessKind::Write);
-            <span class="comment">// Make sure the data race model also knows about this.
-            </span><span class="kw">if let </span><span class="prelude-val">Some</span>(data_race) = alloc_extra.data_race.as_mut() {
-                data_race.write(alloc_id, range, machine)<span class="question-mark">?</span>;
             }
         }
 
@@ -1770,10 +1898,9 @@
     </span><span class="kw">fn </span>sb_retag_reference(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         val: <span class="kw-2">&amp;</span>ImmTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
-        kind: RefKind,
-        retag_cause: RetagCause, <span class="comment">// What caused this retag, for diagnostics only
-        </span>protect: <span class="prelude-ty">Option</span>&lt;ProtectorKind&gt;,
-    ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, ImmTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;&gt; {
+        new_perm: NewPermission,
+        cause: RetagCause, <span class="comment">// What caused this retag, for diagnostics only
+    </span>) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, ImmTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;&gt; {
         <span class="kw">let </span>this = <span class="self">self</span>.eval_context_mut();
         <span class="comment">// We want a place for where the ptr *points to*, so we get one.
         </span><span class="kw">let </span>place = this.ref_to_mplace(val)<span class="question-mark">?</span>;
@@ -1790,7 +1917,7 @@
         </span><span class="kw">let </span>new_tag = this.machine.borrow_tracker.as_mut().unwrap().get_mut().new_ptr();
 
         <span class="comment">// Reborrow.
-        </span><span class="kw">let </span>alloc_id = this.sb_reborrow(<span class="kw-2">&amp;</span>place, size, kind, retag_cause, new_tag, protect)<span class="question-mark">?</span>;
+        </span><span class="kw">let </span>alloc_id = this.sb_reborrow(<span class="kw-2">&amp;</span>place, size, new_perm, new_tag, cause)<span class="question-mark">?</span>;
 
         <span class="comment">// Adjust pointer.
         </span><span class="kw">let </span>new_place = place.map_provenance(|p| {
@@ -1817,7 +1944,22 @@
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>: <span class="lifetime">&#39;mir</span>&gt; EvalContextExt&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt; <span class="kw">for </span><span class="kw">crate</span>::MiriInterpCx&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt; {}
 <span class="kw">pub trait </span>EvalContextExt&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>: <span class="lifetime">&#39;mir</span>&gt;: <span class="kw">crate</span>::MiriInterpCxExt&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt; {
-    <span class="kw">fn </span>sb_retag(
+    <span class="kw">fn </span>sb_retag_ptr_value(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        kind: RetagKind,
+        val: <span class="kw-2">&amp;</span>ImmTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
+    ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, ImmTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;&gt; {
+        <span class="kw">let </span>this = <span class="self">self</span>.eval_context_mut();
+        <span class="kw">let </span>new_perm = NewPermission::from_ref_ty(val.layout.ty, kind, this);
+        <span class="kw">let </span>retag_cause = <span class="kw">match </span>kind {
+            RetagKind::TwoPhase { .. } =&gt; RetagCause::TwoPhase,
+            RetagKind::FnEntry =&gt; <span class="macro">unreachable!</span>(),
+            RetagKind::Raw | RetagKind::Default =&gt; RetagCause::Normal,
+        };
+        this.sb_retag_reference(val, new_perm, retag_cause)
+    }
+
+    <span class="kw">fn </span>sb_retag_place_contents(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         kind: RetagKind,
         place: <span class="kw-2">&amp;</span>PlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
@@ -1825,9 +1967,9 @@
         <span class="kw">let </span>this = <span class="self">self</span>.eval_context_mut();
         <span class="kw">let </span>retag_fields = this.machine.borrow_tracker.as_mut().unwrap().get_mut().retag_fields;
         <span class="kw">let </span>retag_cause = <span class="kw">match </span>kind {
-            RetagKind::TwoPhase { .. } =&gt; RetagCause::TwoPhase,
-            RetagKind::FnEntry =&gt; RetagCause::FnEntry,
-            RetagKind::Raw | RetagKind::Default =&gt; RetagCause::Normal,
+            RetagKind::Raw | RetagKind::TwoPhase { .. } =&gt; <span class="macro">unreachable!</span>(), <span class="comment">// these can only happen in `retag_ptr_value`
+            </span>RetagKind::FnEntry =&gt; RetagCause::FnEntry,
+            RetagKind::Default =&gt; RetagCause::Normal,
         };
         <span class="kw">let </span><span class="kw-2">mut </span>visitor = RetagVisitor { ecx: this, kind, retag_cause, retag_fields };
         <span class="kw">return </span>visitor.visit_value(place);
@@ -1841,15 +1983,14 @@
         }
         <span class="kw">impl</span>&lt;<span class="lifetime">&#39;ecx</span>, <span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt; RetagVisitor&lt;<span class="lifetime">&#39;ecx</span>, <span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt; {
             <span class="attr">#[inline(always)] </span><span class="comment">// yes this helps in our benchmarks
-            </span><span class="kw">fn </span>retag_place(
+            </span><span class="kw">fn </span>retag_ptr_inplace(
                 <span class="kw-2">&amp;mut </span><span class="self">self</span>,
                 place: <span class="kw-2">&amp;</span>PlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
-                ref_kind: RefKind,
+                new_perm: NewPermission,
                 retag_cause: RetagCause,
-                protector: <span class="prelude-ty">Option</span>&lt;ProtectorKind&gt;,
             ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
                 <span class="kw">let </span>val = <span class="self">self</span>.ecx.read_immediate(<span class="kw-2">&amp;</span><span class="self">self</span>.ecx.place_to_op(place)<span class="question-mark">?</span>)<span class="question-mark">?</span>;
-                <span class="kw">let </span>val = <span class="self">self</span>.ecx.sb_retag_reference(<span class="kw-2">&amp;</span>val, ref_kind, retag_cause, protector)<span class="question-mark">?</span>;
+                <span class="kw">let </span>val = <span class="self">self</span>.ecx.sb_retag_reference(<span class="kw-2">&amp;</span>val, new_perm, retag_cause)<span class="question-mark">?</span>;
                 <span class="self">self</span>.ecx.write_immediate(<span class="kw-2">*</span>val, place)<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(())
             }
@@ -1866,13 +2007,8 @@
 
             <span class="kw">fn </span>visit_box(<span class="kw-2">&amp;mut </span><span class="self">self</span>, place: <span class="kw-2">&amp;</span>PlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
                 <span class="comment">// Boxes get a weak protectors, since they may be deallocated.
-                </span><span class="self">self</span>.retag_place(
-                    place,
-                    RefKind::Box,
-                    <span class="self">self</span>.retag_cause,
-                    <span class="comment">/*protector*/
-                    </span>(<span class="self">self</span>.kind == RetagKind::FnEntry).then_some(ProtectorKind::WeakProtector),
-                )
+                </span><span class="kw">let </span>new_perm = NewPermission::from_box_ty(place.layout.ty, <span class="self">self</span>.kind, <span class="self">self</span>.ecx);
+                <span class="self">self</span>.retag_ptr_inplace(place, new_perm, <span class="self">self</span>.retag_cause)
             }
 
             <span class="kw">fn </span>visit_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>, place: <span class="kw-2">&amp;</span>PlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
@@ -1886,36 +2022,16 @@
 
                 <span class="comment">// Check the type of this value to see what to do with it (retag, or recurse).
                 </span><span class="kw">match </span>place.layout.ty.kind() {
-                    ty::Ref(<span class="kw">_</span>, <span class="kw">_</span>, mutbl) =&gt; {
-                        <span class="kw">let </span>ref_kind = <span class="kw">match </span>mutbl {
-                            Mutability::Mut =&gt;
-                                RefKind::Unique { two_phase: <span class="self">self</span>.kind == RetagKind::TwoPhase },
-                            Mutability::Not =&gt; RefKind::Shared,
-                        };
-                        <span class="self">self</span>.retag_place(
-                            place,
-                            ref_kind,
-                            <span class="self">self</span>.retag_cause,
-                            <span class="comment">/*protector*/
-                            </span>(<span class="self">self</span>.kind == RetagKind::FnEntry)
-                                .then_some(ProtectorKind::StrongProtector),
-                        )<span class="question-mark">?</span>;
+                    ty::Ref(..) =&gt; {
+                        <span class="kw">let </span>new_perm =
+                            NewPermission::from_ref_ty(place.layout.ty, <span class="self">self</span>.kind, <span class="self">self</span>.ecx);
+                        <span class="self">self</span>.retag_ptr_inplace(place, new_perm, <span class="self">self</span>.retag_cause)<span class="question-mark">?</span>;
                     }
-                    ty::RawPtr(tym) =&gt; {
-                        <span class="comment">// We definitely do *not* want to recurse into raw pointers -- wide raw
-                        // pointers have fields, and for dyn Trait pointees those can have reference
-                        // type!
-                        </span><span class="kw">if </span><span class="self">self</span>.kind == RetagKind::Raw {
-                            <span class="comment">// Raw pointers need to be enabled.
-                            </span><span class="self">self</span>.retag_place(
-                                place,
-                                RefKind::Raw { mutable: tym.mutbl == Mutability::Mut },
-                                <span class="self">self</span>.retag_cause,
-                                <span class="comment">/*protector*/ </span><span class="prelude-val">None</span>,
-                            )<span class="question-mark">?</span>;
-                        }
-                    }
-                    <span class="kw">_ if </span>place.layout.ty.ty_adt_def().is_some_and(|adt| adt.is_box()) =&gt; {
+                    ty::RawPtr(..) =&gt; {
+                        <span class="comment">// We do *not* want to recurse into raw pointers -- wide raw pointers have
+                        // fields, and for dyn Trait pointees those can have reference type!
+                    </span>}
+                    ty::Adt(adt, <span class="kw">_</span>) <span class="kw">if </span>adt.is_box() =&gt; {
                         <span class="comment">// Recurse for boxes, they require some tricky handling and will end up in `visit_box` above.
                         // (Yes this means we technically also recursively retag the allocator itself
                         // even if field retagging is not enabled. *shrug*)
@@ -1963,12 +2079,12 @@
         </span><span class="kw">let </span>ptr_layout = this.layout_of(this.tcx.mk_mut_ptr(return_place.layout.ty))<span class="question-mark">?</span>;
         <span class="kw">let </span>val = ImmTy::from_immediate(return_place.to_ref(this), ptr_layout);
         <span class="comment">// Reborrow it. With protection! That is part of the point.
-        </span><span class="kw">let </span>val = this.sb_retag_reference(
-            <span class="kw-2">&amp;</span>val,
-            RefKind::Unique { two_phase: <span class="bool-val">false </span>},
-            RetagCause::FnReturn,
-            <span class="comment">/*protector*/ </span><span class="prelude-val">Some</span>(ProtectorKind::StrongProtector),
-        )<span class="question-mark">?</span>;
+        </span><span class="kw">let </span>new_perm = NewPermission::Uniform {
+            perm: Permission::Unique,
+            access: <span class="prelude-val">Some</span>(AccessKind::Write),
+            protector: <span class="prelude-val">Some</span>(ProtectorKind::StrongProtector),
+        };
+        <span class="kw">let </span>val = this.sb_retag_reference(<span class="kw-2">&amp;</span>val, new_perm, RetagCause::FnReturnPlace)<span class="question-mark">?</span>;
         <span class="comment">// And use reborrowed pointer for return place.
         </span><span class="kw">let </span>return_place = this.ref_to_mplace(<span class="kw-2">&amp;</span>val)<span class="question-mark">?</span>;
         this.frame_mut().return_place = return_place.into();
@@ -2018,5 +2134,4 @@
         <span class="prelude-val">Ok</span>(())
     }
 }
-</code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="miri" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (b28d30e1e 2022-12-06)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</code></pre></div></section></main></body></html>

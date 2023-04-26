@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/aquascope/src/analysis/boundaries/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-389f8b4a37bc03c9.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-046227e470cd3629.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-800f2ee593c8e6f7.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-9edae3c387f5a5b3.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../../aquascope/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/aquascope/src/analysis/boundaries/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-63a85fc7cf22dee2.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="aquascope" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (9df3a39fb 2023-04-11)" data-search-js="search-bc5a112813b5d712.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-1159a395118aa44e.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../aquascope/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -530,22 +530,64 @@
 <a href="#530" id="530">530</a>
 <a href="#531" id="531">531</a>
 <a href="#532" id="532">532</a>
-</pre><pre class="rust"><code><span class="doccomment">//! Analysis for finding expected vs actual permission on path usage.
+<a href="#533" id="533">533</a>
+<a href="#534" id="534">534</a>
+<a href="#535" id="535">535</a>
+<a href="#536" id="536">536</a>
+<a href="#537" id="537">537</a>
+<a href="#538" id="538">538</a>
+<a href="#539" id="539">539</a>
+<a href="#540" id="540">540</a>
+<a href="#541" id="541">541</a>
+<a href="#542" id="542">542</a>
+<a href="#543" id="543">543</a>
+<a href="#544" id="544">544</a>
+<a href="#545" id="545">545</a>
+<a href="#546" id="546">546</a>
+<a href="#547" id="547">547</a>
+<a href="#548" id="548">548</a>
+<a href="#549" id="549">549</a>
+<a href="#550" id="550">550</a>
+<a href="#551" id="551">551</a>
+<a href="#552" id="552">552</a>
+<a href="#553" id="553">553</a>
+<a href="#554" id="554">554</a>
+<a href="#555" id="555">555</a>
+<a href="#556" id="556">556</a>
+<a href="#557" id="557">557</a>
+<a href="#558" id="558">558</a>
+<a href="#559" id="559">559</a>
+<a href="#560" id="560">560</a>
+<a href="#561" id="561">561</a>
+<a href="#562" id="562">562</a>
+<a href="#563" id="563">563</a>
+<a href="#564" id="564">564</a>
+<a href="#565" id="565">565</a>
+<a href="#566" id="566">566</a>
+<a href="#567" id="567">567</a>
+<a href="#568" id="568">568</a>
+<a href="#569" id="569">569</a>
+<a href="#570" id="570">570</a>
+<a href="#571" id="571">571</a>
+</pre></div><pre class="rust"><code><span class="doccomment">//! Analysis for the “Needs-at” relations.
+//!
+//! In other words, finding expected vs existing permission for a path usage.
+
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>path_visitor;
 
 <span class="kw">use </span>anyhow::Result;
 <span class="kw">use </span>either::Either;
-<span class="kw">use </span>flowistry::mir::utils::{OperandExt, SpanExt};
 <span class="kw">use </span>path_visitor::get_path_boundaries;
 <span class="kw">use </span>rustc_hir::HirId;
 <span class="kw">use </span>rustc_middle::{
-  mir::{
-    Body, Location, Place, Rvalue, Statement, StatementKind, Terminator,
-    TerminatorKind,
-  },
-  ty::TyCtxt,
+  mir::{Body, Location, Mutability, Place, Rvalue, Statement, StatementKind},
+  ty::{adjustment::AutoBorrowMutability, TyCtxt},
 };
 <span class="kw">use </span>rustc_span::Span;
+<span class="kw">use </span>rustc_utils::{
+  source_map::range::{BytePos, ByteRange, CharPos, CharRange},
+  OperandExt, PlaceExt, SpanExt,
+};
 <span class="kw">use </span>serde::Serialize;
 <span class="kw">use </span>smallvec::{smallvec, SmallVec};
 <span class="kw">use </span>ts_rs::TS;
@@ -560,8 +602,6 @@
     AquascopeAnalysis,
   },
   errors,
-  mir::utils::PlaceExt,
-  Range,
 };
 
 <span class="doccomment">/// A point where a region flow is introduced, potentially resulting in a violation.
@@ -571,7 +611,7 @@
   <span class="comment">// Used for simplicity in the frontend, later the extra information
   // in the flow kind can be shown with extra details.
   </span>is_violation: bool,
-  flow_context: Range,
+  flow_context: CharRange,
   kind: FlowEdgeKind,
 }
 
@@ -579,7 +619,9 @@
 </span><span class="attr">#[derive(Debug, Clone, Serialize, TS)]
 #[ts(export)]
 </span><span class="kw">pub struct </span>PermissionsBoundary {
-  <span class="kw">pub </span>location: usize,
+  <span class="kw">pub </span>location: CharPos,
+  <span class="attr">#[serde(skip)]
+  </span>byte_location: BytePos,
   <span class="kw">pub </span>expected: Permissions,
   <span class="kw">pub </span>actual: PermissionsData,
   <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
@@ -603,18 +645,77 @@
 <span class="comment">// ----------------------------------
 // Permission boundaries on path uses
 
+</span><span class="attr">#[derive(Copy, Clone, Debug)]
+</span><span class="kw">struct </span>ExpectedPermissions(Permissions);
+
+<span class="kw">impl </span>ExpectedPermissions {
+  <span class="kw">pub fn </span>from_assignment() -&gt; <span class="self">Self </span>{
+    <span class="self">Self</span>(Permissions {
+      read: <span class="bool-val">true</span>,
+      write: <span class="bool-val">true</span>,
+      drop: <span class="bool-val">false</span>,
+    })
+  }
+
+  <span class="kw">pub fn </span>from_borrow(mutability: Mutability) -&gt; <span class="self">Self </span>{
+    <span class="self">Self</span>(Permissions {
+      read: <span class="bool-val">true</span>,
+      write: <span class="macro">matches!</span>(mutability, Mutability::Mut),
+      drop: <span class="bool-val">false</span>,
+    })
+  }
+
+  <span class="kw">pub fn </span>from_reborrow(mutability: AutoBorrowMutability) -&gt; <span class="self">Self </span>{
+    <span class="self">Self</span>(Permissions {
+      read: <span class="bool-val">true</span>,
+      write: <span class="macro">matches!</span>(mutability, AutoBorrowMutability::Mut { .. }),
+      drop: <span class="bool-val">false</span>,
+    })
+  }
+
+  <span class="kw">pub fn </span>from_move() -&gt; <span class="self">Self </span>{
+    <span class="self">Self</span>(Permissions {
+      read: <span class="bool-val">true</span>,
+      write: <span class="bool-val">false</span>,
+      drop: <span class="bool-val">true</span>,
+    })
+  }
+
+  <span class="kw">pub fn </span>from_copy() -&gt; <span class="self">Self </span>{
+    <span class="self">Self</span>(Permissions {
+      read: <span class="bool-val">true</span>,
+      write: <span class="bool-val">false</span>,
+      drop: <span class="bool-val">false</span>,
+    })
+  }
+}
+
+<span class="kw">impl </span>From&lt;ExpectedPermissions&gt; <span class="kw">for </span>Permissions {
+  <span class="kw">fn </span>from(ex: ExpectedPermissions) -&gt; Permissions {
+    ex.<span class="number">0
+  </span>}
+}
+
+<span class="doccomment">/// Internal structure for marking nodes as having &quot;expected permissions&quot;.
 </span><span class="kw">struct </span>PathBoundary {
-  <span class="comment">// The HirId node where we want to look for Places.
+  <span class="doccomment">/// The [`HirId`] node where we start the search for matching places.
   </span><span class="kw">pub </span>hir_id: HirId,
-  <span class="comment">// The upper-bound context for region flow.
+
+  <span class="doccomment">/// External context for associated flow constraints.
   </span><span class="kw">pub </span>flow_context: HirId,
-  <span class="comment">// The HirId that could provide additional places we don&#39;t
-  // want to consider. This notably happens in an AssignOp where
-  // the LHS and RHS Places get found together, however, the RHS
-  // places can be more precisely identified.
+
+  <span class="doccomment">/// A [`HirId`] node that may obstruct the search for place permissions.
+  /// The place where this is used is in assignments `*x += y` where
+  /// both `*x` and `y` will appear as potential place candidates. We know
+  /// at the marking phase that it isn&#39;t anything from the `Rvalue` so we
+  /// flag it as ignored.
   </span><span class="kw">pub </span>conflicting_node: <span class="prelude-ty">Option</span>&lt;HirId&gt;,
-  <span class="kw">pub </span>location: Span,
-  <span class="kw">pub </span>expected: Permissions,
+
+  <span class="doccomment">/// Exact source span where boundaries should be placed.
+  </span><span class="kw">pub </span>location: Span,
+
+  <span class="doccomment">/// The permissions required for the [`Place`] usage.
+  </span><span class="kw">pub </span>expected: ExpectedPermissions,
 }
 
 <span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span>PathBoundary {
@@ -802,7 +903,7 @@
   <span class="macro">macro_rules! </span>maybe_in_op {
     (<span class="macro-nonterminal">$loc</span>:expr, <span class="macro-nonterminal">$op</span>:expr) =&gt; {
       <span class="macro-nonterminal">$op
-        </span>.to_place()
+        </span>.as_place()
         .and_then(|p| p.is_source_visible(tcx, body).then_some(p))
         .map(|p| <span class="macro">smallvec!</span>[(<span class="macro-nonterminal">$loc</span>, p)])
         .unwrap_or(<span class="macro">smallvec!</span>[])
@@ -877,10 +978,12 @@
         <span class="macro">smallvec!</span>[(loc, <span class="kw-2">*</span>place)]
       }
 
+
       StatementKind::SetDiscriminant { .. }
       | StatementKind::FakeRead(..)
+      | StatementKind::PlaceMention(..) <span class="comment">// TODO: do we need to handle this new kind
 
-      <span class="comment">// These variants are compiler generated, but it would be
+      // These variants are compiler generated, but it would be
       // insufficient to find a source-visible place only in
       // compiler generated statements.
       //
@@ -893,43 +996,10 @@
       | StatementKind::AscribeUserType(..)
       | StatementKind::Coverage(..)
       | StatementKind::Intrinsic(..)
+      | StatementKind::ConstEvalCounter
       | StatementKind::Nop =&gt; <span class="macro">smallvec!</span>[],
     }
   };
-
-  <span class="kw">let </span>look_in_terminator =
-    |term: <span class="kw-2">&amp;</span>Terminator&lt;<span class="lifetime">&#39;tcx</span>&gt;, loc: Location| -&gt; TempBuff {
-      <span class="kw">match </span><span class="kw-2">&amp;</span>term.kind {
-        TerminatorKind::DropAndReplace { place, value, .. } =&gt; {
-          <span class="kw">let </span><span class="kw-2">mut </span>found_so_far = <span class="macro">maybe_in_op!</span>(loc, value);
-          <span class="kw">if </span>place.is_source_visible(tcx, body) {
-            found_so_far.push((loc, <span class="kw-2">*</span>place));
-          }
-          found_so_far
-        }
-
-        <span class="comment">// None of these cases *should* contain source-visible
-        // places / operators. Usually a terminator is called
-        // with compiler temporaries, so why bother looking.
-        //
-        // I(gavinleroy) could be wrong so if something is
-        // missing suspect something in here.
-        </span>TerminatorKind::Goto { .. }
-        | TerminatorKind::SwitchInt { .. }
-        | TerminatorKind::Resume
-        | TerminatorKind::Abort
-        | TerminatorKind::Return
-        | TerminatorKind::Unreachable
-        | TerminatorKind::Drop { .. }
-        | TerminatorKind::Call { .. }
-        | TerminatorKind::Assert { .. }
-        | TerminatorKind::Yield { .. }
-        | TerminatorKind::GeneratorDrop
-        | TerminatorKind::FalseEdge { .. }
-        | TerminatorKind::FalseUnwind { .. }
-        | TerminatorKind::InlineAsm { .. } =&gt; <span class="macro">smallvec!</span>[],
-      }
-    };
 
   <span class="kw">let </span>mir_locations = mir_locations_opt<span class="question-mark">?
     </span>.values()
@@ -937,7 +1007,7 @@
       <span class="macro">log::debug!</span>(<span class="string">&quot;looking at {loc:?}&quot;</span>);
       <span class="kw">match </span>body.stmt_at(loc) {
         Either::Left(stmt) =&gt; look_in_statement(stmt, loc),
-        Either::Right(term) =&gt; look_in_terminator(term, loc),
+        Either::Right(_term) =&gt; <span class="macro">smallvec!</span>[],
       }
     })
     .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
@@ -1014,11 +1084,15 @@
       <span class="comment">// FIXME(gavinleroy): the spans are chosen in the `path_visitor` such that the end
       // of the span is where we want the stack to be placed. I would like to
       // make this a bit more explicit.
-      </span><span class="kw">let </span>location = analysis.span_to_range(span).char_end;
+      </span><span class="kw">let </span>location = analysis.span_to_range(span).end;
+      <span class="kw">let </span>byte_location = ByteRange::from_span(span, tcx.sess.source_map())
+        .unwrap()
+        .end;
 
       PermissionsBoundary {
         location,
-        expected,
+        byte_location,
+        expected: expected.into(),
         actual,
         expecting_flow,
       }
@@ -1039,9 +1113,8 @@
   analysis: <span class="kw-2">&amp;</span>AquascopeAnalysis&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;tcx</span>&gt;,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;PermissionsBoundary&gt;&gt; {
   <span class="kw">let </span>ctxt = <span class="kw-2">&amp;</span>analysis.permissions;
-  <span class="kw">let </span>tcx = ctxt.tcx;
 
-  <span class="kw">let </span>path_use_points = get_path_boundaries(tcx, ctxt.body_id, ctxt)<span class="question-mark">?
+  <span class="kw">let </span>path_use_points = get_path_boundaries(ctxt)<span class="question-mark">?
     </span>.into_iter()
     .filter_map(|pb| path_to_perm_boundary(pb, analysis));
 
@@ -1055,12 +1128,16 @@
   <span class="kw">let </span>boundaries = path_use_points
     .filter(|pb| {
       first_error_span_opt.map_or(<span class="bool-val">true</span>, |error_span| {
-        pb.expecting_flow.is_some() || (pb.location <span class="kw">as </span>u32) &lt;= error_span.hi().<span class="number">0
-      </span>})
+        pb.expecting_flow.is_some() || {
+          <span class="kw">let </span>error_range =
+            ByteRange::from_span(error_span, ctxt.tcx.sess.source_map())
+              .unwrap();
+          pb.byte_location &lt;= error_range.end
+        }
+      })
     })
     .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
   <span class="prelude-val">Ok</span>(boundaries)
 }
-</code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="aquascope" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (b28d30e1e 2022-12-06)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</code></pre></div></section></main></body></html>

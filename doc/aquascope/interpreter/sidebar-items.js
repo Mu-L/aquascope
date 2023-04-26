@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["MValue",""]],"fn":[["override_queries",""]],"struct":[["InterpretCallbacks",""],["MTrace",""]]};
+window.SIDEBAR_ITEMS = {"enum":["MValue"],"fn":["override_queries"],"struct":["InterpretCallbacks","MTrace"]};

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/aquascope/src/analysis/stepper/find_steps.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>find_steps.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-389f8b4a37bc03c9.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-046227e470cd3629.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-800f2ee593c8e6f7.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-9edae3c387f5a5b3.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../../aquascope/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/aquascope/src/analysis/stepper/find_steps.rs`."><title>find_steps.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-63a85fc7cf22dee2.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="aquascope" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (9df3a39fb 2023-04-11)" data-search-js="search-bc5a112813b5d712.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-1159a395118aa44e.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../aquascope/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1207,35 +1207,65 @@
 <a href="#1207" id="1207">1207</a>
 <a href="#1208" id="1208">1208</a>
 <a href="#1209" id="1209">1209</a>
-</pre><pre class="rust"><code><span class="doccomment">//! Core analysis for creating permission steps.
+<a href="#1210" id="1210">1210</a>
+<a href="#1211" id="1211">1211</a>
+<a href="#1212" id="1212">1212</a>
+<a href="#1213" id="1213">1213</a>
+<a href="#1214" id="1214">1214</a>
+<a href="#1215" id="1215">1215</a>
+<a href="#1216" id="1216">1216</a>
+<a href="#1217" id="1217">1217</a>
+<a href="#1218" id="1218">1218</a>
+<a href="#1219" id="1219">1219</a>
+<a href="#1220" id="1220">1220</a>
+<a href="#1221" id="1221">1221</a>
+<a href="#1222" id="1222">1222</a>
+<a href="#1223" id="1223">1223</a>
+<a href="#1224" id="1224">1224</a>
+<a href="#1225" id="1225">1225</a>
+<a href="#1226" id="1226">1226</a>
+<a href="#1227" id="1227">1227</a>
+<a href="#1228" id="1228">1228</a>
+<a href="#1229" id="1229">1229</a>
+<a href="#1230" id="1230">1230</a>
+<a href="#1231" id="1231">1231</a>
+<a href="#1232" id="1232">1232</a>
+<a href="#1233" id="1233">1233</a>
+<a href="#1234" id="1234">1234</a>
+</pre></div><pre class="rust"><code><span class="doccomment">//! Core analysis for creating permission steps.
 //!
 //! # Overview
 //!
-//! A *permissions step* is the difference in permissions between two MIR `Point`s.
-//! Specifically, a step represents the changes needing to happen to reach a subsequent
-//! state in the permissions static analysis.
+//! Defined on the MIR, a *permissions step* is the difference in permissions between
+//! two adjacent MIR [`Point`]s. The difference represents the gains and losses that
+//! occur between adjacent permissions states. Permission steps on the MIR are useless
+//! to the average user, thus we cluster subsequences of MIR instructions and take the
+//! difference between the first and last point to create a larger step.
 //!
-//! At a high-level, the strategy is to partition the MIR into pieces (referred to as segments),
-//! such that each piece represents a single permission step. This means, that (theoretically)
-//! after the graph has been partitioned the differences are taken in isolation.
-//! It isn&#39;t quite this straightforward so additional details are provided below.
+//! At a high-level, the strategy is to partition the MIR into subsequences (referred to as segments),
+//! such that each segment represents a single permission step. I.E. each segment is a cluster
+//! of instructions representing one source-level permissions step.
+//! After clustering, the steps are easily computed in isolation to create the final permissions
+//! steps. As we&#39;ll see later, the “isolation” is broken down a little to prevent some specific
+//! visual effects.
 //!
 //! # Splitting Strategy
 //!
-//! The main goal of the permission stepper is to provide steps that map to logical &quot;steps&quot; in
+//! The main goal of the permission stepper is to provide steps that map to logical “steps” in
 //! the source code. First, the steps will be determined using HIR language constructs, which are
 //! subsequently lowered to fit the more granular MIR language constructs.
-//! Starting with the HIR, a so-called &quot;logical step&quot; is roughly defined to be a [`Stmt`](rustc_hir::Stmt).
+//! Starting with the HIR, a so-called “logical step” is roughly defined to be a [`Stmt`](rustc_hir::Stmt).
 //! Typically statements fall on their own line and they mark the beginning and end
-//! of some potentially permissions-altering operation. This makes up the first loose rule for
+//! of some potentially permissions-altering operation. This makes up the first loose for
 //! finding permissions steps.
 //!
-//! Statements however, do not cover how permissions change in a control-flow sensitive setting.
+//! Statements however, do not cover how permissions change in a control-flow sensitive construct.
 //! For example, the statements at the beginning of the then and else branch might execute with
-//! different permissions, this sudden change of permissions needs to be communicated to the user.
-//! This leads to another rule, namely, a branch in control flow can also be a permissions-altering
-//! &quot;operation&quot;. The full rules for tracking permissions steps at each respective level of granularity
-//! are outlined below.
+//! different permissions, this sudden change of permissions needs to be communicated to the user,
+//! rather than happening on instructions of the CFG these permissions are changed on the *edges*.
+//! This forms the second rule of creating a step, namely, a branch in control flow is also a
+//! permissions-altering “operation”. The full rules for tracking permissions steps at each
+//! respective level of granularity are outlined below.
 //!
 //! ## Source to HIR
 //!
@@ -1280,14 +1310,18 @@
 //! The core operation performed on the [`SegmentTree`] is taking a *slice*. There are two kinds of
 //! slices:
 //!
-//! 1. linear slices, those that **do not** span several branches of control-flow.
-//! 2. control-flow slices, those that **do** span several branches of control-flow.
+//! 1. linear slices, those that **do not** contain permissions-altering CFG edges.
+//! 2. control-flow slices, those that **only** contain permissions-altering CFG edges.
 //!
 //! These two slices exist to maintain the invariants of the [`MirSegment`] and [`SegmentTree`].
-//! Fundamentally, these slices work on different *shapes* of the underlying graph. A *linear slice*
-//! would slice a portion of the graph which forms a line.
+//! Fundamentally, these slices work on different *shapes* of the underlying graph.
+//!
+//! #### Linear Slices
+//!
+//! A *linear slice* slices a portion of the graph which forms a continuous subsequence.
 //!
 //! Example:
+//!
 //! ```text
 //! before slice:
 //!
@@ -1308,12 +1342,15 @@
 //! ⬤ [l2] ----&gt; ⬤ [l3]
 //!
 //! ```
+//!
 //! In the above example there exists a linear sequence of control-flow from `l1 ⟶ l2 ⟶ l3`.
 //! Depicted, is a *linear slice* of this segment at location `l2`. Linear slices *always*
 //! split a single segment, into two new segments which maintain the [`MirSegment`] invariant.
 //! These slices are used after [`Stmt`s](rustc_hir::Stmt) and the end of a [`Block` expression](rustc_hir::Block).
 //!
-//! A *control-flow* slice, then does not slice a linear sequence of locations but multiple that
+//! #### Control-flow slices
+//!
+//! A *control-flow* slice, then does not slice a continous subsequence but multiple that
 //! /span across/ branches of control flow.
 //!
 //! Example:
@@ -1373,7 +1410,8 @@
 //!
 //! NOTE: one small semantic difference between the resulting segments. The segments
 //! which form the so-called &quot;split set&quot; (segments 1 and 2 in the above example) *cannot*
-//! be further split. They are treated as **atomic**.
+//! be further split. They are treated as **atomic**. This is intuitive if you image that
+//! they only contains edges in the CFG (there would be nothing left to spliti).
 //!
 //! # Finalizing Differences
 //!
@@ -1389,9 +1427,19 @@
 //! To ensure initialized places don&#39;t gain permissions before the end of the let statement,
 //! these places are marked as /attached/ to a specific MIR location, and they are filtered
 //! from any nested segment step results.
+//!
+//! # Known Shortcomings
+//!
+//! There are a few major known limitations, they can be resolved we just need the time:
+//!
+//! - Function bodies that contain infinite loops `loop {}` cannot be analyzed.
+//!   More general, if there does not contain an exit point to the function the
+//!   current algorithm will report this limitation to the user.
+//!
+//! - The control-flow slicing is too strict, if there exists an `if` without
+//!   and `else`, or if there are multiple returns, the algorithm also fails.
 
 </span><span class="kw">use </span>anyhow::{bail, <span class="prelude-ty">Result</span>};
-<span class="kw">use </span>flowistry::mir::utils::{PlaceExt <span class="kw">as </span>FlowistryPlaceExt, SpanExt};
 <span class="kw">use </span>rustc_data_structures::{<span class="self">self</span>, fx::FxHashMap <span class="kw">as </span>HashMap};
 <span class="kw">use </span>rustc_hir::{
   <span class="self">self </span><span class="kw">as </span>hir,
@@ -1403,6 +1451,9 @@
   mir::{<span class="self">self</span>, Local, Location, Place},
 };
 <span class="kw">use </span>rustc_span::Span;
+<span class="kw">use </span>rustc_utils::{
+  source_map::range::CharRange, test_utils::DUMMY_CHAR_RANGE, PlaceExt, SpanExt,
+};
 
 <span class="kw">use super</span>::{
   segment_tree::{MirSegment, SegmentSearchResult, SegmentTree, SplitType},
@@ -1416,8 +1467,6 @@
     },
   },
   errors,
-  mir::utils::PlaceExt <span class="kw">as </span>AquascopePlaceExt,
-  Range,
 };
 
 <span class="kw">pub fn </span>compute_permission_steps&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;tcx</span>&gt;(
@@ -1491,7 +1540,7 @@
     .into_iter()
     .fold(
       HashMap::&lt;
-        Range,
+        CharRange,
         Vec&lt;(MirSegment, Vec&lt;(Place&lt;<span class="lifetime">&#39;tcx</span>&gt;, PermissionsDataDiff)&gt;)&gt;,
       &gt;::default(),
       |<span class="kw-2">mut </span>acc, (span, (segment, place_to_diffs))| {
@@ -1561,8 +1610,9 @@
       //   .collect::&lt;Vec&lt;_&gt;&gt;();
 
       // Conforming to the above HACK this just takes any (from, to) pair.
-      </span><span class="kw">let </span>(from, to) = entries.first().map_or_else(
-        || (Range::default(), Range::default()),
+      </span><span class="kw">let </span>dummy_char_range = DUMMY_CHAR_RANGE.with(|range| <span class="kw-2">*</span>range);
+      <span class="kw">let </span>(from, to) = entries.first().map_or_else(
+        || (dummy_char_range, dummy_char_range),
         |(MirSegment { from, to }, <span class="kw">_</span>)| {
           <span class="kw">let </span>from = analysis.span_to_range(ctxt.location_to_span(<span class="kw-2">*</span>from));
           <span class="kw">let </span>to = analysis.span_to_range(ctxt.location_to_span(<span class="kw-2">*</span>to));
@@ -2416,5 +2466,4 @@
     }
   }
 }
-</code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="aquascope" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (b28d30e1e 2022-12-06)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</code></pre></div></section></main></body></html>

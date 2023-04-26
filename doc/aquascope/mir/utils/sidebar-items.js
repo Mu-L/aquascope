@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"trait":[["BodyExt","Extension trait for [`Body`]"],["PlaceExt","Extension trait for [`Place`]"],["ToRegionVid",""],["TyExt","Extension trait for [`ty::Ty`]"]]};

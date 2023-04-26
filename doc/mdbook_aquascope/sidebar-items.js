@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":[["CACHE_PATH",""]],"struct":[["AquascopePreprocessor",""]]};
+window.SIDEBAR_ITEMS = {"constant":["CACHE_PATH"],"struct":["AquascopePreprocessor"]};

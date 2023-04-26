@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/miri-8f8b361f28c5a248/98ad06d/src/shims/unix/foreign_items.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>foreign_items.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-1f7d512b176f0f72.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-124a1ca42af929b6.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-389f8b4a37bc03c9.css" id="mainThemeStyle"><link rel="stylesheet" id="themeStyle" href="../../../../static.files/light-046227e470cd3629.css"><link rel="stylesheet" disabled href="../../../../static.files/dark-800f2ee593c8e6f7.css"><link rel="stylesheet" disabled href="../../../../static.files/ayu-9edae3c387f5a5b3.css"><script id="default-settings" ></script><script src="../../../../static.files/storage-d43fa987303ecbbb.js"></script><script defer src="../../../../static.files/source-script-5cf2e01a42cc9858.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-287cecec4dbb45b0.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../../miri/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-5ec35bf9ca753509.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/miri-8f8b361f28c5a248/35d6927/src/shims/unix/foreign_items.rs`."><title>foreign_items.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-63a85fc7cf22dee2.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="miri" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (9df3a39fb 2023-04-11)" data-search-js="search-bc5a112813b5d712.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-1159a395118aa44e.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../miri/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -609,7 +609,7 @@
 <a href="#609" id="609">609</a>
 <a href="#610" id="610">610</a>
 <a href="#611" id="611">611</a>
-</pre><pre class="rust"><code><span class="kw">use </span>std::ffi::OsStr;
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::ffi::OsStr;
 
 <span class="kw">use </span>log::trace;
 
@@ -689,19 +689,19 @@
                 <span class="kw">let </span>[fd, buf, count] = this.check_shim(abi, Abi::C { unwind: <span class="bool-val">false </span>}, link_name, args)<span class="question-mark">?</span>;
                 <span class="kw">let </span>fd = this.read_scalar(fd)<span class="question-mark">?</span>.to_i32()<span class="question-mark">?</span>;
                 <span class="kw">let </span>buf = this.read_pointer(buf)<span class="question-mark">?</span>;
-                <span class="kw">let </span>count = this.read_scalar(count)<span class="question-mark">?</span>.to_machine_usize(this)<span class="question-mark">?</span>;
+                <span class="kw">let </span>count = this.read_target_usize(count)<span class="question-mark">?</span>;
                 <span class="kw">let </span>result = this.read(fd, buf, count)<span class="question-mark">?</span>;
-                this.write_scalar(Scalar::from_machine_isize(result, this), dest)<span class="question-mark">?</span>;
+                this.write_scalar(Scalar::from_target_isize(result, this), dest)<span class="question-mark">?</span>;
             }
             <span class="string">&quot;write&quot; </span>=&gt; {
                 <span class="kw">let </span>[fd, buf, n] = this.check_shim(abi, Abi::C { unwind: <span class="bool-val">false </span>}, link_name, args)<span class="question-mark">?</span>;
                 <span class="kw">let </span>fd = this.read_scalar(fd)<span class="question-mark">?</span>.to_i32()<span class="question-mark">?</span>;
                 <span class="kw">let </span>buf = this.read_pointer(buf)<span class="question-mark">?</span>;
-                <span class="kw">let </span>count = this.read_scalar(n)<span class="question-mark">?</span>.to_machine_usize(this)<span class="question-mark">?</span>;
+                <span class="kw">let </span>count = this.read_target_usize(n)<span class="question-mark">?</span>;
                 <span class="macro">trace!</span>(<span class="string">&quot;Called write({:?}, {:?}, {:?})&quot;</span>, fd, buf, count);
                 <span class="kw">let </span>result = this.write(fd, buf, count)<span class="question-mark">?</span>;
                 <span class="comment">// Now, `result` is the value we return back to the program.
-                </span>this.write_scalar(Scalar::from_machine_isize(result, this), dest)<span class="question-mark">?</span>;
+                </span>this.write_scalar(Scalar::from_target_isize(result, this), dest)<span class="question-mark">?</span>;
             }
             <span class="string">&quot;unlink&quot; </span>=&gt; {
                 <span class="kw">let </span>[path] = this.check_shim(abi, Abi::C { unwind: <span class="bool-val">false </span>}, link_name, args)<span class="question-mark">?</span>;
@@ -762,14 +762,14 @@
             <span class="string">&quot;readlink&quot; </span>=&gt; {
                 <span class="kw">let </span>[pathname, buf, bufsize] = this.check_shim(abi, Abi::C { unwind: <span class="bool-val">false </span>}, link_name, args)<span class="question-mark">?</span>;
                 <span class="kw">let </span>result = this.readlink(pathname, buf, bufsize)<span class="question-mark">?</span>;
-                this.write_scalar(Scalar::from_machine_isize(result, this), dest)<span class="question-mark">?</span>;
+                this.write_scalar(Scalar::from_target_isize(result, this), dest)<span class="question-mark">?</span>;
             }
             <span class="string">&quot;posix_fadvise&quot; </span>=&gt; {
                 <span class="kw">let </span>[fd, offset, len, advice] =
                     this.check_shim(abi, Abi::C { unwind: <span class="bool-val">false </span>}, link_name, args)<span class="question-mark">?</span>;
                 this.read_scalar(fd)<span class="question-mark">?</span>.to_i32()<span class="question-mark">?</span>;
-                this.read_scalar(offset)<span class="question-mark">?</span>.to_machine_isize(this)<span class="question-mark">?</span>;
-                this.read_scalar(len)<span class="question-mark">?</span>.to_machine_isize(this)<span class="question-mark">?</span>;
+                this.read_target_isize(offset)<span class="question-mark">?</span>;
+                this.read_target_isize(len)<span class="question-mark">?</span>;
                 this.read_scalar(advice)<span class="question-mark">?</span>.to_i32()<span class="question-mark">?</span>;
                 <span class="comment">// fadvise is only informational, we can ignore it.
                 </span>this.write_null(dest)<span class="question-mark">?</span>;
@@ -802,12 +802,12 @@
             </span><span class="string">&quot;posix_memalign&quot; </span>=&gt; {
                 <span class="kw">let </span>[ret, align, size] = this.check_shim(abi, Abi::C { unwind: <span class="bool-val">false </span>}, link_name, args)<span class="question-mark">?</span>;
                 <span class="kw">let </span>ret = this.deref_operand(ret)<span class="question-mark">?</span>;
-                <span class="kw">let </span>align = this.read_scalar(align)<span class="question-mark">?</span>.to_machine_usize(this)<span class="question-mark">?</span>;
-                <span class="kw">let </span>size = this.read_scalar(size)<span class="question-mark">?</span>.to_machine_usize(this)<span class="question-mark">?</span>;
+                <span class="kw">let </span>align = this.read_target_usize(align)<span class="question-mark">?</span>;
+                <span class="kw">let </span>size = this.read_target_usize(size)<span class="question-mark">?</span>;
                 <span class="comment">// Align must be power of 2, and also at least ptr-sized (POSIX rules).
                 // But failure to adhere to this is not UB, it&#39;s an error condition.
                 </span><span class="kw">if </span>!align.is_power_of_two() || align &lt; this.pointer_size().bytes() {
-                    <span class="kw">let </span>einval = this.eval_libc_i32(<span class="string">&quot;EINVAL&quot;</span>)<span class="question-mark">?</span>;
+                    <span class="kw">let </span>einval = this.eval_libc_i32(<span class="string">&quot;EINVAL&quot;</span>);
                     this.write_int(einval, dest)<span class="question-mark">?</span>;
                 } <span class="kw">else </span>{
                     <span class="kw">if </span>size == <span class="number">0 </span>{
@@ -827,7 +827,7 @@
             <span class="comment">// Dynamic symbol loading
             </span><span class="string">&quot;dlsym&quot; </span>=&gt; {
                 <span class="kw">let </span>[handle, symbol] = this.check_shim(abi, Abi::C { unwind: <span class="bool-val">false </span>}, link_name, args)<span class="question-mark">?</span>;
-                this.read_scalar(handle)<span class="question-mark">?</span>.to_machine_usize(this)<span class="question-mark">?</span>;
+                this.read_target_usize(handle)<span class="question-mark">?</span>;
                 <span class="kw">let </span>symbol = this.read_pointer(symbol)<span class="question-mark">?</span>;
                 <span class="kw">let </span>symbol_name = this.read_c_str(symbol)<span class="question-mark">?</span>;
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(dlsym) = Dlsym::from_str(symbol_name, <span class="kw-2">&amp;</span>this.tcx.sess.target.os)<span class="question-mark">? </span>{
@@ -845,7 +845,7 @@
                 <span class="comment">// FIXME: Which of these are POSIX, and which are GNU/Linux?
                 // At least the names seem to all also exist on macOS.
                 </span><span class="kw">let </span>sysconfs: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="kw">fn</span>(<span class="kw-2">&amp;</span>MiriInterpCx&lt;<span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span>&gt;) -&gt; Scalar&lt;Provenance&gt;)] = <span class="kw-2">&amp;</span>[
-                    (<span class="string">&quot;_SC_PAGESIZE&quot;</span>, |this| Scalar::from_int(PAGE_SIZE, this.pointer_size())),
+                    (<span class="string">&quot;_SC_PAGESIZE&quot;</span>, |this| Scalar::from_int(this.machine.page_size, this.pointer_size())),
                     (<span class="string">&quot;_SC_NPROCESSORS_CONF&quot;</span>, |this| Scalar::from_int(this.machine.num_cpus, this.pointer_size())),
                     (<span class="string">&quot;_SC_NPROCESSORS_ONLN&quot;</span>, |this| Scalar::from_int(this.machine.num_cpus, this.pointer_size())),
                     <span class="comment">// 512 seems to be a reasonable default. The value is not critical, in
@@ -854,7 +854,7 @@
                 ];
                 <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="prelude-val">None</span>;
                 <span class="kw">for </span><span class="kw-2">&amp;</span>(sysconf_name, value) <span class="kw">in </span>sysconfs {
-                    <span class="kw">let </span>sysconf_name = this.eval_libc_i32(sysconf_name)<span class="question-mark">?</span>;
+                    <span class="kw">let </span>sysconf_name = this.eval_libc_i32(sysconf_name);
                     <span class="kw">if </span>sysconf_name == name {
                         result = <span class="prelude-val">Some</span>(value(this));
                         <span class="kw">break</span>;
@@ -1083,7 +1083,7 @@
                 <span class="kw">let </span>[errnum, buf, buflen] = this.check_shim(abi, Abi::C { unwind: <span class="bool-val">false </span>}, link_name, args)<span class="question-mark">?</span>;
                 <span class="kw">let </span>errnum = this.read_scalar(errnum)<span class="question-mark">?</span>;
                 <span class="kw">let </span>buf = this.read_pointer(buf)<span class="question-mark">?</span>;
-                <span class="kw">let </span>buflen = this.read_scalar(buflen)<span class="question-mark">?</span>.to_machine_usize(this)<span class="question-mark">?</span>;
+                <span class="kw">let </span>buflen = this.read_target_usize(buflen)<span class="question-mark">?</span>;
 
                 <span class="kw">let </span>error = this.try_errnum_to_io_error(errnum)<span class="question-mark">?</span>;
                 <span class="kw">let </span>formatted = <span class="kw">match </span>error {
@@ -1091,7 +1091,7 @@
                     <span class="prelude-val">None </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;&lt;unknown errnum in strerror_r: {errnum}&gt;&quot;</span>),
                 };
                 <span class="kw">let </span>(complete, <span class="kw">_</span>) = this.write_os_str_to_c_str(OsStr::new(<span class="kw-2">&amp;</span>formatted), buf, buflen)<span class="question-mark">?</span>;
-                <span class="kw">let </span>ret = <span class="kw">if </span>complete { <span class="number">0 </span>} <span class="kw">else </span>{ this.eval_libc_i32(<span class="string">&quot;ERANGE&quot;</span>)<span class="question-mark">? </span>};
+                <span class="kw">let </span>ret = <span class="kw">if </span>complete { <span class="number">0 </span>} <span class="kw">else </span>{ this.eval_libc_i32(<span class="string">&quot;ERANGE&quot;</span>) };
                 this.write_int(ret, dest)<span class="question-mark">?</span>;
             }
             <span class="string">&quot;getpid&quot; </span>=&gt; {
@@ -1106,8 +1106,8 @@
             </span><span class="kw">if </span>this.frame_in_std() =&gt; {
                 <span class="kw">let </span>[_attr, guard_size] = this.check_shim(abi, Abi::C { unwind: <span class="bool-val">false </span>}, link_name, args)<span class="question-mark">?</span>;
                 <span class="kw">let </span>guard_size = this.deref_operand(guard_size)<span class="question-mark">?</span>;
-                <span class="kw">let </span>guard_size_layout = this.libc_ty_layout(<span class="string">&quot;size_t&quot;</span>)<span class="question-mark">?</span>;
-                this.write_scalar(Scalar::from_uint(<span class="kw">crate</span>::PAGE_SIZE, guard_size_layout.size), <span class="kw-2">&amp;</span>guard_size.into())<span class="question-mark">?</span>;
+                <span class="kw">let </span>guard_size_layout = this.libc_ty_layout(<span class="string">&quot;size_t&quot;</span>);
+                this.write_scalar(Scalar::from_uint(this.machine.page_size, guard_size_layout.size), <span class="kw-2">&amp;</span>guard_size.into())<span class="question-mark">?</span>;
 
                 <span class="comment">// Return success (`0`).
                 </span>this.write_null(dest)<span class="question-mark">?</span>;
@@ -1136,11 +1136,11 @@
                 <span class="kw">let </span>size_place = this.deref_operand(size_place)<span class="question-mark">?</span>;
 
                 this.write_scalar(
-                    Scalar::from_uint(STACK_ADDR, this.pointer_size()),
+                    Scalar::from_uint(this.machine.stack_addr, this.pointer_size()),
                     <span class="kw-2">&amp;</span>addr_place.into(),
                 )<span class="question-mark">?</span>;
                 this.write_scalar(
-                    Scalar::from_uint(STACK_SIZE, this.pointer_size()),
+                    Scalar::from_uint(this.machine.stack_size, this.pointer_size()),
                     <span class="kw-2">&amp;</span>size_place.into(),
                 )<span class="question-mark">?</span>;
 
@@ -1176,7 +1176,7 @@
                 <span class="kw">let </span>uid = this.read_scalar(uid)<span class="question-mark">?</span>.to_u32()<span class="question-mark">?</span>;
                 <span class="kw">let </span>pwd = this.deref_operand(pwd)<span class="question-mark">?</span>;
                 <span class="kw">let </span>buf = this.read_pointer(buf)<span class="question-mark">?</span>;
-                <span class="kw">let </span>buflen = this.read_scalar(buflen)<span class="question-mark">?</span>.to_machine_usize(this)<span class="question-mark">?</span>;
+                <span class="kw">let </span>buflen = this.read_target_usize(buflen)<span class="question-mark">?</span>;
                 <span class="kw">let </span>result = this.deref_operand(result)<span class="question-mark">?</span>;
 
                 <span class="comment">// Must be for &quot;us&quot;.
@@ -1200,25 +1200,24 @@
                     this.write_null(dest)<span class="question-mark">?</span>;
                 } <span class="kw">else </span>{
                     this.write_null(<span class="kw-2">&amp;</span>result.into())<span class="question-mark">?</span>;
-                    this.write_scalar(this.eval_libc(<span class="string">&quot;ERANGE&quot;</span>)<span class="question-mark">?</span>, dest)<span class="question-mark">?</span>;
+                    this.write_scalar(this.eval_libc(<span class="string">&quot;ERANGE&quot;</span>), dest)<span class="question-mark">?</span>;
                 }
             }
 
             <span class="comment">// Platform-specific shims
             </span><span class="kw">_ </span>=&gt; {
                 <span class="kw">let </span>target_os = <span class="kw-2">&amp;*</span>this.tcx.sess.target.os;
-                <span class="kw">match </span>target_os {
-                    <span class="string">&quot;android&quot; </span>=&gt; <span class="kw">return </span>shims::unix::android::foreign_items::EvalContextExt::emulate_foreign_item_by_name(this, link_name, abi, args, dest),
-                    <span class="string">&quot;freebsd&quot; </span>=&gt; <span class="kw">return </span>shims::unix::freebsd::foreign_items::EvalContextExt::emulate_foreign_item_by_name(this, link_name, abi, args, dest),
-                    <span class="string">&quot;linux&quot; </span>=&gt; <span class="kw">return </span>shims::unix::linux::foreign_items::EvalContextExt::emulate_foreign_item_by_name(this, link_name, abi, args, dest),
-                    <span class="string">&quot;macos&quot; </span>=&gt; <span class="kw">return </span>shims::unix::macos::foreign_items::EvalContextExt::emulate_foreign_item_by_name(this, link_name, abi, args, dest),
-                    <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;unsupported Unix OS {target_os}&quot;</span>),
-                }
+                <span class="kw">return match </span>target_os {
+                    <span class="string">&quot;android&quot; </span>=&gt; shims::unix::android::foreign_items::EvalContextExt::emulate_foreign_item_by_name(this, link_name, abi, args, dest),
+                    <span class="string">&quot;freebsd&quot; </span>=&gt; shims::unix::freebsd::foreign_items::EvalContextExt::emulate_foreign_item_by_name(this, link_name, abi, args, dest),
+                    <span class="string">&quot;linux&quot; </span>=&gt; shims::unix::linux::foreign_items::EvalContextExt::emulate_foreign_item_by_name(this, link_name, abi, args, dest),
+                    <span class="string">&quot;macos&quot; </span>=&gt; shims::unix::macos::foreign_items::EvalContextExt::emulate_foreign_item_by_name(this, link_name, abi, args, dest),
+                    <span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(EmulateByNameResult::NotSupported),
+                };
             }
         };
 
         <span class="prelude-val">Ok</span>(EmulateByNameResult::NeedsJumping)
     }
 }
-</code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="miri" data-themes="" data-resource-suffix="" data-rustdoc-version="1.67.0-nightly (b28d30e1e 2022-12-06)" data-search-js="search-444266647c4dba98.js" data-settings-js="settings-bebeae96e00e4617.js" data-settings-css="settings-af96d9e2fc13e081.css" ></div></body></html>
+</code></pre></div></section></main></body></html>

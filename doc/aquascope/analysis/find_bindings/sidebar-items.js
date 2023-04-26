@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["find_bindings",""]]};
+window.SIDEBAR_ITEMS = {"fn":["find_bindings"]};

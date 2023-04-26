@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["DependencyLink","A link between two items in a sort."],["TopologicalSort","Performs topological sorting."]]};
+window.SIDEBAR_ITEMS = {"struct":["DependencyLink","TopologicalSort"]};

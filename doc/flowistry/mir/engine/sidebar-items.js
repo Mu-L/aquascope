@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":[["iterate_to_fixpoint","Runs a given `Analysis` to a fixpoint over the given [`Body`]."]],"struct":[["AnalysisResults","An alternative implementation of `rustc_mir_dataflow::Results`."]]};
