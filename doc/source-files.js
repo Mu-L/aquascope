@@ -22,7 +22,6 @@ var sourcesIndex = JSON.parse('{\
 "clap_complete":["",[["generator",[],["mod.rs","utils.rs"]],["shells",[],["bash.rs","elvish.rs","fish.rs","mod.rs","powershell.rs","shell.rs","zsh.rs"]]],["lib.rs","macros.rs"]],\
 "clap_lex":["",[],["ext.rs","lib.rs"]],\
 "colorchoice":["",[],["lib.rs"]],\
-"console":["",[],["common_term.rs","kb.rs","lib.rs","term.rs","unix_term.rs","utils.rs"]],\
 "crc32fast":["",[["specialized",[],["mod.rs","pclmulqdq.rs"]]],["baseline.rs","combine.rs","lib.rs","table.rs"]],\
 "crossbeam_channel":["",[["flavors",[],["array.rs","at.rs","list.rs","mod.rs","never.rs","tick.rs","zero.rs"]]],["channel.rs","context.rs","counter.rs","err.rs","lib.rs","select.rs","select_macro.rs","utils.rs","waker.rs"]],\
 "crossbeam_deque":["",[],["deque.rs","lib.rs"]],\
@@ -39,7 +38,6 @@ var sourcesIndex = JSON.parse('{\
 "humantime":["",[],["date.rs","duration.rs","lib.rs","wrapper.rs"]],\
 "iana_time_zone":["",[],["ffi_utils.rs","lib.rs","tz_linux.rs"]],\
 "inflector":["",[["cases",[["camelcase",[],["mod.rs"]],["case",[],["mod.rs"]],["classcase",[],["mod.rs"]],["kebabcase",[],["mod.rs"]],["pascalcase",[],["mod.rs"]],["screamingsnakecase",[],["mod.rs"]],["sentencecase",[],["mod.rs"]],["snakecase",[],["mod.rs"]],["tablecase",[],["mod.rs"]],["titlecase",[],["mod.rs"]],["traincase",[],["mod.rs"]]],["mod.rs"]],["numbers",[["deordinalize",[],["mod.rs"]],["ordinalize",[],["mod.rs"]]],["mod.rs"]],["suffix",[["foreignkey",[],["mod.rs"]]],["mod.rs"]]],["lib.rs"]],\
-"insta":["",[["content",[],["json.rs","mod.rs","serialization.rs","yaml.rs"]]],["env.rs","lib.rs","macros.rs","output.rs","redaction.rs","runtime.rs","serialization.rs","settings.rs","snapshot.rs","utils.rs"]],\
 "instant":["",[],["lib.rs","native.rs"]],\
 "intervaltree":["",[],["lib.rs"]],\
 "io_lifetimes":["",[],["example_ffi.rs","lib.rs","portability.rs","raw.rs","traits.rs","views.rs"]],\
@@ -51,7 +49,6 @@ var sourcesIndex = JSON.parse('{\
 "libffi":["",[["high",[],["call.rs","mod.rs","types.rs"]],["middle",[],["builder.rs","mod.rs","types.rs","util.rs"]]],["lib.rs","low.rs"]],\
 "libffi_sys":["",[],["arch.rs","lib.rs"]],\
 "libloading":["",[["os",[["unix",[],["consts.rs","mod.rs"]]],["mod.rs"]]],["changelog.rs","error.rs","lib.rs","safe.rs","util.rs"]],\
-"linked_hash_map":["",[],["lib.rs"]],\
 "linux_raw_sys":["",[["x86_64",[],["errno.rs","general.rs","ioctl.rs"]]],["lib.rs"]],\
 "lock_api":["",[],["lib.rs","mutex.rs","remutex.rs","rwlock.rs"]],\
 "log":["",[],["lib.rs","macros.rs"]],\
@@ -104,7 +101,6 @@ var sourcesIndex = JSON.parse('{\
 "serde_derive":["",[["internals",[],["ast.rs","attr.rs","case.rs","check.rs","ctxt.rs","mod.rs","receiver.rs","respan.rs","symbol.rs"]]],["bound.rs","de.rs","dummy.rs","fragment.rs","lib.rs","pretend.rs","ser.rs","this.rs","try.rs"]],\
 "serde_json":["",[["features_check",[],["mod.rs"]],["io",[],["mod.rs"]],["value",[],["de.rs","from.rs","index.rs","mod.rs","partial_eq.rs","ser.rs"]]],["de.rs","error.rs","iter.rs","lib.rs","macros.rs","map.rs","number.rs","raw.rs","read.rs","ser.rs"]],\
 "shlex":["",[],["lib.rs"]],\
-"similar":["",[["algorithms",[],["capture.rs","compact.rs","hook.rs","lcs.rs","mod.rs","myers.rs","patience.rs","replace.rs","utils.rs"]],["text",[],["abstraction.rs","inline.rs","mod.rs","utils.rs"]]],["common.rs","iter.rs","lib.rs","types.rs","udiff.rs","utils.rs"]],\
 "smallvec":["",[],["lib.rs"]],\
 "smawk":["",[],["lib.rs","monge.rs"]],\
 "strsim":["",[],["lib.rs"]],\
@@ -125,7 +121,6 @@ var sourcesIndex = JSON.parse('{\
 "unicode_width":["",[],["lib.rs","tables.rs"]],\
 "utf8_width":["",[],["lib.rs"]],\
 "utf8parse":["",[],["lib.rs","types.rs"]],\
-"wait_timeout":["",[],["lib.rs","unix.rs"]],\
-"yaml_rust":["",[],["emitter.rs","lib.rs","parser.rs","scanner.rs","yaml.rs"]]\
+"wait_timeout":["",[],["lib.rs","unix.rs"]]\
 }');
 createSourceSidebar();

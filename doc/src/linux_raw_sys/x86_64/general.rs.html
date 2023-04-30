@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/linux-raw-sys-0.3.4/src/x86_64/general.rs`."><title>general.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-63a85fc7cf22dee2.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="linux_raw_sys" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (9df3a39fb 2023-04-11)" data-search-js="search-bc5a112813b5d712.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-1159a395118aa44e.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../linux_raw_sys/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/linux-raw-sys-0.3.6/src/x86_64/general.rs`."><title>general.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-63a85fc7cf22dee2.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="linux_raw_sys" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (9df3a39fb 2023-04-11)" data-search-js="search-bc5a112813b5d712.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-1159a395118aa44e.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../linux_raw_sys/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -5332,6 +5332,29 @@
 <a href="#5332" id="5332">5332</a>
 <a href="#5333" id="5333">5333</a>
 <a href="#5334" id="5334">5334</a>
+<a href="#5335" id="5335">5335</a>
+<a href="#5336" id="5336">5336</a>
+<a href="#5337" id="5337">5337</a>
+<a href="#5338" id="5338">5338</a>
+<a href="#5339" id="5339">5339</a>
+<a href="#5340" id="5340">5340</a>
+<a href="#5341" id="5341">5341</a>
+<a href="#5342" id="5342">5342</a>
+<a href="#5343" id="5343">5343</a>
+<a href="#5344" id="5344">5344</a>
+<a href="#5345" id="5345">5345</a>
+<a href="#5346" id="5346">5346</a>
+<a href="#5347" id="5347">5347</a>
+<a href="#5348" id="5348">5348</a>
+<a href="#5349" id="5349">5349</a>
+<a href="#5350" id="5350">5350</a>
+<a href="#5351" id="5351">5351</a>
+<a href="#5352" id="5352">5352</a>
+<a href="#5353" id="5353">5353</a>
+<a href="#5354" id="5354">5354</a>
+<a href="#5355" id="5355">5355</a>
+<a href="#5356" id="5356">5356</a>
+<a href="#5357" id="5357">5357</a>
 </pre></div><pre class="rust"><code><span class="comment">/* automatically generated by rust-bindgen 0.59.2 */
 
 </span><span class="attr">#[repr(C)]
@@ -5471,9 +5494,9 @@ fmt.write_str(<span class="string">&quot;__BindgenUnionField&quot;</span>)
 </span>}
 }
 <span class="kw">impl</span>&lt;T&gt; ::core::cmp::Eq <span class="kw">for </span>__BindgenUnionField&lt;T&gt; {}
-<span class="kw">pub const </span>LINUX_VERSION_CODE: u32 = <span class="number">393728</span>;
+<span class="kw">pub const </span>LINUX_VERSION_CODE: u32 = <span class="number">393984</span>;
 <span class="kw">pub const </span>LINUX_VERSION_MAJOR: u32 = <span class="number">6</span>;
-<span class="kw">pub const </span>LINUX_VERSION_PATCHLEVEL: u32 = <span class="number">2</span>;
+<span class="kw">pub const </span>LINUX_VERSION_PATCHLEVEL: u32 = <span class="number">3</span>;
 <span class="kw">pub const </span>LINUX_VERSION_SUBLEVEL: u32 = <span class="number">0</span>;
 <span class="kw">pub const </span>AT_SYSINFO_EHDR: u32 = <span class="number">33</span>;
 <span class="kw">pub const </span>AT_VECTOR_SIZE_ARCH: u32 = <span class="number">3</span>;
@@ -5499,6 +5522,8 @@ fmt.write_str(<span class="string">&quot;__BindgenUnionField&quot;</span>)
 <span class="kw">pub const </span>AT_BASE_PLATFORM: u32 = <span class="number">24</span>;
 <span class="kw">pub const </span>AT_RANDOM: u32 = <span class="number">25</span>;
 <span class="kw">pub const </span>AT_HWCAP2: u32 = <span class="number">26</span>;
+<span class="kw">pub const </span>AT_RSEQ_FEATURE_SIZE: u32 = <span class="number">27</span>;
+<span class="kw">pub const </span>AT_RSEQ_ALIGN: u32 = <span class="number">28</span>;
 <span class="kw">pub const </span>AT_EXECFN: u32 = <span class="number">31</span>;
 <span class="kw">pub const </span>AT_MINSIGSTKSZ: u32 = <span class="number">51</span>;
 <span class="kw">pub const </span>__BITS_PER_LONG: u32 = <span class="number">64</span>;
@@ -5646,6 +5671,7 @@ fmt.write_str(<span class="string">&quot;__BindgenUnionField&quot;</span>)
 <span class="kw">pub const </span>F_SEAL_GROW: u32 = <span class="number">4</span>;
 <span class="kw">pub const </span>F_SEAL_WRITE: u32 = <span class="number">8</span>;
 <span class="kw">pub const </span>F_SEAL_FUTURE_WRITE: u32 = <span class="number">16</span>;
+<span class="kw">pub const </span>F_SEAL_EXEC: u32 = <span class="number">32</span>;
 <span class="kw">pub const </span>F_GET_RW_HINT: u32 = <span class="number">1035</span>;
 <span class="kw">pub const </span>F_SET_RW_HINT: u32 = <span class="number">1036</span>;
 <span class="kw">pub const </span>F_GET_FILE_RW_HINT: u32 = <span class="number">1037</span>;
@@ -6045,6 +6071,7 @@ fmt.write_str(<span class="string">&quot;__BindgenUnionField&quot;</span>)
 <span class="kw">pub const </span>MCAST_MSFILTER: u32 = <span class="number">48</span>;
 <span class="kw">pub const </span>IP_MULTICAST_ALL: u32 = <span class="number">49</span>;
 <span class="kw">pub const </span>IP_UNICAST_IF: u32 = <span class="number">50</span>;
+<span class="kw">pub const </span>IP_LOCAL_PORT_RANGE: u32 = <span class="number">51</span>;
 <span class="kw">pub const </span>MCAST_EXCLUDE: u32 = <span class="number">0</span>;
 <span class="kw">pub const </span>MCAST_INCLUDE: u32 = <span class="number">1</span>;
 <span class="kw">pub const </span>IP_DEFAULT_MULTICAST_TTL: u32 = <span class="number">1</span>;
@@ -6720,6 +6747,9 @@ fmt.write_str(<span class="string">&quot;__BindgenUnionField&quot;</span>)
 <span class="kw">pub const </span>PR_SME_GET_VL: u32 = <span class="number">64</span>;
 <span class="kw">pub const </span>PR_SME_VL_LEN_MASK: u32 = <span class="number">65535</span>;
 <span class="kw">pub const </span>PR_SME_VL_INHERIT: u32 = <span class="number">131072</span>;
+<span class="kw">pub const </span>PR_SET_MDWE: u32 = <span class="number">65</span>;
+<span class="kw">pub const </span>PR_MDWE_REFUSE_EXEC_GAIN: u32 = <span class="number">1</span>;
+<span class="kw">pub const </span>PR_GET_MDWE: u32 = <span class="number">66</span>;
 <span class="kw">pub const </span>PR_SET_VMA: u32 = <span class="number">1398164801</span>;
 <span class="kw">pub const </span>PR_SET_VMA_ANON_NAME: u32 = <span class="number">0</span>;
 <span class="kw">pub const </span>GRND_NONBLOCK: u32 = <span class="number">1</span>;
@@ -7654,6 +7684,8 @@ fmt.write_str(<span class="string">&quot;__BindgenUnionField&quot;</span>)
 <span class="kw">pub const </span>MFD_CLOEXEC: u32 = <span class="number">1</span>;
 <span class="kw">pub const </span>MFD_ALLOW_SEALING: u32 = <span class="number">2</span>;
 <span class="kw">pub const </span>MFD_HUGETLB: u32 = <span class="number">4</span>;
+<span class="kw">pub const </span>MFD_NOEXEC_SEAL: u32 = <span class="number">8</span>;
+<span class="kw">pub const </span>MFD_EXEC: u32 = <span class="number">16</span>;
 <span class="kw">pub const </span>MFD_HUGE_SHIFT: u32 = <span class="number">26</span>;
 <span class="kw">pub const </span>MFD_HUGE_MASK: u32 = <span class="number">63</span>;
 <span class="kw">pub const </span>MFD_HUGE_64KB: u32 = <span class="number">1073741824</span>;
@@ -7745,6 +7777,7 @@ fmt.write_str(<span class="string">&quot;__BindgenUnionField&quot;</span>)
 <span class="kw">pub const </span>IORING_NOTIF_USAGE_ZC_COPIED: u32 = <span class="number">2147483648</span>;
 <span class="kw">pub const </span>IORING_ACCEPT_MULTISHOT: u32 = <span class="number">1</span>;
 <span class="kw">pub const </span>IORING_MSG_RING_CQE_SKIP: u32 = <span class="number">1</span>;
+<span class="kw">pub const </span>IORING_MSG_RING_FLAGS_PASS: u32 = <span class="number">2</span>;
 <span class="kw">pub const </span>IORING_CQE_F_BUFFER: u32 = <span class="number">1</span>;
 <span class="kw">pub const </span>IORING_CQE_F_MORE: u32 = <span class="number">2</span>;
 <span class="kw">pub const </span>IORING_CQE_F_SOCK_NONEMPTY: u32 = <span class="number">4</span>;
@@ -7774,6 +7807,7 @@ fmt.write_str(<span class="string">&quot;__BindgenUnionField&quot;</span>)
 <span class="kw">pub const </span>IORING_FEAT_RSRC_TAGS: u32 = <span class="number">1024</span>;
 <span class="kw">pub const </span>IORING_FEAT_CQE_SKIP: u32 = <span class="number">2048</span>;
 <span class="kw">pub const </span>IORING_FEAT_LINKED_FILE: u32 = <span class="number">4096</span>;
+<span class="kw">pub const </span>IORING_FEAT_REG_REG_RING: u32 = <span class="number">8192</span>;
 <span class="kw">pub const </span>IORING_RSRC_REGISTER_SPARSE: u32 = <span class="number">1</span>;
 <span class="kw">pub const </span>IORING_REGISTER_FILES_SKIP: i32 = -<span class="number">2</span>;
 <span class="kw">pub const </span>IO_URING_OP_SUPPORTED: u32 = <span class="number">1</span>;
@@ -9825,6 +9859,7 @@ MEMBARRIER_CMD_PRIVATE_EXPEDITED_SYNC_CORE = <span class="number">32</span>,
 MEMBARRIER_CMD_REGISTER_PRIVATE_EXPEDITED_SYNC_CORE = <span class="number">64</span>,
 MEMBARRIER_CMD_PRIVATE_EXPEDITED_RSEQ = <span class="number">128</span>,
 MEMBARRIER_CMD_REGISTER_PRIVATE_EXPEDITED_RSEQ = <span class="number">256</span>,
+MEMBARRIER_CMD_GET_REGISTRATIONS = <span class="number">512</span>,
 }
 <span class="attr">#[repr(u32)]
 #[non_exhaustive]
@@ -10190,6 +10225,7 @@ IORING_CQE_BUFFER_SHIFT = <span class="number">16</span>,
 <span class="kw">pub const </span>IORING_REGISTER_SYNC_CANCEL: _bindgen_ty_10 = _bindgen_ty_10::IORING_REGISTER_SYNC_CANCEL;
 <span class="kw">pub const </span>IORING_REGISTER_FILE_ALLOC_RANGE: _bindgen_ty_10 = _bindgen_ty_10::IORING_REGISTER_FILE_ALLOC_RANGE;
 <span class="kw">pub const </span>IORING_REGISTER_LAST: _bindgen_ty_10 = _bindgen_ty_10::IORING_REGISTER_LAST;
+<span class="kw">pub const </span>IORING_REGISTER_USE_REGISTERED_RING: _bindgen_ty_10 = _bindgen_ty_10::IORING_REGISTER_USE_REGISTERED_RING;
 <span class="attr">#[repr(u32)]
 #[non_exhaustive]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
@@ -10221,6 +10257,7 @@ IORING_UNREGISTER_PBUF_RING = <span class="number">23</span>,
 IORING_REGISTER_SYNC_CANCEL = <span class="number">24</span>,
 IORING_REGISTER_FILE_ALLOC_RANGE = <span class="number">25</span>,
 IORING_REGISTER_LAST = <span class="number">26</span>,
+IORING_REGISTER_USE_REGISTERED_RING = <span class="number">2147483648</span>,
 }
 <span class="kw">pub const </span>IO_WQ_BOUND: _bindgen_ty_11 = _bindgen_ty_11::IO_WQ_BOUND;
 <span class="kw">pub const </span>IO_WQ_UNBOUND: _bindgen_ty_11 = _bindgen_ty_11::IO_WQ_UNBOUND;
@@ -10326,7 +10363,7 @@ IO_WQ_UNBOUND = <span class="number">1</span>,
 <span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>io_uring_buf_ring__bindgen_ty_1 {
 <span class="kw">pub </span>__bindgen_anon_1: __BindgenUnionField&lt;io_uring_buf_ring__bindgen_ty_1__bindgen_ty_1&gt;,
-<span class="kw">pub </span>bufs: __BindgenUnionField&lt;[io_uring_buf; <span class="number">0usize</span>]&gt;,
+<span class="kw">pub </span>__bindgen_anon_2: __BindgenUnionField&lt;io_uring_buf_ring__bindgen_ty_1__bindgen_ty_2&gt;,
 <span class="kw">pub </span>bindgen_union_field: [u64; <span class="number">2usize</span>],
 }
 <span class="attr">#[repr(C)]
@@ -10337,6 +10374,15 @@ IO_WQ_UNBOUND = <span class="number">1</span>,
 <span class="kw">pub </span>resv3: __u16,
 <span class="kw">pub </span>tail: __u16,
 }
+<span class="attr">#[repr(C)]
+#[derive(Debug)]
+</span><span class="kw">pub struct </span>io_uring_buf_ring__bindgen_ty_1__bindgen_ty_2 {
+<span class="kw">pub </span>__empty_bufs: io_uring_buf_ring__bindgen_ty_1__bindgen_ty_2__bindgen_ty_1,
+<span class="kw">pub </span>bufs: __IncompleteArrayField&lt;io_uring_buf&gt;,
+}
+<span class="attr">#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+</span><span class="kw">pub struct </span>io_uring_buf_ring__bindgen_ty_1__bindgen_ty_2__bindgen_ty_1 {}
 <span class="attr">#[repr(C)]
 #[derive(Debug, Copy, Clone)]
 </span><span class="kw">pub struct </span>io_uring_buf_reg {

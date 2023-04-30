@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["dynamic_redaction","rounded_redaction","sorted_redaction"],"macro":["allow_duplicates","assert_compact_json_snapshot","assert_debug_snapshot","assert_display_snapshot","assert_json_snapshot","assert_snapshot","assert_yaml_snapshot","with_settings"],"mod":["internals"],"struct":["MetaData","Settings","Snapshot"]};
