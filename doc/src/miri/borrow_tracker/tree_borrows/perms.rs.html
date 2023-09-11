@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/miri-8f8b361f28c5a248/35d6927/src/borrow_tracker/tree_borrows/perms.rs`."><title>perms.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-63a85fc7cf22dee2.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="miri" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (9df3a39fb 2023-04-11)" data-search-js="search-bc5a112813b5d712.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-1159a395118aa44e.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../miri/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/miri-8f8b361f28c5a248/63c5542/src/borrow_tracker/tree_borrows/perms.rs`."><title>perms.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-47e7ab555ef2818a.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="miri" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0-nightly (58eefc33a 2023-08-24)" data-channel="nightly" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-b2d31d2efc7e9b67.css" data-theme-dark-css="dark-3388a2fb2ef8066b.css" data-theme-ayu-css="ayu-8c3c66a6cf12cb2f.css" ><script src="../../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-ef3a2de404864b0b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-b2d31d2efc7e9b67.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-3388a2fb2ef8066b.css"><link rel="stylesheet" href="../../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../miri/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -305,13 +305,204 @@
 <a href="#305" id="305">305</a>
 <a href="#306" id="306">306</a>
 <a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
+<a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
+<a href="#347" id="347">347</a>
+<a href="#348" id="348">348</a>
+<a href="#349" id="349">349</a>
+<a href="#350" id="350">350</a>
+<a href="#351" id="351">351</a>
+<a href="#352" id="352">352</a>
+<a href="#353" id="353">353</a>
+<a href="#354" id="354">354</a>
+<a href="#355" id="355">355</a>
+<a href="#356" id="356">356</a>
+<a href="#357" id="357">357</a>
+<a href="#358" id="358">358</a>
+<a href="#359" id="359">359</a>
+<a href="#360" id="360">360</a>
+<a href="#361" id="361">361</a>
+<a href="#362" id="362">362</a>
+<a href="#363" id="363">363</a>
+<a href="#364" id="364">364</a>
+<a href="#365" id="365">365</a>
+<a href="#366" id="366">366</a>
+<a href="#367" id="367">367</a>
+<a href="#368" id="368">368</a>
+<a href="#369" id="369">369</a>
+<a href="#370" id="370">370</a>
+<a href="#371" id="371">371</a>
+<a href="#372" id="372">372</a>
+<a href="#373" id="373">373</a>
+<a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
+<a href="#403" id="403">403</a>
+<a href="#404" id="404">404</a>
+<a href="#405" id="405">405</a>
+<a href="#406" id="406">406</a>
+<a href="#407" id="407">407</a>
+<a href="#408" id="408">408</a>
+<a href="#409" id="409">409</a>
+<a href="#410" id="410">410</a>
+<a href="#411" id="411">411</a>
+<a href="#412" id="412">412</a>
+<a href="#413" id="413">413</a>
+<a href="#414" id="414">414</a>
+<a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
+<a href="#445" id="445">445</a>
+<a href="#446" id="446">446</a>
+<a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
+<a href="#449" id="449">449</a>
+<a href="#450" id="450">450</a>
+<a href="#451" id="451">451</a>
+<a href="#452" id="452">452</a>
+<a href="#453" id="453">453</a>
+<a href="#454" id="454">454</a>
+<a href="#455" id="455">455</a>
+<a href="#456" id="456">456</a>
+<a href="#457" id="457">457</a>
+<a href="#458" id="458">458</a>
+<a href="#459" id="459">459</a>
+<a href="#460" id="460">460</a>
+<a href="#461" id="461">461</a>
+<a href="#462" id="462">462</a>
+<a href="#463" id="463">463</a>
+<a href="#464" id="464">464</a>
+<a href="#465" id="465">465</a>
+<a href="#466" id="466">466</a>
+<a href="#467" id="467">467</a>
+<a href="#468" id="468">468</a>
+<a href="#469" id="469">469</a>
+<a href="#470" id="470">470</a>
+<a href="#471" id="471">471</a>
+<a href="#472" id="472">472</a>
+<a href="#473" id="473">473</a>
+<a href="#474" id="474">474</a>
+<a href="#475" id="475">475</a>
+<a href="#476" id="476">476</a>
+<a href="#477" id="477">477</a>
+<a href="#478" id="478">478</a>
+<a href="#479" id="479">479</a>
+<a href="#480" id="480">480</a>
+<a href="#481" id="481">481</a>
+<a href="#482" id="482">482</a>
+<a href="#483" id="483">483</a>
+<a href="#484" id="484">484</a>
+<a href="#485" id="485">485</a>
+<a href="#486" id="486">486</a>
+<a href="#487" id="487">487</a>
+<a href="#488" id="488">488</a>
+<a href="#489" id="489">489</a>
+<a href="#490" id="490">490</a>
+<a href="#491" id="491">491</a>
+<a href="#492" id="492">492</a>
+<a href="#493" id="493">493</a>
+<a href="#494" id="494">494</a>
+<a href="#495" id="495">495</a>
+<a href="#496" id="496">496</a>
+<a href="#497" id="497">497</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::cmp::{Ordering, PartialOrd};
 <span class="kw">use </span>std::fmt;
 
+<span class="kw">use </span><span class="kw">crate</span>::borrow_tracker::tree_borrows::diagnostics::TransitionError;
 <span class="kw">use </span><span class="kw">crate</span>::borrow_tracker::tree_borrows::tree::AccessRelatedness;
 <span class="kw">use </span><span class="kw">crate</span>::borrow_tracker::AccessKind;
 
-<span class="doccomment">/// The activation states of a pointer
+<span class="doccomment">/// The activation states of a pointer.
 </span><span class="attr">#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 </span><span class="kw">enum </span>PermissionPriv {
     <span class="doccomment">/// represents: a local reference that has not yet been written to;
@@ -374,12 +565,31 @@
     </span><span class="kw">fn </span>foreign_read(state: PermissionPriv, protected: bool) -&gt; <span class="prelude-ty">Option</span>&lt;PermissionPriv&gt; {
         <span class="kw">use </span><span class="prelude-ty">Option</span>::<span class="kw-2">*</span>;
         <span class="prelude-val">Some</span>(<span class="kw">match </span>state {
-            <span class="comment">// The inner data `ty_is_freeze` of `Reserved` is always irrelevant for Read
+            <span class="comment">// Non-writeable states just ignore foreign reads.
+            </span>non_writeable @ (Frozen | Disabled) =&gt; non_writeable,
+            <span class="comment">// Writeable states are more tricky, and depend on whether things are protected.
+            // The inner data `ty_is_freeze` of `Reserved` is always irrelevant for Read
             // accesses, since the data is not being mutated. Hence the `{ .. }`
-            </span>res @ Reserved { .. } <span class="kw">if </span>!protected =&gt; res,
-            Reserved { .. } =&gt; Frozen, <span class="comment">// protected reserved
-            </span>Active =&gt; Frozen,
-            non_writeable @ (Frozen | Disabled) =&gt; non_writeable,
+            </span>res @ Reserved { .. } =&gt;
+                <span class="kw">if </span>protected {
+                    <span class="comment">// Someone else read, make sure we won&#39;t write.
+                    // We could make this `Disabled` but it doesn&#39;t look like we get anything out of that extra UB.
+                    </span>Frozen
+                } <span class="kw">else </span>{
+                    <span class="comment">// Before activation and without protectors, foreign reads are fine.
+                    // That&#39;s the entire point of 2-phase borrows.
+                    </span>res
+                },
+            Active =&gt;
+                <span class="kw">if </span>protected {
+                    <span class="comment">// We wrote, someone else reads -- that&#39;s bad.
+                    // (If this is initialized, this move-to-protected will mean insta-UB.)
+                    </span>Disabled
+                } <span class="kw">else </span>{
+                    <span class="comment">// We don&#39;t want to disable here to allow read-read reordering: it is crucial
+                    // that the foreign read does not invalidate future reads through this tag.
+                    </span>Frozen
+                },
         })
     }
 
@@ -419,90 +629,46 @@
     }
 }
 
-<span class="kw">impl </span>PermissionPriv {
-    <span class="doccomment">/// Determines whether a transition that occured is compatible with the presence
-    /// of a Protector. This is not included in the `transition` functions because
-    /// it would distract from the few places where the transition is modified
-    /// because of a protector, but not forbidden.
-    </span><span class="kw">fn </span>protector_allows_transition(<span class="self">self</span>, new: <span class="self">Self</span>) -&gt; bool {
-        <span class="kw">match </span>(<span class="self">self</span>, new) {
-            <span class="kw">_ if </span><span class="self">self </span>== new =&gt; <span class="bool-val">true</span>,
-            <span class="comment">// It is always a protector violation to not be readable anymore
-            </span>(<span class="kw">_</span>, Disabled) =&gt; <span class="bool-val">false</span>,
-            <span class="comment">// In the case of a `Reserved` under a protector, both transitions
-            // `Reserved =&gt; Active` and `Reserved =&gt; Frozen` can legitimately occur.
-            // The first is standard (Child Write), the second is for Foreign Writes
-            // on protected Reserved where we must ensure that the pointer is not
-            // written to in the future.
-            </span>(Reserved { .. }, Active) | (Reserved { .. }, Frozen) =&gt; <span class="bool-val">true</span>,
-            <span class="comment">// This pointer should have stayed writeable for the whole function
-            </span>(Active, Frozen) =&gt; <span class="bool-val">false</span>,
-            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Transition from {self:?} to {new:?} should never be possible&quot;</span>),
-        }
-    }
+<span class="doccomment">/// Public interface to the state machine that controls read-write permissions.
+/// This is the &quot;private `enum`&quot; pattern.
+</span><span class="attr">#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+</span><span class="kw">pub struct </span>Permission {
+    inner: PermissionPriv,
 }
 
-<span class="doccomment">/// Public interface to the state machine that controls read-write permissions.
+<span class="doccomment">/// Transition from one permission to the next.
 </span><span class="attr">#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-</span><span class="kw">pub struct </span>Permission(PermissionPriv);
-
-<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Permission {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        <span class="macro">write!</span>(
-            f,
-            <span class="string">&quot;{}&quot;</span>,
-            <span class="kw">match </span><span class="self">self</span>.<span class="number">0 </span>{
-                PermissionPriv::Reserved { .. } =&gt; <span class="string">&quot;Reserved&quot;</span>,
-                PermissionPriv::Active =&gt; <span class="string">&quot;Active&quot;</span>,
-                PermissionPriv::Frozen =&gt; <span class="string">&quot;Frozen&quot;</span>,
-                PermissionPriv::Disabled =&gt; <span class="string">&quot;Disabled&quot;</span>,
-            }
-        )
-    }
+</span><span class="kw">pub struct </span>PermTransition {
+    from: PermissionPriv,
+    to: PermissionPriv,
 }
 
 <span class="kw">impl </span>Permission {
     <span class="doccomment">/// Default initial permission of the root of a new tree.
-    </span><span class="kw">pub fn </span>new_root() -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(Active)
+    </span><span class="kw">pub fn </span>new_active() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ inner: Active }
     }
 
     <span class="doccomment">/// Default initial permission of a reborrowed mutable reference.
-    </span><span class="kw">pub fn </span>new_unique_2phase(ty_is_freeze: bool) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(Reserved { ty_is_freeze })
+    </span><span class="kw">pub fn </span>new_reserved(ty_is_freeze: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ inner: Reserved { ty_is_freeze } }
     }
 
     <span class="doccomment">/// Default initial permission of a reborrowed shared reference
     </span><span class="kw">pub fn </span>new_frozen() -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(Frozen)
+        <span class="self">Self </span>{ inner: Frozen }
     }
 
-    <span class="doccomment">/// Pretty-printing. Needs to be here and not in diagnostics.rs
-    /// because `Self` is private.
-    </span><span class="kw">pub fn </span>short_name(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
-        <span class="comment">// Make sure there are all of the same length as each other
-        // and also as `diagnostics::DisplayFmtPermission.uninit` otherwise
-        // alignment will be incorrect.
-        </span><span class="kw">match </span><span class="self">self</span>.<span class="number">0 </span>{
-            Reserved { ty_is_freeze: <span class="bool-val">true </span>} =&gt; <span class="string">&quot;Res&quot;</span>,
-            Reserved { ty_is_freeze: <span class="bool-val">false </span>} =&gt; <span class="string">&quot;Re*&quot;</span>,
-            Active =&gt; <span class="string">&quot;Act&quot;</span>,
-            Frozen =&gt; <span class="string">&quot;Frz&quot;</span>,
-            Disabled =&gt; <span class="string">&quot;Dis&quot;</span>,
-        }
+    <span class="kw">pub fn </span>is_active(<span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.inner, Active)
     }
 
-    <span class="doccomment">/// Check that there are no complaints from a possible protector.
-    ///
-    /// Note: this is not in charge of checking that there *is* a protector,
-    /// it should be used as
-    /// ```
-    /// let no_protector_error = if is_protected(tag) {
-    ///     old_perm.protector_allows_transition(new_perm)
-    /// };
-    /// ```
-    </span><span class="kw">pub fn </span>protector_allows_transition(<span class="self">self</span>, new: <span class="self">Self</span>) -&gt; bool {
-        <span class="self">self</span>.<span class="number">0</span>.protector_allows_transition(new.<span class="number">0</span>)
+    <span class="kw">pub fn </span>is_reserved(<span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.inner, Reserved { .. })
+    }
+
+    <span class="kw">pub fn </span>is_frozen(<span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.inner, Frozen)
     }
 
     <span class="doccomment">/// Apply the transition to the inner PermissionPriv.
@@ -511,9 +677,217 @@
         rel_pos: AccessRelatedness,
         old_perm: <span class="self">Self</span>,
         protected: bool,
-    ) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">let </span>old_state = old_perm.<span class="number">0</span>;
-        transition::perform_access(kind, rel_pos, old_state, protected).map(<span class="self">Self</span>)
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;PermTransition&gt; {
+        <span class="kw">let </span>old_state = old_perm.inner;
+        transition::perform_access(kind, rel_pos, old_state, protected)
+            .map(|new_state| PermTransition { from: old_state, to: new_state })
+    }
+}
+
+<span class="kw">impl </span>PermTransition {
+    <span class="doccomment">/// All transitions created through normal means (using `perform_access`)
+    /// should be possible, but the same is not guaranteed by construction of
+    /// transitions inferred by diagnostics. This checks that a transition
+    /// reconstructed by diagnostics is indeed one that could happen.
+    </span><span class="kw">fn </span>is_possible(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.from &lt;= <span class="self">self</span>.to
+    }
+
+    <span class="kw">pub fn </span>from(from: Permission, to: Permission) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>t = <span class="self">Self </span>{ from: from.inner, to: to.inner };
+        t.is_possible().then_some(t)
+    }
+
+    <span class="kw">pub fn </span>is_noop(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.from == <span class="self">self</span>.to
+    }
+
+    <span class="doccomment">/// Extract result of a transition (checks that the starting point matches).
+    </span><span class="kw">pub fn </span>applied(<span class="self">self</span>, starting_point: Permission) -&gt; <span class="prelude-ty">Option</span>&lt;Permission&gt; {
+        (starting_point.inner == <span class="self">self</span>.from).then_some(Permission { inner: <span class="self">self</span>.to })
+    }
+
+    <span class="doccomment">/// Extract starting point of a transition
+    </span><span class="kw">pub fn </span>started(<span class="self">self</span>) -&gt; Permission {
+        Permission { inner: <span class="self">self</span>.from }
+    }
+
+    <span class="doccomment">/// Determines if this transition would disable the permission.
+    </span><span class="kw">pub fn </span>produces_disabled(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.to == Disabled
+    }
+}
+
+<span class="kw">pub mod </span>diagnostics {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">impl </span>fmt::Display <span class="kw">for </span>PermissionPriv {
+        <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+            <span class="macro">write!</span>(
+                f,
+                <span class="string">&quot;{}&quot;</span>,
+                <span class="kw">match </span><span class="self">self </span>{
+                    Reserved { .. } =&gt; <span class="string">&quot;Reserved&quot;</span>,
+                    Active =&gt; <span class="string">&quot;Active&quot;</span>,
+                    Frozen =&gt; <span class="string">&quot;Frozen&quot;</span>,
+                    Disabled =&gt; <span class="string">&quot;Disabled&quot;</span>,
+                }
+            )
+        }
+    }
+
+    <span class="kw">impl </span>fmt::Display <span class="kw">for </span>PermTransition {
+        <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+            <span class="macro">write!</span>(f, <span class="string">&quot;from {} to {}&quot;</span>, <span class="self">self</span>.from, <span class="self">self</span>.to)
+        }
+    }
+
+    <span class="kw">impl </span>fmt::Display <span class="kw">for </span>Permission {
+        <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+            <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.inner)
+        }
+    }
+
+    <span class="kw">impl </span>Permission {
+        <span class="doccomment">/// Abbreviated name of the permission (uniformly 3 letters for nice alignment).
+        </span><span class="kw">pub fn </span>short_name(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+            <span class="comment">// Make sure there are all of the same length as each other
+            // and also as `diagnostics::DisplayFmtPermission.uninit` otherwise
+            // alignment will be incorrect.
+            </span><span class="kw">match </span><span class="self">self</span>.inner {
+                Reserved { ty_is_freeze: <span class="bool-val">true </span>} =&gt; <span class="string">&quot;Res&quot;</span>,
+                Reserved { ty_is_freeze: <span class="bool-val">false </span>} =&gt; <span class="string">&quot;Re*&quot;</span>,
+                Active =&gt; <span class="string">&quot;Act&quot;</span>,
+                Frozen =&gt; <span class="string">&quot;Frz&quot;</span>,
+                Disabled =&gt; <span class="string">&quot;Dis&quot;</span>,
+            }
+        }
+    }
+
+    <span class="kw">impl </span>PermTransition {
+        <span class="doccomment">/// Readable explanation of the consequences of an event.
+        /// Fits in the sentence &quot;This accessed caused {trans.summary()}&quot;.
+        ///
+        /// Important: for the purposes of this explanation, `Reserved` is considered
+        /// to have write permissions, because that&#39;s what the diagnostics care about
+        /// (otherwise `Reserved -&gt; Frozen` would be considered a noop).
+        </span><span class="kw">pub fn </span>summary(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+            <span class="macro">assert!</span>(<span class="self">self</span>.is_possible());
+            <span class="kw">match </span>(<span class="self">self</span>.from, <span class="self">self</span>.to) {
+                (<span class="kw">_</span>, Active) =&gt; <span class="string">&quot;the first write to a 2-phase borrowed mutable reference&quot;</span>,
+                (<span class="kw">_</span>, Frozen) =&gt; <span class="string">&quot;a loss of write permissions&quot;</span>,
+                (Frozen, Disabled) =&gt; <span class="string">&quot;a loss of read permissions&quot;</span>,
+                (<span class="kw">_</span>, Disabled) =&gt; <span class="string">&quot;a loss of read and write permissions&quot;</span>,
+                (old, new) =&gt;
+                    <span class="macro">unreachable!</span>(<span class="string">&quot;Transition from {old:?} to {new:?} should never be possible&quot;</span>),
+            }
+        }
+
+        <span class="doccomment">/// Determines whether `self` is a relevant transition for the error `err`.
+        /// `self` will be a transition that happened to a tag some time before
+        /// that tag caused the error.
+        ///
+        /// Irrelevant events:
+        /// - modifications of write permissions when the error is related to read permissions
+        ///   (on failed reads and protected `Frozen -&gt; Disabled`, ignore `Reserved -&gt; Active`,
+        ///   `Reserved -&gt; Frozen`, and `Active -&gt; Frozen`)
+        /// - all transitions for attempts to deallocate strongly protected tags
+        ///
+        /// # Panics
+        ///
+        /// This function assumes that its arguments apply to the same location
+        /// and that they were obtained during a normal execution. It will panic otherwise.
+        /// - all transitions involved in `self` and `err` should be increasing
+        /// (Reserved &lt; Active &lt; Frozen &lt; Disabled);
+        /// - between `self` and `err` the permission should also be increasing,
+        /// so all permissions inside `err` should be greater than `self.1`;
+        /// - `Active` and `Reserved` cannot cause an error due to insufficient permissions,
+        /// so `err` cannot be a `ChildAccessForbidden(_)` of either of them;
+        /// - `err` should not be `ProtectedDisabled(Disabled)`, because the protected
+        /// tag should not have been `Disabled` in the first place (if this occurs it means
+        /// we have unprotected tags that become protected)
+        </span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">super</span>::<span class="kw">super</span>) <span class="kw">fn </span>is_relevant(<span class="kw-2">&amp;</span><span class="self">self</span>, err: TransitionError) -&gt; bool {
+            <span class="comment">// NOTE: `super::super` is the visibility of `TransitionError`
+            </span><span class="macro">assert!</span>(<span class="self">self</span>.is_possible());
+            <span class="kw">if </span><span class="self">self</span>.is_noop() {
+                <span class="kw">return </span><span class="bool-val">false</span>;
+            }
+            <span class="kw">match </span>err {
+                TransitionError::ChildAccessForbidden(insufficient) =&gt; {
+                    <span class="comment">// Show where the permission was gained then lost,
+                    // but ignore unrelated permissions.
+                    // This eliminates transitions like `Active -&gt; Frozen`
+                    // when the error is a failed `Read`.
+                    </span><span class="kw">match </span>(<span class="self">self</span>.to, insufficient.inner) {
+                        (Frozen, Frozen) =&gt; <span class="bool-val">true</span>,
+                        (Active, Frozen) =&gt; <span class="bool-val">true</span>,
+                        (Disabled, Disabled) =&gt; <span class="bool-val">true</span>,
+                        <span class="comment">// A pointer being `Disabled` is a strictly stronger source of
+                        // errors than it being `Frozen`. If we try to access a `Disabled`,
+                        // then where it became `Frozen` (or `Active`) is the least of our concerns for now.
+                        </span>(Active | Frozen, Disabled) =&gt; <span class="bool-val">false</span>,
+
+                        <span class="comment">// `Active` and `Reserved` have all permissions, so a
+                        // `ChildAccessForbidden(Reserved | Active)` can never exist.
+                        </span>(<span class="kw">_</span>, Active) | (<span class="kw">_</span>, Reserved { .. }) =&gt;
+                            <span class="macro">unreachable!</span>(<span class="string">&quot;this permission cannot cause an error&quot;</span>),
+                        <span class="comment">// No transition has `Reserved` as its `.to` unless it&#39;s a noop.
+                        </span>(Reserved { .. }, <span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;self is a noop transition&quot;</span>),
+                        <span class="comment">// All transitions produced in normal executions (using `apply_access`)
+                        // change permissions in the order `Reserved -&gt; Active -&gt; Frozen -&gt; Disabled`.
+                        // We assume that the error was triggered on the same location that
+                        // the transition `self` applies to, so permissions found must be increasing
+                        // in the order `self.from &lt; self.to &lt;= insufficient.inner`
+                        </span>(Disabled, Frozen) =&gt;
+                            <span class="macro">unreachable!</span>(<span class="string">&quot;permissions between self and err must be increasing&quot;</span>),
+                    }
+                }
+                TransitionError::ProtectedDisabled(before_disabled) =&gt; {
+                    <span class="comment">// Show how we got to the starting point of the forbidden transition,
+                    // but ignore what came before.
+                    // This eliminates transitions like `Reserved -&gt; Active`
+                    // when the error is a `Frozen -&gt; Disabled`.
+                    </span><span class="kw">match </span>(<span class="self">self</span>.to, before_disabled.inner) {
+                        <span class="comment">// We absolutely want to know where it was activated.
+                        </span>(Active, Active) =&gt; <span class="bool-val">true</span>,
+                        <span class="comment">// And knowing where it became Frozen is also important.
+                        </span>(Frozen, Frozen) =&gt; <span class="bool-val">true</span>,
+                        <span class="comment">// If the error is a transition `Frozen -&gt; Disabled`, then we don&#39;t really
+                        // care whether before that was `Reserved -&gt; Active -&gt; Frozen` or
+                        // `Reserved -&gt; Frozen` or even `Frozen` directly.
+                        // The error will only show either
+                        // - created as Frozen, then Frozen -&gt; Disabled is forbidden
+                        // - created as Reserved, later became Frozen, then Frozen -&gt; Disabled is forbidden
+                        // In both cases the `Reserved -&gt; Active` part is inexistant or irrelevant.
+                        </span>(Active, Frozen) =&gt; <span class="bool-val">false</span>,
+
+                        (<span class="kw">_</span>, Disabled) =&gt;
+                            <span class="macro">unreachable!</span>(
+                                <span class="string">&quot;permission that results in Disabled should not itself be Disabled in the first place&quot;
+                            </span>),
+                        <span class="comment">// No transition has `Reserved` as its `.to` unless it&#39;s a noop.
+                        </span>(Reserved { .. }, <span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;self is a noop transition&quot;</span>),
+
+                        <span class="comment">// Permissions only evolve in the order `Reserved -&gt; Active -&gt; Frozen -&gt; Disabled`,
+                        // so permissions found must be increasing in the order
+                        // `self.from &lt; self.to &lt;= forbidden.from &lt; forbidden.to`.
+                        </span>(Disabled, Reserved { .. } | Active | Frozen)
+                        | (Frozen, Reserved { .. } | Active)
+                        | (Active, Reserved { .. }) =&gt;
+                            <span class="macro">unreachable!</span>(<span class="string">&quot;permissions between self and err must be increasing&quot;</span>),
+                    }
+                }
+                <span class="comment">// We don&#39;t care because protectors evolve independently from
+                // permissions.
+                </span>TransitionError::ProtectedDealloc =&gt; <span class="bool-val">false</span>,
+            }
+        }
+
+        <span class="doccomment">/// Endpoint of a transition.
+        /// Meant only for diagnostics, use `applied` in non-diagnostics
+        /// code, which also checks that the starting point matches the current state.
+        </span><span class="kw">pub fn </span>endpoint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Permission {
+            Permission { inner: <span class="self">self</span>.to }
+        }
     }
 }
 
@@ -525,7 +899,7 @@
         <span class="kw">pub use super</span>::<span class="kw-2">*</span>;
         <span class="kw">impl </span>PermissionPriv {
             <span class="doccomment">/// Enumerate all states
-            </span><span class="kw">pub fn </span>all() -&gt; <span class="kw">impl </span>Iterator&lt;Item = PermissionPriv&gt; {
+            </span><span class="kw">pub fn </span>all() -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="self">Self</span>&gt; {
                 <span class="macro">vec!</span>[
                     Active,
                     Reserved { ty_is_freeze: <span class="bool-val">true </span>},
@@ -537,9 +911,15 @@
             }
         }
 
+        <span class="kw">impl </span>Permission {
+            <span class="kw">pub fn </span>all() -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="self">Self</span>&gt; {
+                PermissionPriv::all().map(|inner| <span class="self">Self </span>{ inner })
+            }
+        }
+
         <span class="kw">impl </span>AccessKind {
             <span class="doccomment">/// Enumerate all AccessKind.
-            </span><span class="kw">pub fn </span>all() -&gt; <span class="kw">impl </span>Iterator&lt;Item = AccessKind&gt; {
+            </span><span class="kw">pub fn </span>all() -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="self">Self</span>&gt; {
                 <span class="kw">use </span>AccessKind::<span class="kw-2">*</span>;
                 [Read, Write].into_iter()
             }
@@ -547,7 +927,7 @@
 
         <span class="kw">impl </span>AccessRelatedness {
             <span class="doccomment">/// Enumerate all relative positions
-            </span><span class="kw">pub fn </span>all() -&gt; <span class="kw">impl </span>Iterator&lt;Item = AccessRelatedness&gt; {
+            </span><span class="kw">pub fn </span>all() -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="self">Self</span>&gt; {
                 <span class="kw">use </span>AccessRelatedness::<span class="kw-2">*</span>;
                 [This, StrictChildAccess, AncestorAccess, DistantAccess].into_iter()
             }
@@ -576,7 +956,7 @@
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">fn </span>foreign_read_is_noop_after_write() {
+    </span><span class="kw">fn </span>foreign_read_is_noop_after_foreign_write() {
         <span class="kw">use </span>transition::<span class="kw-2">*</span>;
         <span class="kw">let </span>old_access = AccessKind::Write;
         <span class="kw">let </span>new_access = AccessKind::Read;

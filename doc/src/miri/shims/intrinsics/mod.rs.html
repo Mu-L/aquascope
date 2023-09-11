@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/miri-8f8b361f28c5a248/35d6927/src/shims/intrinsics/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-63a85fc7cf22dee2.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="miri" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (9df3a39fb 2023-04-11)" data-search-js="search-bc5a112813b5d712.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-1159a395118aa44e.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../miri/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/miri-8f8b361f28c5a248/63c5542/src/shims/intrinsics/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-47e7ab555ef2818a.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="miri" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0-nightly (58eefc33a 2023-08-24)" data-channel="nightly" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-b2d31d2efc7e9b67.css" data-theme-dark-css="dark-3388a2fb2ef8066b.css" data-theme-ayu-css="ayu-8c3c66a6cf12cb2f.css" ><script src="../../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-ef3a2de404864b0b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-b2d31d2efc7e9b67.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-3388a2fb2ef8066b.css"><link rel="stylesheet" href="../../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../miri/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -412,31 +412,6 @@
 <a href="#412" id="412">412</a>
 <a href="#413" id="413">413</a>
 <a href="#414" id="414">414</a>
-<a href="#415" id="415">415</a>
-<a href="#416" id="416">416</a>
-<a href="#417" id="417">417</a>
-<a href="#418" id="418">418</a>
-<a href="#419" id="419">419</a>
-<a href="#420" id="420">420</a>
-<a href="#421" id="421">421</a>
-<a href="#422" id="422">422</a>
-<a href="#423" id="423">423</a>
-<a href="#424" id="424">424</a>
-<a href="#425" id="425">425</a>
-<a href="#426" id="426">426</a>
-<a href="#427" id="427">427</a>
-<a href="#428" id="428">428</a>
-<a href="#429" id="429">429</a>
-<a href="#430" id="430">430</a>
-<a href="#431" id="431">431</a>
-<a href="#432" id="432">432</a>
-<a href="#433" id="433">433</a>
-<a href="#434" id="434">434</a>
-<a href="#435" id="435">435</a>
-<a href="#436" id="436">436</a>
-<a href="#437" id="437">437</a>
-<a href="#438" id="438">438</a>
-<a href="#439" id="439">439</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>atomic;
 <span class="kw">mod </span>simd;
 
@@ -445,12 +420,12 @@
 <span class="kw">use </span>log::trace;
 
 <span class="kw">use </span>rustc_apfloat::{Float, Round};
-<span class="kw">use </span>rustc_middle::ty::layout::{IntegerExt, LayoutOf};
+<span class="kw">use </span>rustc_middle::ty::layout::LayoutOf;
 <span class="kw">use </span>rustc_middle::{
     mir,
-    ty::{<span class="self">self</span>, FloatTy, Ty},
+    ty::{<span class="self">self</span>, FloatTy},
 };
-<span class="kw">use </span>rustc_target::abi::{Integer, Size};
+<span class="kw">use </span>rustc_target::abi::Size;
 
 <span class="kw">use crate</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>atomic::EvalContextExt <span class="kw">as _</span>;
@@ -473,11 +448,21 @@
         </span><span class="kw">if </span>this.emulate_intrinsic(instance, args, dest, ret)<span class="question-mark">? </span>{
             <span class="kw">return </span><span class="prelude-val">Ok</span>(());
         }
+        <span class="kw">let </span>intrinsic_name = this.tcx.item_name(instance.def_id());
+        <span class="kw">let </span>intrinsic_name = intrinsic_name.as_str();
+
+        <span class="comment">// Handle intrinsics without return place.
+        </span><span class="kw">match </span>intrinsic_name {
+            <span class="string">&quot;abort&quot; </span>=&gt; {
+                <span class="macro">throw_machine_stop!</span>(TerminationInfo::Abort(
+                    <span class="string">&quot;the program aborted execution&quot;</span>.to_owned()
+                ))
+            }
+            <span class="kw">_ </span>=&gt; {}
+        }
 
         <span class="comment">// All remaining supported intrinsics have a return place.
-        </span><span class="kw">let </span>intrinsic_name = this.tcx.item_name(instance.def_id());
-        <span class="kw">let </span>intrinsic_name = intrinsic_name.as_str();
-        <span class="kw">let </span>ret = <span class="kw">match </span>ret {
+        </span><span class="kw">let </span>ret = <span class="kw">match </span>ret {
             <span class="prelude-val">None </span>=&gt; <span class="macro">throw_unsup_format!</span>(<span class="string">&quot;unimplemented (diverging) intrinsic: `{intrinsic_name}`&quot;</span>),
             <span class="prelude-val">Some</span>(p) =&gt; p,
         };
@@ -535,13 +520,13 @@
             <span class="comment">// Raw memory accesses
             </span><span class="string">&quot;volatile_load&quot; </span>=&gt; {
                 <span class="kw">let </span>[place] = check_arg_count(args)<span class="question-mark">?</span>;
-                <span class="kw">let </span>place = this.deref_operand(place)<span class="question-mark">?</span>;
-                this.copy_op(<span class="kw-2">&amp;</span>place.into(), dest, <span class="comment">/*allow_transmute*/ </span><span class="bool-val">false</span>)<span class="question-mark">?</span>;
+                <span class="kw">let </span>place = this.deref_pointer(place)<span class="question-mark">?</span>;
+                this.copy_op(<span class="kw-2">&amp;</span>place, dest, <span class="comment">/*allow_transmute*/ </span><span class="bool-val">false</span>)<span class="question-mark">?</span>;
             }
             <span class="string">&quot;volatile_store&quot; </span>=&gt; {
                 <span class="kw">let </span>[place, dest] = check_arg_count(args)<span class="question-mark">?</span>;
-                <span class="kw">let </span>place = this.deref_operand(place)<span class="question-mark">?</span>;
-                this.copy_op(dest, <span class="kw-2">&amp;</span>place.into(), <span class="comment">/*allow_transmute*/ </span><span class="bool-val">false</span>)<span class="question-mark">?</span>;
+                <span class="kw">let </span>place = this.deref_pointer(place)<span class="question-mark">?</span>;
+                this.copy_op(dest, <span class="kw-2">&amp;</span>place, <span class="comment">/*allow_transmute*/ </span><span class="bool-val">false</span>)<span class="question-mark">?</span>;
             }
 
             <span class="string">&quot;write_bytes&quot; </span>| <span class="string">&quot;volatile_set_memory&quot; </span>=&gt; {
@@ -795,10 +780,28 @@
                 <span class="kw">let </span>val = this.read_immediate(val)<span class="question-mark">?</span>;
 
                 <span class="kw">let </span>res = <span class="kw">match </span>val.layout.ty.kind() {
-                    ty::Float(FloatTy::F32) =&gt;
-                        this.float_to_int_unchecked(val.to_scalar().to_f32()<span class="question-mark">?</span>, dest.layout.ty)<span class="question-mark">?</span>,
-                    ty::Float(FloatTy::F64) =&gt;
-                        this.float_to_int_unchecked(val.to_scalar().to_f64()<span class="question-mark">?</span>, dest.layout.ty)<span class="question-mark">?</span>,
+                    ty::Float(FloatTy::F32) =&gt; {
+                        <span class="kw">let </span>f = val.to_scalar().to_f32()<span class="question-mark">?</span>;
+                        this
+                            .float_to_int_checked(f, dest.layout.ty, Round::TowardZero)
+                            .ok_or_else(|| {
+                                <span class="macro">err_ub_format!</span>(
+                                    <span class="string">&quot;`float_to_int_unchecked` intrinsic called on {f} which cannot be represented in target type `{:?}`&quot;</span>,
+                                    dest.layout.ty
+                                )
+                            })<span class="question-mark">?
+                    </span>}
+                    ty::Float(FloatTy::F64) =&gt; {
+                        <span class="kw">let </span>f = val.to_scalar().to_f64()<span class="question-mark">?</span>;
+                        this
+                            .float_to_int_checked(f, dest.layout.ty, Round::TowardZero)
+                            .ok_or_else(|| {
+                                <span class="macro">err_ub_format!</span>(
+                                    <span class="string">&quot;`float_to_int_unchecked` intrinsic called on {f} which cannot be represented in target type `{:?}`&quot;</span>,
+                                    dest.layout.ty
+                                )
+                            })<span class="question-mark">?
+                    </span>}
                     <span class="kw">_ </span>=&gt;
                         <span class="macro">span_bug!</span>(
                             this.cur_span(),
@@ -814,66 +817,13 @@
             </span><span class="string">&quot;breakpoint&quot; </span>=&gt; {
                 <span class="kw">let </span>[] = check_arg_count(args)<span class="question-mark">?</span>;
                 <span class="comment">// normally this would raise a SIGTRAP, which aborts if no debugger is connected
-                </span><span class="macro">throw_machine_stop!</span>(TerminationInfo::Abort(<span class="macro">format!</span>(<span class="string">&quot;Trace/breakpoint trap&quot;</span>)))
+                </span><span class="macro">throw_machine_stop!</span>(TerminationInfo::Abort(<span class="macro">format!</span>(<span class="string">&quot;trace/breakpoint trap&quot;</span>)))
             }
 
             name =&gt; <span class="macro">throw_unsup_format!</span>(<span class="string">&quot;unimplemented intrinsic: `{name}`&quot;</span>),
         }
 
         <span class="prelude-val">Ok</span>(())
-    }
-
-    <span class="kw">fn </span>float_to_int_unchecked&lt;F&gt;(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        f: F,
-        dest_ty: Ty&lt;<span class="lifetime">&#39;tcx</span>&gt;,
-    ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, Scalar&lt;Provenance&gt;&gt;
-    <span class="kw">where
-        </span>F: Float + Into&lt;Scalar&lt;Provenance&gt;&gt;,
-    {
-        <span class="kw">let </span>this = <span class="self">self</span>.eval_context_ref();
-
-        <span class="comment">// Step 1: cut off the fractional part of `f`. The result of this is
-        // guaranteed to be precisely representable in IEEE floats.
-        </span><span class="kw">let </span>f = f.round_to_integral(Round::TowardZero).value;
-
-        <span class="comment">// Step 2: Cast the truncated float to the target integer type and see if we lose any information in this step.
-        </span><span class="prelude-val">Ok</span>(<span class="kw">match </span>dest_ty.kind() {
-            <span class="comment">// Unsigned
-            </span>ty::Uint(t) =&gt; {
-                <span class="kw">let </span>size = Integer::from_uint_ty(this, <span class="kw-2">*</span>t).size();
-                <span class="kw">let </span>res = f.to_u128(size.bits_usize());
-                <span class="kw">if </span>res.status.is_empty() {
-                    <span class="comment">// No status flags means there was no further rounding or other loss of precision.
-                    </span>Scalar::from_uint(res.value, size)
-                } <span class="kw">else </span>{
-                    <span class="comment">// `f` was not representable in this integer type.
-                    </span><span class="macro">throw_ub_format!</span>(
-                        <span class="string">&quot;`float_to_int_unchecked` intrinsic called on {f} which cannot be represented in target type `{dest_ty:?}`&quot;</span>,
-                    );
-                }
-            }
-            <span class="comment">// Signed
-            </span>ty::Int(t) =&gt; {
-                <span class="kw">let </span>size = Integer::from_int_ty(this, <span class="kw-2">*</span>t).size();
-                <span class="kw">let </span>res = f.to_i128(size.bits_usize());
-                <span class="kw">if </span>res.status.is_empty() {
-                    <span class="comment">// No status flags means there was no further rounding or other loss of precision.
-                    </span>Scalar::from_int(res.value, size)
-                } <span class="kw">else </span>{
-                    <span class="comment">// `f` was not representable in this integer type.
-                    </span><span class="macro">throw_ub_format!</span>(
-                        <span class="string">&quot;`float_to_int_unchecked` intrinsic called on {f} which cannot be represented in target type `{dest_ty:?}`&quot;</span>,
-                    );
-                }
-            }
-            <span class="comment">// Nothing else
-            </span><span class="kw">_ </span>=&gt;
-                <span class="macro">span_bug!</span>(
-                    this.cur_span(),
-                    <span class="string">&quot;`float_to_int_unchecked` called with non-int output type {dest_ty:?}&quot;
-                </span>),
-        })
     }
 }
 </code></pre></div></section></main></body></html>

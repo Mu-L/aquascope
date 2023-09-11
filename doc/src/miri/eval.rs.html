@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/miri-8f8b361f28c5a248/35d6927/src/eval.rs`."><title>eval.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-63a85fc7cf22dee2.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="miri" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (9df3a39fb 2023-04-11)" data-search-js="search-bc5a112813b5d712.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-1159a395118aa44e.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../miri/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/miri-8f8b361f28c5a248/63c5542/src/eval.rs`."><title>eval.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-47e7ab555ef2818a.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="miri" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0-nightly (58eefc33a 2023-08-24)" data-channel="nightly" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-b2d31d2efc7e9b67.css" data-theme-dark-css="dark-3388a2fb2ef8066b.css" data-theme-ayu-css="ayu-8c3c66a6cf12cb2f.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-ef3a2de404864b0b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-b2d31d2efc7e9b67.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-3388a2fb2ef8066b.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../miri/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -571,6 +571,31 @@
 <a href="#571" id="571">571</a>
 <a href="#572" id="572">572</a>
 <a href="#573" id="573">573</a>
+<a href="#574" id="574">574</a>
+<a href="#575" id="575">575</a>
+<a href="#576" id="576">576</a>
+<a href="#577" id="577">577</a>
+<a href="#578" id="578">578</a>
+<a href="#579" id="579">579</a>
+<a href="#580" id="580">580</a>
+<a href="#581" id="581">581</a>
+<a href="#582" id="582">582</a>
+<a href="#583" id="583">583</a>
+<a href="#584" id="584">584</a>
+<a href="#585" id="585">585</a>
+<a href="#586" id="586">586</a>
+<a href="#587" id="587">587</a>
+<a href="#588" id="588">588</a>
+<a href="#589" id="589">589</a>
+<a href="#590" id="590">590</a>
+<a href="#591" id="591">591</a>
+<a href="#592" id="592">592</a>
+<a href="#593" id="593">593</a>
+<a href="#594" id="594">594</a>
+<a href="#595" id="595">595</a>
+<a href="#596" id="596">596</a>
+<a href="#597" id="597">597</a>
+<a href="#598" id="598">598</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Main evaluator loop and setting up the initial stack frame.
 
 </span><span class="kw">use </span>std::ffi::{OsStr, OsString};
@@ -581,8 +606,10 @@
 <span class="kw">use </span>std::thread;
 
 <span class="kw">use </span>log::info;
+<span class="kw">use </span>rustc_middle::ty::Ty;
 
 <span class="kw">use </span><span class="kw">crate</span>::borrow_tracker::RetagFields;
+<span class="kw">use </span><span class="kw">crate</span>::diagnostics::report_leaks;
 <span class="kw">use </span>rustc_data_structures::fx::FxHashSet;
 <span class="kw">use </span>rustc_hir::def::Namespace;
 <span class="kw">use </span>rustc_hir::def_id::DefId;
@@ -662,6 +689,10 @@
     </span><span class="kw">pub </span>validate: bool,
     <span class="doccomment">/// Determines if Stacked Borrows or Tree Borrows is enabled.
     </span><span class="kw">pub </span>borrow_tracker: <span class="prelude-ty">Option</span>&lt;BorrowTrackerMethod&gt;,
+    <span class="doccomment">/// Whether `core::ptr::Unique` receives special treatment.
+    /// If `true` then `Unique` is reborrowed with its own new tag and permission,
+    /// otherwise `Unique` is just another raw pointer.
+    </span><span class="kw">pub </span>unique_is_unique: bool,
     <span class="doccomment">/// Controls alignment checking.
     </span><span class="kw">pub </span>check_alignment: AlignmentCheck,
     <span class="doccomment">/// Controls function [ABI](Abi) checking.
@@ -718,6 +749,8 @@
     </span><span class="kw">pub </span>num_cpus: u32,
     <span class="doccomment">/// Requires Miri to emulate pages of a certain size
     </span><span class="kw">pub </span>page_size: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    <span class="doccomment">/// Whether to collect a backtrace when each allocation is created, just in case it leaks.
+    </span><span class="kw">pub </span>collect_leak_backtraces: bool,
 }
 
 <span class="kw">impl </span>Default <span class="kw">for </span>MiriConfig {
@@ -726,6 +759,7 @@
             env: <span class="macro">vec!</span>[],
             validate: <span class="bool-val">true</span>,
             borrow_tracker: <span class="prelude-val">Some</span>(BorrowTrackerMethod::StackedBorrows),
+            unique_is_unique: <span class="bool-val">false</span>,
             check_alignment: AlignmentCheck::Int,
             check_abi: <span class="bool-val">true</span>,
             isolated_op: IsolatedOp::Reject(RejectOpWith::Abort),
@@ -747,11 +781,12 @@
             mute_stdout_stderr: <span class="bool-val">false</span>,
             preemption_rate: <span class="number">0.01</span>, <span class="comment">// 1%
             </span>report_progress: <span class="prelude-val">None</span>,
-            retag_fields: RetagFields::OnlyScalar,
+            retag_fields: RetagFields::Yes,
             external_so_file: <span class="prelude-val">None</span>,
             gc_interval: <span class="number">10_000</span>,
             num_cpus: <span class="number">1</span>,
             page_size: <span class="prelude-val">None</span>,
+            collect_leak_backtraces: <span class="bool-val">true</span>,
         }
     }
 }
@@ -809,7 +844,7 @@
                     this.machine.main_fn_ret_place.unwrap().ptr,
                     this.machine.layouts.isize,
                 );
-                <span class="kw">let </span>exit_code = this.read_target_isize(<span class="kw-2">&amp;</span>ret_place.into())<span class="question-mark">?</span>;
+                <span class="kw">let </span>exit_code = this.read_target_isize(<span class="kw-2">&amp;</span>ret_place)<span class="question-mark">?</span>;
                 <span class="comment">// Need to call this ourselves since we are not going to return to the scheduler
                 // loop, and we want the main thread TLS to not show up as memory leaks.
                 </span>this.terminate_active_thread()<span class="question-mark">?</span>;
@@ -864,11 +899,11 @@
     <span class="comment">// Third argument (`argv`): created from `config.args`.
     </span><span class="kw">let </span>argv = {
         <span class="comment">// Put each argument in memory, collect pointers.
-        </span><span class="kw">let </span><span class="kw-2">mut </span>argvs = Vec::&lt;Immediate&lt;Provenance&gt;&gt;::new();
+        </span><span class="kw">let </span><span class="kw-2">mut </span>argvs = Vec::&lt;Immediate&lt;Provenance&gt;&gt;::with_capacity(config.args.len());
         <span class="kw">for </span>arg <span class="kw">in </span>config.args.iter() {
             <span class="comment">// Make space for `0` terminator.
             </span><span class="kw">let </span>size = u64::try_from(arg.len()).unwrap().checked_add(<span class="number">1</span>).unwrap();
-            <span class="kw">let </span>arg_type = tcx.mk_array(tcx.types.u8, size);
+            <span class="kw">let </span>arg_type = Ty::new_array(tcx, tcx.types.u8, size);
             <span class="kw">let </span>arg_place =
                 ecx.allocate(ecx.layout_of(arg_type)<span class="question-mark">?</span>, MiriMemoryKind::Machine.into())<span class="question-mark">?</span>;
             ecx.write_os_str_to_c_str(OsStr::new(arg), arg_place.ptr, size)<span class="question-mark">?</span>;
@@ -876,13 +911,15 @@
             argvs.push(arg_place.to_ref(<span class="kw-2">&amp;</span>ecx));
         }
         <span class="comment">// Make an array with all these pointers, in the Miri memory.
-        </span><span class="kw">let </span>argvs_layout = ecx.layout_of(
-            tcx.mk_array(tcx.mk_imm_ptr(tcx.types.u8), u64::try_from(argvs.len()).unwrap()),
-        )<span class="question-mark">?</span>;
+        </span><span class="kw">let </span>argvs_layout = ecx.layout_of(Ty::new_array(
+            tcx,
+            Ty::new_imm_ptr(tcx, tcx.types.u8),
+            u64::try_from(argvs.len()).unwrap(),
+        ))<span class="question-mark">?</span>;
         <span class="kw">let </span>argvs_place = ecx.allocate(argvs_layout, MiriMemoryKind::Machine.into())<span class="question-mark">?</span>;
         <span class="kw">for </span>(idx, arg) <span class="kw">in </span>argvs.into_iter().enumerate() {
-            <span class="kw">let </span>place = ecx.mplace_field(<span class="kw-2">&amp;</span>argvs_place, idx)<span class="question-mark">?</span>;
-            ecx.write_immediate(arg, <span class="kw-2">&amp;</span>place.into())<span class="question-mark">?</span>;
+            <span class="kw">let </span>place = ecx.project_field(<span class="kw-2">&amp;</span>argvs_place, idx)<span class="question-mark">?</span>;
+            ecx.write_immediate(arg, <span class="kw-2">&amp;</span>place)<span class="question-mark">?</span>;
         }
         ecx.mark_immutable(<span class="kw-2">&amp;</span>argvs_place);
         <span class="comment">// A pointer to that place is the 3rd argument for main.
@@ -891,15 +928,15 @@
         </span>{
             <span class="kw">let </span>argc_place =
                 ecx.allocate(ecx.machine.layouts.isize, MiriMemoryKind::Machine.into())<span class="question-mark">?</span>;
-            ecx.write_scalar(argc, <span class="kw-2">&amp;</span>argc_place.into())<span class="question-mark">?</span>;
+            ecx.write_scalar(argc, <span class="kw-2">&amp;</span>argc_place)<span class="question-mark">?</span>;
             ecx.mark_immutable(<span class="kw-2">&amp;</span>argc_place);
             ecx.machine.argc = <span class="prelude-val">Some</span>(<span class="kw-2">*</span>argc_place);
 
             <span class="kw">let </span>argv_place = ecx.allocate(
-                ecx.layout_of(tcx.mk_imm_ptr(tcx.types.unit))<span class="question-mark">?</span>,
+                ecx.layout_of(Ty::new_imm_ptr(tcx, tcx.types.unit))<span class="question-mark">?</span>,
                 MiriMemoryKind::Machine.into(),
             )<span class="question-mark">?</span>;
-            ecx.write_immediate(argv, <span class="kw-2">&amp;</span>argv_place.into())<span class="question-mark">?</span>;
+            ecx.write_immediate(argv, <span class="kw-2">&amp;</span>argv_place)<span class="question-mark">?</span>;
             ecx.mark_immutable(<span class="kw-2">&amp;</span>argv_place);
             ecx.machine.argv = <span class="prelude-val">Some</span>(<span class="kw-2">*</span>argv_place);
         }
@@ -908,14 +945,15 @@
             <span class="comment">// Construct a command string with all the arguments.
             </span><span class="kw">let </span>cmd_utf16: Vec&lt;u16&gt; = args_to_utf16_command_string(config.args.iter());
 
-            <span class="kw">let </span>cmd_type = tcx.mk_array(tcx.types.u16, u64::try_from(cmd_utf16.len()).unwrap());
+            <span class="kw">let </span>cmd_type =
+                Ty::new_array(tcx, tcx.types.u16, u64::try_from(cmd_utf16.len()).unwrap());
             <span class="kw">let </span>cmd_place =
                 ecx.allocate(ecx.layout_of(cmd_type)<span class="question-mark">?</span>, MiriMemoryKind::Machine.into())<span class="question-mark">?</span>;
             ecx.machine.cmd_line = <span class="prelude-val">Some</span>(<span class="kw-2">*</span>cmd_place);
             <span class="comment">// Store the UTF-16 string. We just allocated so we know the bounds are fine.
             </span><span class="kw">for </span>(idx, <span class="kw-2">&amp;</span>c) <span class="kw">in </span>cmd_utf16.iter().enumerate() {
-                <span class="kw">let </span>place = ecx.mplace_field(<span class="kw-2">&amp;</span>cmd_place, idx)<span class="question-mark">?</span>;
-                ecx.write_scalar(Scalar::from_u16(c), <span class="kw-2">&amp;</span>place.into())<span class="question-mark">?</span>;
+                <span class="kw">let </span>place = ecx.project_field(<span class="kw-2">&amp;</span>cmd_place, idx)<span class="question-mark">?</span>;
+                ecx.write_scalar(Scalar::from_u16(c), <span class="kw-2">&amp;</span>place)<span class="question-mark">?</span>;
             }
             ecx.mark_immutable(<span class="kw-2">&amp;</span>cmd_place);
         }
@@ -929,14 +967,18 @@
 
     </span><span class="kw">match </span>entry_type {
         EntryFnType::Main { .. } =&gt; {
-            <span class="kw">let </span>start_id = tcx.lang_items().start_fn().unwrap();
+            <span class="kw">let </span>start_id = tcx.lang_items().start_fn().unwrap_or_else(|| {
+                tcx.sess.fatal(
+                    <span class="string">&quot;could not find start function. Make sure the entry point is marked with `#[start]`.&quot;
+                </span>);
+            });
             <span class="kw">let </span>main_ret_ty = tcx.fn_sig(entry_id).no_bound_vars().unwrap().output();
             <span class="kw">let </span>main_ret_ty = main_ret_ty.no_bound_vars().unwrap();
             <span class="kw">let </span>start_instance = ty::Instance::resolve(
                 tcx,
                 ty::ParamEnv::reveal_all(),
                 start_id,
-                tcx.mk_substs(<span class="kw-2">&amp;</span>[ty::subst::GenericArg::from(main_ret_ty)]),
+                tcx.mk_args(<span class="kw-2">&amp;</span>[ty::GenericArg::from(main_ret_ty)]),
             )
             .unwrap()
             .unwrap();
@@ -945,7 +987,7 @@
 
             <span class="comment">// Inlining of `DEFAULT` from
             // https://github.com/rust-lang/rust/blob/master/compiler/rustc_session/src/config/sigpipe.rs.
-            // Alaways using DEFAULT is okay since we don&#39;t support signals in Miri anyway.
+            // Always using DEFAULT is okay since we don&#39;t support signals in Miri anyway.
             </span><span class="kw">let </span>sigpipe = <span class="number">2</span>;
 
             ecx.call_function(
@@ -991,8 +1033,9 @@
     <span class="kw">let </span><span class="kw-2">mut </span>ecx = <span class="kw">match </span>create_ecx(tcx, entry_id, entry_type, <span class="kw-2">&amp;</span>config) {
         <span class="prelude-val">Ok</span>(v) =&gt; v,
         <span class="prelude-val">Err</span>(err) =&gt; {
-            err.print_backtrace();
-            <span class="macro">panic!</span>(<span class="string">&quot;Miri initialization error: {}&quot;</span>, err.kind())
+            <span class="kw">let </span>(kind, backtrace) = err.into_parts();
+            backtrace.print_backtrace();
+            <span class="macro">panic!</span>(<span class="string">&quot;Miri initialization error: {kind:?}&quot;</span>)
         }
     };
 
@@ -1029,11 +1072,18 @@
             <span class="kw">return </span><span class="prelude-val">None</span>;
         }
         <span class="comment">// Check for memory leaks.
-        </span><span class="macro">info!</span>(<span class="string">&quot;Additonal static roots: {:?}&quot;</span>, ecx.machine.static_roots);
-        <span class="kw">let </span>leaks = ecx.leak_report(<span class="kw-2">&amp;</span>ecx.machine.static_roots);
-        <span class="kw">if </span>leaks != <span class="number">0 </span>{
-            tcx.sess.err(<span class="string">&quot;the evaluated program leaked memory&quot;</span>);
-            tcx.sess.note_without_error(<span class="string">&quot;pass `-Zmiri-ignore-leaks` to disable this check&quot;</span>);
+        </span><span class="macro">info!</span>(<span class="string">&quot;Additional static roots: {:?}&quot;</span>, ecx.machine.static_roots);
+        <span class="kw">let </span>leaks = ecx.find_leaked_allocations(<span class="kw-2">&amp;</span>ecx.machine.static_roots);
+        <span class="kw">if </span>!leaks.is_empty() {
+            report_leaks(<span class="kw-2">&amp;</span>ecx, leaks);
+            <span class="kw">let </span>leak_message = <span class="string">&quot;the evaluated program leaked memory, pass `-Zmiri-ignore-leaks` to disable this check&quot;</span>;
+            <span class="kw">if </span>ecx.machine.collect_leak_backtraces {
+                <span class="comment">// If we are collecting leak backtraces, each leak is a distinct error diagnostic.
+                </span>tcx.sess.note_without_error(leak_message);
+            } <span class="kw">else </span>{
+                <span class="comment">// If we do not have backtraces, we just report an error without any span.
+                </span>tcx.sess.err(leak_message);
+            };
             <span class="comment">// Ignore the provided return code - let the reported error
             // determine the return code.
             </span><span class="kw">return </span><span class="prelude-val">None</span>;

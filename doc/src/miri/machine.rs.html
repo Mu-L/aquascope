@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/miri-8f8b361f28c5a248/35d6927/src/machine.rs`."><title>machine.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-63a85fc7cf22dee2.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="miri" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (9df3a39fb 2023-04-11)" data-search-js="search-bc5a112813b5d712.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-1159a395118aa44e.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../miri/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/miri-8f8b361f28c5a248/63c5542/src/machine.rs`."><title>machine.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-47e7ab555ef2818a.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="miri" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0-nightly (58eefc33a 2023-08-24)" data-channel="nightly" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-b2d31d2efc7e9b67.css" data-theme-dark-css="dark-3388a2fb2ef8066b.css" data-theme-ayu-css="ayu-8c3c66a6cf12cb2f.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-ef3a2de404864b0b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-b2d31d2efc7e9b67.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-3388a2fb2ef8066b.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../miri/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1242,13 +1242,180 @@
 <a href="#1242" id="1242">1242</a>
 <a href="#1243" id="1243">1243</a>
 <a href="#1244" id="1244">1244</a>
+<a href="#1245" id="1245">1245</a>
+<a href="#1246" id="1246">1246</a>
+<a href="#1247" id="1247">1247</a>
+<a href="#1248" id="1248">1248</a>
+<a href="#1249" id="1249">1249</a>
+<a href="#1250" id="1250">1250</a>
+<a href="#1251" id="1251">1251</a>
+<a href="#1252" id="1252">1252</a>
+<a href="#1253" id="1253">1253</a>
+<a href="#1254" id="1254">1254</a>
+<a href="#1255" id="1255">1255</a>
+<a href="#1256" id="1256">1256</a>
+<a href="#1257" id="1257">1257</a>
+<a href="#1258" id="1258">1258</a>
+<a href="#1259" id="1259">1259</a>
+<a href="#1260" id="1260">1260</a>
+<a href="#1261" id="1261">1261</a>
+<a href="#1262" id="1262">1262</a>
+<a href="#1263" id="1263">1263</a>
+<a href="#1264" id="1264">1264</a>
+<a href="#1265" id="1265">1265</a>
+<a href="#1266" id="1266">1266</a>
+<a href="#1267" id="1267">1267</a>
+<a href="#1268" id="1268">1268</a>
+<a href="#1269" id="1269">1269</a>
+<a href="#1270" id="1270">1270</a>
+<a href="#1271" id="1271">1271</a>
+<a href="#1272" id="1272">1272</a>
+<a href="#1273" id="1273">1273</a>
+<a href="#1274" id="1274">1274</a>
+<a href="#1275" id="1275">1275</a>
+<a href="#1276" id="1276">1276</a>
+<a href="#1277" id="1277">1277</a>
+<a href="#1278" id="1278">1278</a>
+<a href="#1279" id="1279">1279</a>
+<a href="#1280" id="1280">1280</a>
+<a href="#1281" id="1281">1281</a>
+<a href="#1282" id="1282">1282</a>
+<a href="#1283" id="1283">1283</a>
+<a href="#1284" id="1284">1284</a>
+<a href="#1285" id="1285">1285</a>
+<a href="#1286" id="1286">1286</a>
+<a href="#1287" id="1287">1287</a>
+<a href="#1288" id="1288">1288</a>
+<a href="#1289" id="1289">1289</a>
+<a href="#1290" id="1290">1290</a>
+<a href="#1291" id="1291">1291</a>
+<a href="#1292" id="1292">1292</a>
+<a href="#1293" id="1293">1293</a>
+<a href="#1294" id="1294">1294</a>
+<a href="#1295" id="1295">1295</a>
+<a href="#1296" id="1296">1296</a>
+<a href="#1297" id="1297">1297</a>
+<a href="#1298" id="1298">1298</a>
+<a href="#1299" id="1299">1299</a>
+<a href="#1300" id="1300">1300</a>
+<a href="#1301" id="1301">1301</a>
+<a href="#1302" id="1302">1302</a>
+<a href="#1303" id="1303">1303</a>
+<a href="#1304" id="1304">1304</a>
+<a href="#1305" id="1305">1305</a>
+<a href="#1306" id="1306">1306</a>
+<a href="#1307" id="1307">1307</a>
+<a href="#1308" id="1308">1308</a>
+<a href="#1309" id="1309">1309</a>
+<a href="#1310" id="1310">1310</a>
+<a href="#1311" id="1311">1311</a>
+<a href="#1312" id="1312">1312</a>
+<a href="#1313" id="1313">1313</a>
+<a href="#1314" id="1314">1314</a>
+<a href="#1315" id="1315">1315</a>
+<a href="#1316" id="1316">1316</a>
+<a href="#1317" id="1317">1317</a>
+<a href="#1318" id="1318">1318</a>
+<a href="#1319" id="1319">1319</a>
+<a href="#1320" id="1320">1320</a>
+<a href="#1321" id="1321">1321</a>
+<a href="#1322" id="1322">1322</a>
+<a href="#1323" id="1323">1323</a>
+<a href="#1324" id="1324">1324</a>
+<a href="#1325" id="1325">1325</a>
+<a href="#1326" id="1326">1326</a>
+<a href="#1327" id="1327">1327</a>
+<a href="#1328" id="1328">1328</a>
+<a href="#1329" id="1329">1329</a>
+<a href="#1330" id="1330">1330</a>
+<a href="#1331" id="1331">1331</a>
+<a href="#1332" id="1332">1332</a>
+<a href="#1333" id="1333">1333</a>
+<a href="#1334" id="1334">1334</a>
+<a href="#1335" id="1335">1335</a>
+<a href="#1336" id="1336">1336</a>
+<a href="#1337" id="1337">1337</a>
+<a href="#1338" id="1338">1338</a>
+<a href="#1339" id="1339">1339</a>
+<a href="#1340" id="1340">1340</a>
+<a href="#1341" id="1341">1341</a>
+<a href="#1342" id="1342">1342</a>
+<a href="#1343" id="1343">1343</a>
+<a href="#1344" id="1344">1344</a>
+<a href="#1345" id="1345">1345</a>
+<a href="#1346" id="1346">1346</a>
+<a href="#1347" id="1347">1347</a>
+<a href="#1348" id="1348">1348</a>
+<a href="#1349" id="1349">1349</a>
+<a href="#1350" id="1350">1350</a>
+<a href="#1351" id="1351">1351</a>
+<a href="#1352" id="1352">1352</a>
+<a href="#1353" id="1353">1353</a>
+<a href="#1354" id="1354">1354</a>
+<a href="#1355" id="1355">1355</a>
+<a href="#1356" id="1356">1356</a>
+<a href="#1357" id="1357">1357</a>
+<a href="#1358" id="1358">1358</a>
+<a href="#1359" id="1359">1359</a>
+<a href="#1360" id="1360">1360</a>
+<a href="#1361" id="1361">1361</a>
+<a href="#1362" id="1362">1362</a>
+<a href="#1363" id="1363">1363</a>
+<a href="#1364" id="1364">1364</a>
+<a href="#1365" id="1365">1365</a>
+<a href="#1366" id="1366">1366</a>
+<a href="#1367" id="1367">1367</a>
+<a href="#1368" id="1368">1368</a>
+<a href="#1369" id="1369">1369</a>
+<a href="#1370" id="1370">1370</a>
+<a href="#1371" id="1371">1371</a>
+<a href="#1372" id="1372">1372</a>
+<a href="#1373" id="1373">1373</a>
+<a href="#1374" id="1374">1374</a>
+<a href="#1375" id="1375">1375</a>
+<a href="#1376" id="1376">1376</a>
+<a href="#1377" id="1377">1377</a>
+<a href="#1378" id="1378">1378</a>
+<a href="#1379" id="1379">1379</a>
+<a href="#1380" id="1380">1380</a>
+<a href="#1381" id="1381">1381</a>
+<a href="#1382" id="1382">1382</a>
+<a href="#1383" id="1383">1383</a>
+<a href="#1384" id="1384">1384</a>
+<a href="#1385" id="1385">1385</a>
+<a href="#1386" id="1386">1386</a>
+<a href="#1387" id="1387">1387</a>
+<a href="#1388" id="1388">1388</a>
+<a href="#1389" id="1389">1389</a>
+<a href="#1390" id="1390">1390</a>
+<a href="#1391" id="1391">1391</a>
+<a href="#1392" id="1392">1392</a>
+<a href="#1393" id="1393">1393</a>
+<a href="#1394" id="1394">1394</a>
+<a href="#1395" id="1395">1395</a>
+<a href="#1396" id="1396">1396</a>
+<a href="#1397" id="1397">1397</a>
+<a href="#1398" id="1398">1398</a>
+<a href="#1399" id="1399">1399</a>
+<a href="#1400" id="1400">1400</a>
+<a href="#1401" id="1401">1401</a>
+<a href="#1402" id="1402">1402</a>
+<a href="#1403" id="1403">1403</a>
+<a href="#1404" id="1404">1404</a>
+<a href="#1405" id="1405">1405</a>
+<a href="#1406" id="1406">1406</a>
+<a href="#1407" id="1407">1407</a>
+<a href="#1408" id="1408">1408</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Global machine state as well as implementation of the interpreter engine
 //! `Machine` trait.
 
 </span><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::cell::RefCell;
 <span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::path::Path;
+<span class="kw">use </span>std::process;
 
+<span class="kw">use </span>either::Either;
 <span class="kw">use </span>rand::rngs::StdRng;
 <span class="kw">use </span>rand::SeedableRng;
 
@@ -1266,7 +1433,7 @@
     },
 };
 <span class="kw">use </span>rustc_span::def_id::{CrateNum, DefId};
-<span class="kw">use </span>rustc_span::Symbol;
+<span class="kw">use </span>rustc_span::{Span, SpanData, Symbol};
 <span class="kw">use </span>rustc_target::abi::{Align, Size};
 <span class="kw">use </span>rustc_target::spec::abi::Abi;
 
@@ -1276,8 +1443,14 @@
     <span class="kw-2">*</span>,
 };
 
-<span class="doccomment">/// The number of the available real-time signal with the lowest priority.
-/// Dummy constant related to epoll, must be between 32 and 64.
+<span class="doccomment">/// First real-time signal.
+/// `signal(7)` says this must be between 32 and 64 and specifies 34 or 35
+/// as typical values.
+</span><span class="kw">pub const </span>SIGRTMIN: i32 = <span class="number">34</span>;
+
+<span class="doccomment">/// Last real-time signal.
+/// `signal(7)` says it must be between 32 and 64 and specifies
+/// `SIGRTMAX` - `SIGRTMIN` &gt;= 8 (which is the value of `_POSIX_RTSIG_MAX`)
 </span><span class="kw">pub const </span>SIGRTMAX: i32 = <span class="number">42</span>;
 
 <span class="doccomment">/// Extra data stored with each stack frame
@@ -1348,6 +1521,8 @@
     <span class="doccomment">/// Memory for thread-local statics.
     /// This memory may leak.
     </span>Tls,
+    <span class="doccomment">/// Memory mapped directly by the program
+    </span>Mmap,
 }
 
 <span class="kw">impl </span>From&lt;MiriMemoryKind&gt; <span class="kw">for </span>MemoryKind&lt;MiriMemoryKind&gt; {
@@ -1363,7 +1538,20 @@
         <span class="kw">use </span><span class="self">self</span>::MiriMemoryKind::<span class="kw-2">*</span>;
         <span class="kw">match </span><span class="self">self </span>{
             Rust | Miri | C | WinHeap | Runtime =&gt; <span class="bool-val">false</span>,
-            Machine | Global | ExternStatic | Tls =&gt; <span class="bool-val">true</span>,
+            Machine | Global | ExternStatic | Tls | Mmap =&gt; <span class="bool-val">true</span>,
+        }
+    }
+}
+
+<span class="kw">impl </span>MiriMemoryKind {
+    <span class="doccomment">/// Whether we have a useful allocation span for an allocation of this kind.
+    </span><span class="kw">fn </span>should_save_allocation_span(<span class="self">self</span>) -&gt; bool {
+        <span class="kw">use </span><span class="self">self</span>::MiriMemoryKind::<span class="kw-2">*</span>;
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="comment">// Heap allocations are fine since the `Allocation` is created immediately.
+            </span>Rust | Miri | C | WinHeap | Mmap =&gt; <span class="bool-val">true</span>,
+            <span class="comment">// Everything else is unclear, let&#39;s not show potentially confusing spans.
+            </span>Machine | Global | ExternStatic | Tls | Runtime =&gt; <span class="bool-val">false</span>,
         }
     }
 }
@@ -1381,6 +1569,7 @@
             Global =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;global (static or const)&quot;</span>),
             ExternStatic =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;extern static&quot;</span>),
             Tls =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;thread-local static&quot;</span>),
+            Mmap =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;mmap&quot;</span>),
         }
     }
 }
@@ -1497,20 +1686,25 @@
 
 <span class="doccomment">/// Extra per-allocation data
 </span><span class="attr">#[derive(Debug, Clone)]
-</span><span class="kw">pub struct </span>AllocExtra {
+</span><span class="kw">pub struct </span>AllocExtra&lt;<span class="lifetime">&#39;tcx</span>&gt; {
     <span class="doccomment">/// Global state of the borrow tracker, if enabled.
     </span><span class="kw">pub </span>borrow_tracker: <span class="prelude-ty">Option</span>&lt;borrow_tracker::AllocState&gt;,
-    <span class="doccomment">/// Data race detection via the use of a vector-clock,
-    ///  this is only added if it is enabled.
+    <span class="doccomment">/// Data race detection via the use of a vector-clock.
+    /// This is only added if it is enabled.
     </span><span class="kw">pub </span>data_race: <span class="prelude-ty">Option</span>&lt;data_race::AllocState&gt;,
-    <span class="doccomment">/// Weak memory emulation via the use of store buffers,
-    ///  this is only added if it is enabled.
+    <span class="doccomment">/// Weak memory emulation via the use of store buffers.
+    /// This is only added if it is enabled.
     </span><span class="kw">pub </span>weak_memory: <span class="prelude-ty">Option</span>&lt;weak_memory::AllocState&gt;,
+    <span class="doccomment">/// A backtrace to where this allocation was allocated.
+    /// As this is recorded for leak reports, it only exists
+    /// if this allocation is leakable. The backtrace is not
+    /// pruned yet; that should be done before printing it.
+    </span><span class="kw">pub </span>backtrace: <span class="prelude-ty">Option</span>&lt;Vec&lt;FrameInfo&lt;<span class="lifetime">&#39;tcx</span>&gt;&gt;&gt;,
 }
 
-<span class="kw">impl </span>VisitTags <span class="kw">for </span>AllocExtra {
+<span class="kw">impl </span>VisitTags <span class="kw">for </span>AllocExtra&lt;<span class="lifetime">&#39;_</span>&gt; {
     <span class="kw">fn </span>visit_tags(<span class="kw-2">&amp;</span><span class="self">self</span>, visit: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>FnMut(BorTag)) {
-        <span class="kw">let </span>AllocExtra { borrow_tracker, data_race, weak_memory } = <span class="self">self</span>;
+        <span class="kw">let </span>AllocExtra { borrow_tracker, data_race, weak_memory, backtrace: <span class="kw">_ </span>} = <span class="self">self</span>;
 
         borrow_tracker.visit_tags(visit);
         data_race.visit_tags(visit);
@@ -1539,12 +1733,14 @@
 </span>}
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>: <span class="lifetime">&#39;mir</span>&gt; PrimitiveLayouts&lt;<span class="lifetime">&#39;tcx</span>&gt; {
-    <span class="kw">fn </span>new(layout_cx: LayoutCx&lt;<span class="lifetime">&#39;tcx</span>, TyCtxt&lt;<span class="lifetime">&#39;tcx</span>&gt;&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, LayoutError&lt;<span class="lifetime">&#39;tcx</span>&gt;&gt; {
+    <span class="kw">fn </span>new(layout_cx: LayoutCx&lt;<span class="lifetime">&#39;tcx</span>, TyCtxt&lt;<span class="lifetime">&#39;tcx</span>&gt;&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;tcx </span>LayoutError&lt;<span class="lifetime">&#39;tcx</span>&gt;&gt; {
         <span class="kw">let </span>tcx = layout_cx.tcx;
-        <span class="kw">let </span>mut_raw_ptr = tcx.mk_ptr(TypeAndMut { ty: tcx.types.unit, mutbl: Mutability::Mut });
-        <span class="kw">let </span>const_raw_ptr = tcx.mk_ptr(TypeAndMut { ty: tcx.types.unit, mutbl: Mutability::Not });
+        <span class="kw">let </span>mut_raw_ptr =
+            Ty::new_ptr(tcx, TypeAndMut { ty: tcx.types.unit, mutbl: Mutability::Mut });
+        <span class="kw">let </span>const_raw_ptr =
+            Ty::new_ptr(tcx, TypeAndMut { ty: tcx.types.unit, mutbl: Mutability::Not });
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
-            unit: layout_cx.layout_of(tcx.mk_unit())<span class="question-mark">?</span>,
+            unit: layout_cx.layout_of(Ty::new_unit(tcx))<span class="question-mark">?</span>,
             i8: layout_cx.layout_of(tcx.types.i8)<span class="question-mark">?</span>,
             i16: layout_cx.layout_of(tcx.types.i16)<span class="question-mark">?</span>,
             i32: layout_cx.layout_of(tcx.types.i32)<span class="question-mark">?</span>,
@@ -1652,7 +1848,7 @@
     /// the emulated program.
     </span>profiler: <span class="prelude-ty">Option</span>&lt;measureme::Profiler&gt;,
     <span class="doccomment">/// Used with `profiler` to cache the `StringId`s for event names
-    /// uesd with `measureme`.
+    /// used with `measureme`.
     </span>string_cache: FxHashMap&lt;String, measureme::StringId&gt;,
 
     <span class="doccomment">/// Cache of `Instance` exported under the given `Symbol` name.
@@ -1711,12 +1907,21 @@
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) gc_interval: u32,
     <span class="doccomment">/// The number of blocks that passed since the last BorTag GC pass.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) since_gc: u32,
+
     <span class="doccomment">/// The number of CPUs to be reported by miri.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) num_cpus: u32,
+
     <span class="doccomment">/// Determines Miri&#39;s page size and associated values
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) page_size: u64,
     <span class="kw">pub</span>(<span class="kw">crate</span>) stack_addr: u64,
     <span class="kw">pub</span>(<span class="kw">crate</span>) stack_size: u64,
+
+    <span class="doccomment">/// Whether to collect a backtrace when each allocation is created, just in case it leaks.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) collect_leak_backtraces: bool,
+
+    <span class="doccomment">/// The spans we will use to report where an allocation was created and deallocated in
+    /// diagnostics.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) allocation_spans: RefCell&lt;FxHashMap&lt;AllocId, (Span, <span class="prelude-ty">Option</span>&lt;Span&gt;)&gt;&gt;,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt; MiriMachine&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt; {
@@ -1726,12 +1931,26 @@
         <span class="kw">let </span>layouts =
             PrimitiveLayouts::new(layout_cx).expect(<span class="string">&quot;Couldn&#39;t get layouts of primitive types&quot;</span>);
         <span class="kw">let </span>profiler = config.measureme_out.as_ref().map(|out| {
-            measureme::Profiler::new(out).expect(<span class="string">&quot;Couldn&#39;t create `measureme` profiler&quot;</span>)
+            <span class="kw">let </span>crate_name = layout_cx
+                .tcx
+                .sess
+                .opts
+                .crate_name
+                .clone()
+                .unwrap_or_else(|| <span class="string">&quot;unknown-crate&quot;</span>.to_string());
+            <span class="kw">let </span>pid = process::id();
+            <span class="comment">// We adopt the same naming scheme for the profiler output that rustc uses. In rustc,
+            // the PID is padded so that the nondeterministic value of the PID does not spread
+            // nondeterminism to the allocator. In Miri we are not aiming for such performance
+            // control, we just pad for consistency with rustc.
+            </span><span class="kw">let </span>filename = <span class="macro">format!</span>(<span class="string">&quot;{crate_name}-{pid:07}&quot;</span>);
+            <span class="kw">let </span>path = Path::new(out).join(filename);
+            measureme::Profiler::new(path).expect(<span class="string">&quot;Couldn&#39;t create `measureme` profiler&quot;</span>)
         });
         <span class="kw">let </span>rng = StdRng::seed_from_u64(config.seed.unwrap_or(<span class="number">0</span>));
-        <span class="kw">let </span>borrow_tracker = config.borrow_tracker.map(|bt| bt.instanciate_global_state(config));
+        <span class="kw">let </span>borrow_tracker = config.borrow_tracker.map(|bt| bt.instantiate_global_state(config));
         <span class="kw">let </span>data_race = config.data_race_detector.then(|| data_race::GlobalState::new(config));
-        <span class="comment">// Determinine page size, stack address, and stack size.
+        <span class="comment">// Determine page size, stack address, and stack size.
         // These values are mostly meaningless, but the stack address is also where we start
         // allocating physical integer addresses for all allocations.
         </span><span class="kw">let </span>page_size = <span class="kw">if let </span><span class="prelude-val">Some</span>(page_size) = config.page_size {
@@ -1740,7 +1959,7 @@
             <span class="kw">let </span>target = <span class="kw-2">&amp;</span>tcx.sess.target;
             <span class="kw">match </span>target.arch.as_ref() {
                 <span class="string">&quot;wasm32&quot; </span>| <span class="string">&quot;wasm64&quot; </span>=&gt; <span class="number">64 </span>* <span class="number">1024</span>, <span class="comment">// https://webassembly.github.io/spec/core/exec/runtime.html#memory-instances
-                </span><span class="string">&quot;aarch64&quot; </span>=&gt;
+                </span><span class="string">&quot;aarch64&quot; </span>=&gt; {
                     <span class="kw">if </span>target.options.vendor.as_ref() == <span class="string">&quot;apple&quot; </span>{
                         <span class="comment">// No &quot;definitive&quot; source, but see:
                         // https://www.wwdcnotes.com/notes/wwdc20/10214/
@@ -1748,7 +1967,8 @@
                         </span><span class="number">16 </span>* <span class="number">1024
                     </span>} <span class="kw">else </span>{
                         <span class="number">4 </span>* <span class="number">1024
-                    </span>},
+                    </span>}
+                }
                 <span class="kw">_ </span>=&gt; <span class="number">4 </span>* <span class="number">1024</span>,
             }
         };
@@ -1825,6 +2045,8 @@
             page_size,
             stack_addr,
             stack_size,
+            collect_leak_backtraces: config.collect_leak_backtraces,
+            allocation_spans: RefCell::new(FxHashMap::default()),
         }
     }
 
@@ -1855,20 +2077,24 @@
         val: ImmTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
     ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
         <span class="kw">let </span>place = this.allocate(val.layout, MiriMemoryKind::ExternStatic.into())<span class="question-mark">?</span>;
-        this.write_immediate(<span class="kw-2">*</span>val, <span class="kw-2">&amp;</span>place.into())<span class="question-mark">?</span>;
+        this.write_immediate(<span class="kw-2">*</span>val, <span class="kw-2">&amp;</span>place)<span class="question-mark">?</span>;
         <span class="self">Self</span>::add_extern_static(this, name, place.ptr);
         <span class="prelude-val">Ok</span>(())
     }
 
     <span class="doccomment">/// Sets up the &quot;extern statics&quot; for this machine.
     </span><span class="kw">fn </span>init_extern_statics(this: <span class="kw-2">&amp;mut </span>MiriInterpCx&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt;) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
+        <span class="comment">// &quot;__rust_no_alloc_shim_is_unstable&quot;
+        </span><span class="kw">let </span>val = ImmTy::from_int(<span class="number">0</span>, this.machine.layouts.u8);
+        <span class="self">Self</span>::alloc_extern_static(this, <span class="string">&quot;__rust_no_alloc_shim_is_unstable&quot;</span>, val)<span class="question-mark">?</span>;
+
         <span class="kw">match </span>this.tcx.sess.target.os.as_ref() {
             <span class="string">&quot;linux&quot; </span>=&gt; {
                 <span class="comment">// &quot;environ&quot;
                 </span><span class="self">Self</span>::add_extern_static(
                     this,
                     <span class="string">&quot;environ&quot;</span>,
-                    this.machine.env_vars.environ.unwrap().ptr,
+                    this.machine.env_vars.environ.as_ref().unwrap().ptr,
                 );
                 <span class="comment">// A couple zero-initialized pointer-sized extern statics.
                 // Most of them are for weak symbols, which we all set to null (indicating that the
@@ -1885,7 +2111,7 @@
                 </span><span class="self">Self</span>::add_extern_static(
                     this,
                     <span class="string">&quot;environ&quot;</span>,
-                    this.machine.env_vars.environ.unwrap().ptr,
+                    this.machine.env_vars.environ.as_ref().unwrap().ptr,
                 );
             }
             <span class="string">&quot;android&quot; </span>=&gt; {
@@ -1923,6 +2149,39 @@
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_local(<span class="kw-2">&amp;</span><span class="self">self</span>, frame: <span class="kw-2">&amp;</span>FrameInfo&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
         <span class="kw">let </span>def_id = frame.instance.def_id();
         def_id.is_local() || <span class="self">self</span>.local_crates.contains(<span class="kw-2">&amp;</span>def_id.krate)
+    }
+
+    <span class="doccomment">/// Called when the interpreter is going to shut down abnormally, such as due to a Ctrl-C.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>handle_abnormal_termination(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="comment">// All strings in the profile data are stored in a single string table which is not
+        // written to disk until the profiler is dropped. If the interpreter exits without dropping
+        // the profiler, it is not possible to interpret the profile data and all measureme tools
+        // will panic when given the file.
+        </span>drop(<span class="self">self</span>.profiler.take());
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>round_up_to_multiple_of_page_size(<span class="kw-2">&amp;</span><span class="self">self</span>, length: u64) -&gt; <span class="prelude-ty">Option</span>&lt;u64&gt; {
+        <span class="attr">#[allow(clippy::arithmetic_side_effects)] </span><span class="comment">// page size is nonzero
+        </span>(length.checked_add(<span class="self">self</span>.page_size - <span class="number">1</span>)<span class="question-mark">? </span>/ <span class="self">self</span>.page_size).checked_mul(<span class="self">self</span>.page_size)
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>page_align(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Align {
+        Align::from_bytes(<span class="self">self</span>.page_size).unwrap()
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>allocated_span(<span class="kw-2">&amp;</span><span class="self">self</span>, alloc_id: AllocId) -&gt; <span class="prelude-ty">Option</span>&lt;SpanData&gt; {
+        <span class="self">self</span>.allocation_spans
+            .borrow()
+            .get(<span class="kw-2">&amp;</span>alloc_id)
+            .map(|(allocated, _deallocated)| allocated.data())
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>deallocated_span(<span class="kw-2">&amp;</span><span class="self">self</span>, alloc_id: AllocId) -&gt; <span class="prelude-ty">Option</span>&lt;SpanData&gt; {
+        <span class="self">self</span>.allocation_spans
+            .borrow()
+            .get(<span class="kw-2">&amp;</span>alloc_id)
+            .and_then(|(_allocated, deallocated)| <span class="kw-2">*</span>deallocated)
+            .map(Span::data)
     }
 }
 
@@ -1972,6 +2231,8 @@
             page_size: <span class="kw">_</span>,
             stack_addr: <span class="kw">_</span>,
             stack_size: <span class="kw">_</span>,
+            collect_leak_backtraces: <span class="kw">_</span>,
+            allocation_spans: <span class="kw">_</span>,
         } = <span class="self">self</span>;
 
         threads.visit_tags(visit);
@@ -2017,7 +2278,7 @@
     <span class="kw">type </span>ExtraFnVal = Dlsym;
 
     <span class="kw">type </span>FrameExtra = FrameExtra&lt;<span class="lifetime">&#39;tcx</span>&gt;;
-    <span class="kw">type </span>AllocExtra = AllocExtra;
+    <span class="kw">type </span>AllocExtra = AllocExtra&lt;<span class="lifetime">&#39;tcx</span>&gt;;
 
     <span class="kw">type </span>Provenance = Provenance;
     <span class="kw">type </span>ProvenanceExtra = ProvenanceExtra;
@@ -2075,7 +2336,7 @@
         ecx: <span class="kw-2">&amp;mut </span>MiriInterpCx&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt;,
         instance: ty::Instance&lt;<span class="lifetime">&#39;tcx</span>&gt;,
         abi: Abi,
-        args: <span class="kw-2">&amp;</span>[OpTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;],
+        args: <span class="kw-2">&amp;</span>[FnArg&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;],
         dest: <span class="kw-2">&amp;</span>PlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
         ret: <span class="prelude-ty">Option</span>&lt;mir::BasicBlock&gt;,
         unwind: mir::UnwindAction,
@@ -2088,12 +2349,13 @@
         ecx: <span class="kw-2">&amp;mut </span>MiriInterpCx&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt;,
         fn_val: Dlsym,
         abi: Abi,
-        args: <span class="kw-2">&amp;</span>[OpTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;],
+        args: <span class="kw-2">&amp;</span>[FnArg&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;],
         dest: <span class="kw-2">&amp;</span>PlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
         ret: <span class="prelude-ty">Option</span>&lt;mir::BasicBlock&gt;,
         _unwind: mir::UnwindAction,
     ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
-        ecx.call_dlsym(fn_val, abi, args, dest, ret)
+        <span class="kw">let </span>args = ecx.copy_fn_args(args)<span class="question-mark">?</span>; <span class="comment">// FIXME: Should `InPlace` arguments be reset to uninit?
+        </span>ecx.call_dlsym(fn_val, abi, <span class="kw-2">&amp;</span>args, dest, ret)
     }
 
     <span class="attr">#[inline(always)]
@@ -2117,9 +2379,22 @@
         ecx.assert_panic(msg, unwind)
     }
 
-    <span class="attr">#[inline(always)]
-    </span><span class="kw">fn </span>abort(_ecx: <span class="kw-2">&amp;mut </span>MiriInterpCx&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt;, msg: String) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, !&gt; {
-        <span class="macro">throw_machine_stop!</span>(TerminationInfo::Abort(msg))
+    <span class="kw">fn </span>panic_nounwind(ecx: <span class="kw-2">&amp;mut </span>InterpCx&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>, <span class="self">Self</span>&gt;, msg: <span class="kw-2">&amp;</span>str) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
+        ecx.start_panic_nounwind(msg)
+    }
+
+    <span class="kw">fn </span>unwind_terminate(ecx: <span class="kw-2">&amp;mut </span>InterpCx&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>, <span class="self">Self</span>&gt;) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
+        <span class="comment">// Call the lang item.
+        </span><span class="kw">let </span>panic = ecx.tcx.lang_items().panic_cannot_unwind().unwrap();
+        <span class="kw">let </span>panic = ty::Instance::mono(ecx.tcx.tcx, panic);
+        ecx.call_function(
+            panic,
+            Abi::Rust,
+            <span class="kw-2">&amp;</span>[],
+            <span class="prelude-val">None</span>,
+            StackPopCleanup::Goto { ret: <span class="prelude-val">None</span>, unwind: mir::UnwindAction::Unreachable },
+        )<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(())
     }
 
     <span class="attr">#[inline(always)]
@@ -2152,7 +2427,7 @@
                 <span class="macro">panic!</span>(<span class="string">&quot;extern_statics cannot contain wildcards&quot;</span>)
             };
             <span class="kw">let </span>(shim_size, shim_align, _kind) = ecx.get_alloc_info(alloc_id);
-            <span class="kw">let </span>def_ty = ecx.tcx.type_of(def_id).subst_identity();
+            <span class="kw">let </span>def_ty = ecx.tcx.type_of(def_id).instantiate_identity();
             <span class="kw">let </span>extern_decl_layout = ecx.tcx.layout_of(ty::ParamEnv::empty().and(def_ty)).unwrap();
             <span class="kw">if </span>extern_decl_layout.size != shim_size || extern_decl_layout.align.abi != shim_align {
                 <span class="macro">throw_unsup_format!</span>(
@@ -2211,11 +2486,34 @@
             )
         });
         <span class="kw">let </span>buffer_alloc = ecx.machine.weak_memory.then(weak_memory::AllocState::new_allocation);
+
+        <span class="comment">// If an allocation is leaked, we want to report a backtrace to indicate where it was
+        // allocated. We don&#39;t need to record a backtrace for allocations which are allowed to
+        // leak.
+        </span><span class="kw">let </span>backtrace = <span class="kw">if </span>kind.may_leak() || !ecx.machine.collect_leak_backtraces {
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="prelude-val">Some</span>(ecx.generate_stacktrace())
+        };
+
         <span class="kw">let </span>alloc: Allocation&lt;Provenance, <span class="self">Self</span>::AllocExtra&gt; = alloc.adjust_from_tcx(
             <span class="kw-2">&amp;</span>ecx.tcx,
-            AllocExtra { borrow_tracker, data_race: race_alloc, weak_memory: buffer_alloc },
+            AllocExtra {
+                borrow_tracker,
+                data_race: race_alloc,
+                weak_memory: buffer_alloc,
+                backtrace,
+            },
             |ptr| ecx.global_base_pointer(ptr),
         )<span class="question-mark">?</span>;
+
+        <span class="kw">if </span><span class="macro">matches!</span>(kind, MemoryKind::Machine(kind) <span class="kw">if </span>kind.should_save_allocation_span()) {
+            ecx.machine
+                .allocation_spans
+                .borrow_mut()
+                .insert(id, (ecx.machine.current_span(), <span class="prelude-val">None</span>));
+        }
+
         <span class="prelude-val">Ok</span>(Cow::Owned(alloc))
     }
 
@@ -2293,7 +2591,7 @@
     </span><span class="kw">fn </span>before_memory_read(
         _tcx: TyCtxt&lt;<span class="lifetime">&#39;tcx</span>&gt;,
         machine: <span class="kw-2">&amp;</span><span class="self">Self</span>,
-        alloc_extra: <span class="kw-2">&amp;</span>AllocExtra,
+        alloc_extra: <span class="kw-2">&amp;</span>AllocExtra&lt;<span class="lifetime">&#39;tcx</span>&gt;,
         (alloc_id, prov_extra): (AllocId, <span class="self">Self</span>::ProvenanceExtra),
         range: AllocRange,
     ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
@@ -2313,7 +2611,7 @@
     </span><span class="kw">fn </span>before_memory_write(
         _tcx: TyCtxt&lt;<span class="lifetime">&#39;tcx</span>&gt;,
         machine: <span class="kw-2">&amp;mut </span><span class="self">Self</span>,
-        alloc_extra: <span class="kw-2">&amp;mut </span>AllocExtra,
+        alloc_extra: <span class="kw-2">&amp;mut </span>AllocExtra&lt;<span class="lifetime">&#39;tcx</span>&gt;,
         (alloc_id, prov_extra): (AllocId, <span class="self">Self</span>::ProvenanceExtra),
         range: AllocRange,
     ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
@@ -2333,7 +2631,7 @@
     </span><span class="kw">fn </span>before_memory_deallocation(
         _tcx: TyCtxt&lt;<span class="lifetime">&#39;tcx</span>&gt;,
         machine: <span class="kw-2">&amp;mut </span><span class="self">Self</span>,
-        alloc_extra: <span class="kw-2">&amp;mut </span>AllocExtra,
+        alloc_extra: <span class="kw-2">&amp;mut </span>AllocExtra&lt;<span class="lifetime">&#39;tcx</span>&gt;,
         (alloc_id, prove_extra): (AllocId, <span class="self">Self</span>::ProvenanceExtra),
         range: AllocRange,
     ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
@@ -2345,6 +2643,10 @@
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(borrow_tracker) = <span class="kw-2">&amp;mut </span>alloc_extra.borrow_tracker {
             borrow_tracker.before_memory_deallocation(alloc_id, prove_extra, range, machine)<span class="question-mark">?</span>;
+        }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, deallocated_at)) = machine.allocation_spans.borrow_mut().get_mut(<span class="kw-2">&amp;</span>alloc_id)
+        {
+            <span class="kw-2">*</span>deallocated_at = <span class="prelude-val">Some</span>(machine.current_span());
         }
         <span class="prelude-val">Ok</span>(())
     }
@@ -2370,6 +2672,26 @@
     ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
         <span class="kw">if </span>ecx.machine.borrow_tracker.is_some() {
             ecx.retag_place_contents(kind, place)<span class="question-mark">?</span>;
+        }
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="kw">fn </span>protect_in_place_function_argument(
+        ecx: <span class="kw-2">&amp;mut </span>InterpCx&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>, <span class="self">Self</span>&gt;,
+        place: <span class="kw-2">&amp;</span>PlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
+    ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
+        <span class="comment">// We do need to write `uninit` so that even after the call ends, the former contents of
+        // this place cannot be observed any more.
+        </span>ecx.write_uninit(place)<span class="question-mark">?</span>;
+        <span class="comment">// If we have a borrow tracker, we also have it set up protection so that all reads *and
+        // writes* during this call are insta-UB.
+        </span><span class="kw">if </span>ecx.machine.borrow_tracker.is_some() {
+            <span class="comment">// Have to do `to_op` first because a `Place::Local` doesn&#39;t imply the local doesn&#39;t have an address.
+            </span><span class="kw">if let </span>Either::Left(place) = ecx.place_to_op(place)<span class="question-mark">?</span>.as_mplace_or_imm() {
+                ecx.protect_place(<span class="kw-2">&amp;</span>place)<span class="question-mark">?</span>;
+            } <span class="kw">else </span>{
+                <span class="comment">// Locals that don&#39;t have their address taken are as protected as they can ever be.
+            </span>}
         }
         <span class="prelude-val">Ok</span>(())
     }
@@ -2456,8 +2778,17 @@
             </span><span class="kw">let </span>stack_len = ecx.active_thread_stack().len();
             ecx.active_thread_mut().set_top_user_relevant_frame(stack_len - <span class="number">1</span>);
         }
-        <span class="kw">if </span>ecx.machine.borrow_tracker.is_some() {
-            ecx.retag_return_place()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="kw">fn </span>before_stack_pop(
+        ecx: <span class="kw-2">&amp;</span>InterpCx&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>, <span class="self">Self</span>&gt;,
+        frame: <span class="kw-2">&amp;</span>Frame&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>, <span class="self">Self</span>::Provenance, <span class="self">Self</span>::FrameExtra&gt;,
+    ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
+        <span class="comment">// We want this *before* the return value copy, because the return place itself is protected
+        // until we do `end_call` here.
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(borrow_tracker) = <span class="kw-2">&amp;</span>ecx.machine.borrow_tracker {
+            borrow_tracker.borrow_mut().end_call(<span class="kw-2">&amp;</span>frame.extra);
         }
         <span class="prelude-val">Ok</span>(())
     }
@@ -2476,9 +2807,6 @@
             </span>ecx.active_thread_mut().recompute_top_user_relevant_frame();
         }
         <span class="kw">let </span>timing = frame.extra.timing.take();
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(borrow_tracker) = <span class="kw-2">&amp;</span>ecx.machine.borrow_tracker {
-            borrow_tracker.borrow_mut().end_call(<span class="kw-2">&amp;</span>frame.extra);
-        }
         <span class="kw">let </span>res = ecx.handle_stack_pop_unwind(frame.extra, unwinding);
         <span class="kw">if let </span><span class="prelude-val">Some</span>(profiler) = ecx.machine.profiler.as_ref() {
             profiler.finish_recording_interval_event(timing.unwrap());

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/miri-8f8b361f28c5a248/35d6927/src/helpers.rs`."><title>helpers.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-63a85fc7cf22dee2.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="miri" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (9df3a39fb 2023-04-11)" data-search-js="search-bc5a112813b5d712.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-1159a395118aa44e.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../miri/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/miri-8f8b361f28c5a248/63c5542/src/helpers.rs`."><title>helpers.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-47e7ab555ef2818a.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="miri" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0-nightly (58eefc33a 2023-08-24)" data-channel="nightly" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-b2d31d2efc7e9b67.css" data-theme-dark-css="dark-3388a2fb2ef8066b.css" data-theme-ayu-css="ayu-8c3c66a6cf12cb2f.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-ef3a2de404864b0b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-b2d31d2efc7e9b67.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-3388a2fb2ef8066b.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../miri/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1097,9 +1097,66 @@
 <a href="#1097" id="1097">1097</a>
 <a href="#1098" id="1098">1098</a>
 <a href="#1099" id="1099">1099</a>
+<a href="#1100" id="1100">1100</a>
+<a href="#1101" id="1101">1101</a>
+<a href="#1102" id="1102">1102</a>
+<a href="#1103" id="1103">1103</a>
+<a href="#1104" id="1104">1104</a>
+<a href="#1105" id="1105">1105</a>
+<a href="#1106" id="1106">1106</a>
+<a href="#1107" id="1107">1107</a>
+<a href="#1108" id="1108">1108</a>
+<a href="#1109" id="1109">1109</a>
+<a href="#1110" id="1110">1110</a>
+<a href="#1111" id="1111">1111</a>
+<a href="#1112" id="1112">1112</a>
+<a href="#1113" id="1113">1113</a>
+<a href="#1114" id="1114">1114</a>
+<a href="#1115" id="1115">1115</a>
+<a href="#1116" id="1116">1116</a>
+<a href="#1117" id="1117">1117</a>
+<a href="#1118" id="1118">1118</a>
+<a href="#1119" id="1119">1119</a>
+<a href="#1120" id="1120">1120</a>
+<a href="#1121" id="1121">1121</a>
+<a href="#1122" id="1122">1122</a>
+<a href="#1123" id="1123">1123</a>
+<a href="#1124" id="1124">1124</a>
+<a href="#1125" id="1125">1125</a>
+<a href="#1126" id="1126">1126</a>
+<a href="#1127" id="1127">1127</a>
+<a href="#1128" id="1128">1128</a>
+<a href="#1129" id="1129">1129</a>
+<a href="#1130" id="1130">1130</a>
+<a href="#1131" id="1131">1131</a>
+<a href="#1132" id="1132">1132</a>
+<a href="#1133" id="1133">1133</a>
+<a href="#1134" id="1134">1134</a>
+<a href="#1135" id="1135">1135</a>
+<a href="#1136" id="1136">1136</a>
+<a href="#1137" id="1137">1137</a>
+<a href="#1138" id="1138">1138</a>
+<a href="#1139" id="1139">1139</a>
+<a href="#1140" id="1140">1140</a>
+<a href="#1141" id="1141">1141</a>
+<a href="#1142" id="1142">1142</a>
+<a href="#1143" id="1143">1143</a>
+<a href="#1144" id="1144">1144</a>
+<a href="#1145" id="1145">1145</a>
+<a href="#1146" id="1146">1146</a>
+<a href="#1147" id="1147">1147</a>
+<a href="#1148" id="1148">1148</a>
+<a href="#1149" id="1149">1149</a>
+<a href="#1150" id="1150">1150</a>
+<a href="#1151" id="1151">1151</a>
+<a href="#1152" id="1152">1152</a>
+<a href="#1153" id="1153">1153</a>
+<a href="#1154" id="1154">1154</a>
+<a href="#1155" id="1155">1155</a>
+<a href="#1156" id="1156">1156</a>
+<a href="#1157" id="1157">1157</a>
 </pre></div><pre class="rust"><code><span class="kw">pub mod </span>convert;
 
-<span class="kw">use </span>std::any::Any;
 <span class="kw">use </span>std::cmp;
 <span class="kw">use </span>std::iter;
 <span class="kw">use </span>std::num::NonZeroUsize;
@@ -1109,37 +1166,20 @@
 
 <span class="kw">use </span>rustc_hir::def::{DefKind, Namespace};
 <span class="kw">use </span>rustc_hir::def_id::{DefId, CRATE_DEF_INDEX};
+<span class="kw">use </span>rustc_index::IndexVec;
 <span class="kw">use </span>rustc_middle::mir;
 <span class="kw">use </span>rustc_middle::ty::{
     <span class="self">self</span>,
-    layout::{LayoutOf, TyAndLayout},
-    List, TyCtxt,
+    layout::{IntegerExt <span class="kw">as _</span>, LayoutOf, TyAndLayout},
+    List, Ty, TyCtxt,
 };
 <span class="kw">use </span>rustc_span::{def_id::CrateNum, sym, Span, Symbol};
-<span class="kw">use </span>rustc_target::abi::{Align, FieldsShape, Size, Variants};
+<span class="kw">use </span>rustc_target::abi::{Align, FieldIdx, FieldsShape, Integer, Size, Variants};
 <span class="kw">use </span>rustc_target::spec::abi::Abi;
 
 <span class="kw">use </span>rand::RngCore;
 
 <span class="kw">use crate</span>::<span class="kw-2">*</span>;
-
-<span class="doccomment">/// A trait to work around not having trait object upcasting:
-/// Add `AsAny` as supertrait and your trait objects can be turned into `&amp;dyn Any` on which you can
-/// then call `downcast`.
-</span><span class="kw">pub trait </span>AsAny: Any {
-    <span class="kw">fn </span>as_any(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">dyn </span>Any;
-    <span class="kw">fn </span>as_any_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>Any;
-}
-<span class="kw">impl</span>&lt;T: Any&gt; AsAny <span class="kw">for </span>T {
-    <span class="attr">#[inline(always)]
-    </span><span class="kw">fn </span>as_any(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">dyn </span>Any {
-        <span class="self">self
-    </span>}
-    <span class="attr">#[inline(always)]
-    </span><span class="kw">fn </span>as_any_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>Any {
-        <span class="self">self
-    </span>}
-}
 
 <span class="comment">// This mapping should match `decode_error_kind` in
 // &lt;https://github.com/rust-lang/rust/blob/master/library/std/src/sys/unix/mod.rs&gt;.
@@ -1261,11 +1301,11 @@
         <span class="kw">let </span>instance = this.resolve_path(path, Namespace::ValueNS);
         <span class="kw">let </span>cid = GlobalId { instance, promoted: <span class="prelude-val">None </span>};
         <span class="comment">// We don&#39;t give a span -- this isn&#39;t actually used directly by the program anyway.
-        </span><span class="kw">let </span>const_val = this
-            .eval_global(cid, <span class="prelude-val">None</span>)
-            .unwrap_or_else(|err| <span class="macro">panic!</span>(<span class="string">&quot;failed to evaluate required Rust item: {path:?}\n{err}&quot;</span>));
-        this.read_scalar(<span class="kw-2">&amp;</span>const_val.into())
-            .unwrap_or_else(|err| <span class="macro">panic!</span>(<span class="string">&quot;failed to read required Rust item: {path:?}\n{err}&quot;</span>))
+        </span><span class="kw">let </span>const_val = this.eval_global(cid, <span class="prelude-val">None</span>).unwrap_or_else(|err| {
+            <span class="macro">panic!</span>(<span class="string">&quot;failed to evaluate required Rust item: {path:?}\n{err:?}&quot;</span>)
+        });
+        this.read_scalar(<span class="kw-2">&amp;</span>const_val)
+            .unwrap_or_else(|err| <span class="macro">panic!</span>(<span class="string">&quot;failed to read required Rust item: {path:?}\n{err:?}&quot;</span>))
     }
 
     <span class="doccomment">/// Helper function to get a `libc` constant as a `Scalar`.
@@ -1328,20 +1368,20 @@
         this.layout_of(ty).unwrap()
     }
 
-    <span class="doccomment">/// Project to the given *named* field of the mplace (which must be a struct or union type).
-    </span><span class="kw">fn </span>mplace_field_named(
+    <span class="doccomment">/// Project to the given *named* field (which must be a struct or union type).
+    </span><span class="kw">fn </span>project_field_named&lt;P: Projectable&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        mplace: <span class="kw-2">&amp;</span>MPlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
+        base: <span class="kw-2">&amp;</span>P,
         name: <span class="kw-2">&amp;</span>str,
-    ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, MPlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;&gt; {
+    ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, P&gt; {
         <span class="kw">let </span>this = <span class="self">self</span>.eval_context_ref();
-        <span class="kw">let </span>adt = mplace.layout.ty.ty_adt_def().unwrap();
+        <span class="kw">let </span>adt = base.layout().ty.ty_adt_def().unwrap();
         <span class="kw">for </span>(idx, field) <span class="kw">in </span>adt.non_enum_variant().fields.iter().enumerate() {
             <span class="kw">if </span>field.name.as_str() == name {
-                <span class="kw">return </span>this.mplace_field(mplace, idx);
+                <span class="kw">return </span>this.project_field(base, idx);
             }
         }
-        <span class="macro">bug!</span>(<span class="string">&quot;No field named {} in type {}&quot;</span>, name, mplace.layout.ty);
+        <span class="macro">bug!</span>(<span class="string">&quot;No field named {} in type {}&quot;</span>, name, base.layout().ty);
     }
 
     <span class="doccomment">/// Write an int of the appropriate size to `dest`. The target type may be signed or unsigned,
@@ -1350,13 +1390,13 @@
     </span><span class="kw">fn </span>write_int(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         i: <span class="kw">impl </span>Into&lt;i128&gt;,
-        dest: <span class="kw-2">&amp;</span>PlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
+        dest: <span class="kw-2">&amp;</span><span class="kw">impl </span>Writeable&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
     ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
-        <span class="macro">assert!</span>(dest.layout.abi.is_scalar(), <span class="string">&quot;write_int on non-scalar type {}&quot;</span>, dest.layout.ty);
-        <span class="kw">let </span>val = <span class="kw">if </span>dest.layout.abi.is_signed() {
-            Scalar::from_int(i, dest.layout.size)
+        <span class="macro">assert!</span>(dest.layout().abi.is_scalar(), <span class="string">&quot;write_int on non-scalar type {}&quot;</span>, dest.layout().ty);
+        <span class="kw">let </span>val = <span class="kw">if </span>dest.layout().abi.is_signed() {
+            Scalar::from_int(i, dest.layout().size)
         } <span class="kw">else </span>{
-            Scalar::from_uint(u64::try_from(i.into()).unwrap(), dest.layout.size)
+            Scalar::from_uint(u64::try_from(i.into()).unwrap(), dest.layout().size)
         };
         <span class="self">self</span>.eval_context_mut().write_scalar(val, dest)
     }
@@ -1365,12 +1405,12 @@
     </span><span class="kw">fn </span>write_int_fields(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         values: <span class="kw-2">&amp;</span>[i128],
-        dest: <span class="kw-2">&amp;</span>MPlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
+        dest: <span class="kw-2">&amp;</span><span class="kw">impl </span>Writeable&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
     ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
         <span class="kw">let </span>this = <span class="self">self</span>.eval_context_mut();
         <span class="kw">for </span>(idx, <span class="kw-2">&amp;</span>val) <span class="kw">in </span>values.iter().enumerate() {
-            <span class="kw">let </span>field = this.mplace_field(dest, idx)<span class="question-mark">?</span>;
-            this.write_int(val, <span class="kw-2">&amp;</span>field.into())<span class="question-mark">?</span>;
+            <span class="kw">let </span>field = this.project_field(dest, idx)<span class="question-mark">?</span>;
+            this.write_int(val, <span class="kw-2">&amp;</span>field)<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
     }
@@ -1379,18 +1419,18 @@
     </span><span class="kw">fn </span>write_int_fields_named(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         values: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, i128)],
-        dest: <span class="kw-2">&amp;</span>MPlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
+        dest: <span class="kw-2">&amp;</span><span class="kw">impl </span>Writeable&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
     ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
         <span class="kw">let </span>this = <span class="self">self</span>.eval_context_mut();
         <span class="kw">for </span><span class="kw-2">&amp;</span>(name, val) <span class="kw">in </span>values.iter() {
-            <span class="kw">let </span>field = this.mplace_field_named(dest, name)<span class="question-mark">?</span>;
-            this.write_int(val, <span class="kw-2">&amp;</span>field.into())<span class="question-mark">?</span>;
+            <span class="kw">let </span>field = this.project_field_named(dest, name)<span class="question-mark">?</span>;
+            this.write_int(val, <span class="kw-2">&amp;</span>field)<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
     }
 
     <span class="doccomment">/// Write a 0 of the appropriate size to `dest`.
-    </span><span class="kw">fn </span>write_null(<span class="kw-2">&amp;mut </span><span class="self">self</span>, dest: <span class="kw-2">&amp;</span>PlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
+    </span><span class="kw">fn </span>write_null(<span class="kw-2">&amp;mut </span><span class="self">self</span>, dest: <span class="kw-2">&amp;</span><span class="kw">impl </span>Writeable&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
         <span class="self">self</span>.write_int(<span class="number">0</span>, dest)
     }
 
@@ -1400,8 +1440,8 @@
     }
 
     <span class="doccomment">/// Get the `Place` for a local
-    </span><span class="kw">fn </span>local_place(<span class="kw-2">&amp;mut </span><span class="self">self</span>, local: mir::Local) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, PlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;&gt; {
-        <span class="kw">let </span>this = <span class="self">self</span>.eval_context_mut();
+    </span><span class="kw">fn </span>local_place(<span class="kw-2">&amp;</span><span class="self">self</span>, local: mir::Local) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, PlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;&gt; {
+        <span class="kw">let </span>this = <span class="self">self</span>.eval_context_ref();
         <span class="kw">let </span>place = mir::Place { local, projection: List::empty() };
         this.eval_place(place)
     }
@@ -1435,7 +1475,7 @@
     <span class="doccomment">/// Call a function: Push the stack frame and pass the arguments.
     /// For now, arguments must be scalars (so that the caller does not have to know the layout).
     ///
-    /// If you do not provie a return place, a dangling zero-sized place will be created
+    /// If you do not provide a return place, a dangling zero-sized place will be created
     /// for your convenience.
     </span><span class="kw">fn </span>call_function(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
@@ -1578,6 +1618,16 @@
                 <span class="self">self</span>.ecx
             }
 
+            <span class="kw">fn </span>aggregate_field_order(memory_index: <span class="kw-2">&amp;</span>IndexVec&lt;FieldIdx, u32&gt;, idx: usize) -&gt; usize {
+                <span class="comment">// We need to do an *inverse* lookup: find the field that has position `idx` in memory order.
+                </span><span class="kw">for </span>(src_field, <span class="kw-2">&amp;</span>mem_pos) <span class="kw">in </span>memory_index.iter_enumerated() {
+                    <span class="kw">if </span>mem_pos <span class="kw">as </span>usize == idx {
+                        <span class="kw">return </span>src_field.as_usize();
+                    }
+                }
+                <span class="macro">panic!</span>(<span class="string">&quot;invalid `memory_index`, could not find {}-th field in memory order&quot;</span>, idx);
+            }
+
             <span class="comment">// Hook to detect `UnsafeCell`.
             </span><span class="kw">fn </span>visit_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>, v: <span class="kw-2">&amp;</span>MPlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;UnsafeCellVisitor: {:?} {:?}&quot;</span>, <span class="kw-2">*</span>v, v.layout.ty);
@@ -1619,33 +1669,6 @@
                             // is hiding.
                             </span><span class="self">self</span>.walk_value(v)
                         }
-                    }
-                }
-            }
-
-            <span class="comment">// Make sure we visit aggregrates in increasing offset order.
-            </span><span class="kw">fn </span>visit_aggregate(
-                <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-                place: <span class="kw-2">&amp;</span>MPlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
-                fields: <span class="kw">impl </span>Iterator&lt;Item = InterpResult&lt;<span class="lifetime">&#39;tcx</span>, MPlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;&gt;&gt;,
-            ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
-                <span class="kw">match </span>place.layout.fields {
-                    FieldsShape::Array { .. } =&gt; {
-                        <span class="comment">// For the array layout, we know the iterator will yield sorted elements so
-                        // we can avoid the allocation.
-                        </span><span class="self">self</span>.walk_aggregate(place, fields)
-                    }
-                    FieldsShape::Arbitrary { .. } =&gt; {
-                        <span class="comment">// Gather the subplaces and sort them before visiting.
-                        </span><span class="kw">let </span><span class="kw-2">mut </span>places = fields
-                            .collect::&lt;InterpResult&lt;<span class="lifetime">&#39;tcx</span>, Vec&lt;MPlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;&gt;&gt;&gt;()<span class="question-mark">?</span>;
-                        <span class="comment">// we just compare offsets, the abs. value never matters
-                        </span>places.sort_by_key(|place| place.ptr.addr());
-                        <span class="self">self</span>.walk_aggregate(place, places.into_iter().map(<span class="prelude-val">Ok</span>))
-                    }
-                    FieldsShape::Union { .. } | FieldsShape::Primitive =&gt; {
-                        <span class="comment">// Uh, what?
-                        </span><span class="macro">bug!</span>(<span class="string">&quot;unions/primitives are not aggregates we should ever visit&quot;</span>)
                     }
                 }
             }
@@ -1715,14 +1738,14 @@
     /// necessary.
     </span><span class="kw">fn </span>last_error_place(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, MPlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;&gt; {
         <span class="kw">let </span>this = <span class="self">self</span>.eval_context_mut();
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(errno_place) = this.active_thread_ref().last_error {
-            <span class="prelude-val">Ok</span>(errno_place)
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(errno_place) = this.active_thread_ref().last_error.as_ref() {
+            <span class="prelude-val">Ok</span>(errno_place.clone())
         } <span class="kw">else </span>{
             <span class="comment">// Allocate new place, set initial value to 0.
             </span><span class="kw">let </span>errno_layout = this.machine.layouts.u32;
             <span class="kw">let </span>errno_place = this.allocate(errno_layout, MiriMemoryKind::Machine.into())<span class="question-mark">?</span>;
-            this.write_scalar(Scalar::from_u32(<span class="number">0</span>), <span class="kw-2">&amp;</span>errno_place.into())<span class="question-mark">?</span>;
-            this.active_thread_mut().last_error = <span class="prelude-val">Some</span>(errno_place);
+            this.write_scalar(Scalar::from_u32(<span class="number">0</span>), <span class="kw-2">&amp;</span>errno_place)<span class="question-mark">?</span>;
+            this.active_thread_mut().last_error = <span class="prelude-val">Some</span>(errno_place.clone());
             <span class="prelude-val">Ok</span>(errno_place)
         }
     }
@@ -1731,14 +1754,14 @@
     </span><span class="kw">fn </span>set_last_error(<span class="kw-2">&amp;mut </span><span class="self">self</span>, scalar: Scalar&lt;Provenance&gt;) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
         <span class="kw">let </span>this = <span class="self">self</span>.eval_context_mut();
         <span class="kw">let </span>errno_place = this.last_error_place()<span class="question-mark">?</span>;
-        this.write_scalar(scalar, <span class="kw-2">&amp;</span>errno_place.into())
+        this.write_scalar(scalar, <span class="kw-2">&amp;</span>errno_place)
     }
 
     <span class="doccomment">/// Gets the last error variable.
     </span><span class="kw">fn </span>get_last_error(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, Scalar&lt;Provenance&gt;&gt; {
         <span class="kw">let </span>this = <span class="self">self</span>.eval_context_mut();
         <span class="kw">let </span>errno_place = this.last_error_place()<span class="question-mark">?</span>;
-        this.read_scalar(<span class="kw-2">&amp;</span>errno_place.into())
+        this.read_scalar(<span class="kw-2">&amp;</span>errno_place)
     }
 
     <span class="doccomment">/// This function tries to produce the most similar OS error from the `std::io::ErrorKind`
@@ -1829,44 +1852,78 @@
         }
     }
 
-    <span class="doccomment">/// Calculates the MPlaceTy given the offset and layout of an access on an operand
-    </span><span class="kw">fn </span>deref_operand_and_offset(
+    <span class="doccomment">/// Dereference a pointer operand to a place using `layout` instead of the pointer&#39;s declared type
+    </span><span class="kw">fn </span>deref_pointer_as(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        op: <span class="kw-2">&amp;</span>OpTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
-        offset: u64,
+        op: <span class="kw-2">&amp;</span><span class="kw">impl </span>Readable&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
         layout: TyAndLayout&lt;<span class="lifetime">&#39;tcx</span>&gt;,
     ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, MPlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;&gt; {
         <span class="kw">let </span>this = <span class="self">self</span>.eval_context_ref();
-        <span class="kw">let </span>op_place = this.deref_operand(op)<span class="question-mark">?</span>; <span class="comment">// FIXME: we still deref with the original type!
-        </span><span class="kw">let </span>offset = Size::from_bytes(offset);
+        <span class="kw">let </span>ptr = this.read_pointer(op)<span class="question-mark">?</span>;
+
+        <span class="kw">let </span>mplace = MPlaceTy::from_aligned_ptr(ptr, layout);
+
+        this.check_mplace(<span class="kw-2">&amp;</span>mplace)<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(mplace)
+    }
+
+    <span class="doccomment">/// Deref&#39; a pointer *without* checking that the place is dereferenceable.
+    </span><span class="kw">fn </span>deref_pointer_unchecked(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        val: <span class="kw-2">&amp;</span>ImmTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
+        layout: TyAndLayout&lt;<span class="lifetime">&#39;tcx</span>&gt;,
+    ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, MPlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;&gt; {
+        <span class="kw">let </span>this = <span class="self">self</span>.eval_context_ref();
+        <span class="kw">let </span><span class="kw-2">mut </span>mplace = this.ref_to_mplace(val)<span class="question-mark">?</span>;
+
+        mplace.layout = layout;
+        mplace.align = layout.align.abi;
+
+        <span class="prelude-val">Ok</span>(mplace)
+    }
+
+    <span class="doccomment">/// Calculates the MPlaceTy given the offset and layout of an access on an operand
+    </span><span class="kw">fn </span>deref_pointer_and_offset(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        op: <span class="kw-2">&amp;</span><span class="kw">impl </span>Readable&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
+        offset: u64,
+        base_layout: TyAndLayout&lt;<span class="lifetime">&#39;tcx</span>&gt;,
+        value_layout: TyAndLayout&lt;<span class="lifetime">&#39;tcx</span>&gt;,
+    ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, MPlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;&gt; {
+        <span class="kw">let </span>this = <span class="self">self</span>.eval_context_ref();
+        <span class="kw">let </span>op_place = this.deref_pointer_as(op, base_layout)<span class="question-mark">?</span>;
+        <span class="kw">let </span>offset = Size::from_bytes(offset);
 
         <span class="comment">// Ensure that the access is within bounds.
-        </span><span class="macro">assert!</span>(op_place.layout.size &gt;= offset + layout.size);
-        <span class="kw">let </span>value_place = op_place.offset(offset, layout, this)<span class="question-mark">?</span>;
+        </span><span class="macro">assert!</span>(base_layout.size &gt;= offset + value_layout.size);
+        <span class="kw">let </span>value_place = op_place.offset(offset, value_layout, this)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(value_place)
     }
 
-    <span class="kw">fn </span>read_scalar_at_offset(
+    <span class="kw">fn </span>deref_pointer_and_read(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        op: <span class="kw-2">&amp;</span>OpTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
+        op: <span class="kw-2">&amp;</span><span class="kw">impl </span>Readable&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
         offset: u64,
-        layout: TyAndLayout&lt;<span class="lifetime">&#39;tcx</span>&gt;,
+        base_layout: TyAndLayout&lt;<span class="lifetime">&#39;tcx</span>&gt;,
+        value_layout: TyAndLayout&lt;<span class="lifetime">&#39;tcx</span>&gt;,
     ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, Scalar&lt;Provenance&gt;&gt; {
         <span class="kw">let </span>this = <span class="self">self</span>.eval_context_ref();
-        <span class="kw">let </span>value_place = this.deref_operand_and_offset(op, offset, layout)<span class="question-mark">?</span>;
-        this.read_scalar(<span class="kw-2">&amp;</span>value_place.into())
+        <span class="kw">let </span>value_place = this.deref_pointer_and_offset(op, offset, base_layout, value_layout)<span class="question-mark">?</span>;
+        this.read_scalar(<span class="kw-2">&amp;</span>value_place)
     }
 
-    <span class="kw">fn </span>write_scalar_at_offset(
+    <span class="kw">fn </span>deref_pointer_and_write(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        op: <span class="kw-2">&amp;</span>OpTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
+        op: <span class="kw-2">&amp;</span><span class="kw">impl </span>Readable&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
         offset: u64,
         value: <span class="kw">impl </span>Into&lt;Scalar&lt;Provenance&gt;&gt;,
-        layout: TyAndLayout&lt;<span class="lifetime">&#39;tcx</span>&gt;,
+        base_layout: TyAndLayout&lt;<span class="lifetime">&#39;tcx</span>&gt;,
+        value_layout: TyAndLayout&lt;<span class="lifetime">&#39;tcx</span>&gt;,
     ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, ()&gt; {
         <span class="kw">let </span>this = <span class="self">self</span>.eval_context_mut();
-        <span class="kw">let </span>value_place = this.deref_operand_and_offset(op, offset, layout)<span class="question-mark">?</span>;
-        this.write_scalar(value, <span class="kw-2">&amp;</span>value_place.into())
+        <span class="kw">let </span>value_place = this.deref_pointer_and_offset(op, offset, base_layout, value_layout)<span class="question-mark">?</span>;
+        this.write_scalar(value, <span class="kw-2">&amp;</span>value_place)
     }
 
     <span class="doccomment">/// Parse a `timespec` struct and return it as a `std::time::Duration`. It returns `None`
@@ -1877,11 +1934,11 @@
         tp: <span class="kw-2">&amp;</span>MPlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
     ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, <span class="prelude-ty">Option</span>&lt;Duration&gt;&gt; {
         <span class="kw">let </span>this = <span class="self">self</span>.eval_context_mut();
-        <span class="kw">let </span>seconds_place = this.mplace_field(tp, <span class="number">0</span>)<span class="question-mark">?</span>;
-        <span class="kw">let </span>seconds_scalar = this.read_scalar(<span class="kw-2">&amp;</span>seconds_place.into())<span class="question-mark">?</span>;
+        <span class="kw">let </span>seconds_place = this.project_field(tp, <span class="number">0</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>seconds_scalar = this.read_scalar(<span class="kw-2">&amp;</span>seconds_place)<span class="question-mark">?</span>;
         <span class="kw">let </span>seconds = seconds_scalar.to_target_isize(this)<span class="question-mark">?</span>;
-        <span class="kw">let </span>nanoseconds_place = this.mplace_field(tp, <span class="number">1</span>)<span class="question-mark">?</span>;
-        <span class="kw">let </span>nanoseconds_scalar = this.read_scalar(<span class="kw-2">&amp;</span>nanoseconds_place.into())<span class="question-mark">?</span>;
+        <span class="kw">let </span>nanoseconds_place = this.project_field(tp, <span class="number">1</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>nanoseconds_scalar = this.read_scalar(<span class="kw-2">&amp;</span>nanoseconds_place)<span class="question-mark">?</span>;
         <span class="kw">let </span>nanoseconds = nanoseconds_scalar.to_target_isize(this)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="kw">try </span>{
@@ -2109,6 +2166,65 @@
         <span class="kw">match </span>tcx.get_attrs(def_id, sym::link_name).filter_map(|a| a.value_str()).next() {
             <span class="prelude-val">Some</span>(name) =&gt; name,
             <span class="prelude-val">None </span>=&gt; tcx.item_name(def_id),
+        }
+    }
+
+    <span class="doccomment">/// Converts `f` to integer type `dest_ty` after rounding with mode `round`.
+    /// Returns `None` if `f` is NaN or out of range.
+    </span><span class="kw">fn </span>float_to_int_checked&lt;F&gt;(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        f: F,
+        dest_ty: Ty&lt;<span class="lifetime">&#39;tcx</span>&gt;,
+        round: rustc_apfloat::Round,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;Scalar&lt;Provenance&gt;&gt;
+    <span class="kw">where
+        </span>F: rustc_apfloat::Float + Into&lt;Scalar&lt;Provenance&gt;&gt;,
+    {
+        <span class="kw">let </span>this = <span class="self">self</span>.eval_context_ref();
+
+        <span class="kw">match </span>dest_ty.kind() {
+            <span class="comment">// Unsigned
+            </span>ty::Uint(t) =&gt; {
+                <span class="kw">let </span>size = Integer::from_uint_ty(this, <span class="kw-2">*</span>t).size();
+                <span class="kw">let </span>res = f.to_u128_r(size.bits_usize(), round, <span class="kw-2">&amp;mut </span><span class="bool-val">false</span>);
+                <span class="kw">if </span>res.status.intersects(
+                    rustc_apfloat::Status::INVALID_OP
+                        | rustc_apfloat::Status::OVERFLOW
+                        | rustc_apfloat::Status::UNDERFLOW,
+                ) {
+                    <span class="comment">// Floating point value is NaN (flagged with INVALID_OP) or outside the range
+                    // of values of the integer type (flagged with OVERFLOW or UNDERFLOW).
+                    </span><span class="prelude-val">None
+                </span>} <span class="kw">else </span>{
+                    <span class="comment">// Floating point value can be represented by the integer type after rounding.
+                    // The INEXACT flag is ignored on purpose to allow rounding.
+                    </span><span class="prelude-val">Some</span>(Scalar::from_uint(res.value, size))
+                }
+            }
+            <span class="comment">// Signed
+            </span>ty::Int(t) =&gt; {
+                <span class="kw">let </span>size = Integer::from_int_ty(this, <span class="kw-2">*</span>t).size();
+                <span class="kw">let </span>res = f.to_i128_r(size.bits_usize(), round, <span class="kw-2">&amp;mut </span><span class="bool-val">false</span>);
+                <span class="kw">if </span>res.status.intersects(
+                    rustc_apfloat::Status::INVALID_OP
+                        | rustc_apfloat::Status::OVERFLOW
+                        | rustc_apfloat::Status::UNDERFLOW,
+                ) {
+                    <span class="comment">// Floating point value is NaN (flagged with INVALID_OP) or outside the range
+                    // of values of the integer type (flagged with OVERFLOW or UNDERFLOW).
+                    </span><span class="prelude-val">None
+                </span>} <span class="kw">else </span>{
+                    <span class="comment">// Floating point value can be represented by the integer type after rounding.
+                    // The INEXACT flag is ignored on purpose to allow rounding.
+                    </span><span class="prelude-val">Some</span>(Scalar::from_int(res.value, size))
+                }
+            }
+            <span class="comment">// Nothing else
+            </span><span class="kw">_ </span>=&gt;
+                <span class="macro">span_bug!</span>(
+                    this.cur_span(),
+                    <span class="string">&quot;attempted float-to-int conversion with non-int output type {dest_ty:?}&quot;
+                </span>),
         }
     }
 }

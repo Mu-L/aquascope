@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/miri-8f8b361f28c5a248/35d6927/src/shims/unix/linux/fd.rs`."><title>fd.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-63a85fc7cf22dee2.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="miri" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (9df3a39fb 2023-04-11)" data-search-js="search-bc5a112813b5d712.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../static.files/main-1159a395118aa44e.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../../miri/index.html"><img class="rust-logo" src="../../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/miri-8f8b361f28c5a248/63c5542/src/shims/unix/linux/fd.rs`."><title>fd.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-47e7ab555ef2818a.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="miri" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0-nightly (58eefc33a 2023-08-24)" data-channel="nightly" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-b2d31d2efc7e9b67.css" data-theme-dark-css="dark-3388a2fb2ef8066b.css" data-theme-ayu-css="ayu-8c3c66a6cf12cb2f.css" ><script src="../../../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../../src-files.js"></script><script defer src="../../../../../static.files/main-ef3a2de404864b0b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../../static.files/light-b2d31d2efc7e9b67.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../../static.files/dark-3388a2fb2ef8066b.css"><link rel="stylesheet" href="../../../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../../miri/index.html"><img class="rust-logo" src="../../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -251,10 +251,9 @@
 <a href="#251" id="251">251</a>
 <a href="#252" id="252">252</a>
 <a href="#253" id="253">253</a>
-<a href="#254" id="254">254</a>
-<a href="#255" id="255">255</a>
-<a href="#256" id="256">256</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>rustc_middle::ty::ScalarInt;
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::cell::Cell;
+
+<span class="kw">use </span>rustc_middle::ty::ScalarInt;
 
 <span class="kw">use crate</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>epoll::{Epoll, EpollEvent};
@@ -262,8 +261,6 @@
 <span class="kw">use </span>socketpair::SocketPair;
 
 <span class="kw">use </span>shims::unix::fs::EvalContextExt <span class="kw">as _</span>;
-
-<span class="kw">use </span>std::cell::Cell;
 
 <span class="kw">pub mod </span>epoll;
 <span class="kw">pub mod </span>event;
@@ -327,17 +324,16 @@
         <span class="kw">let </span>epoll_ctl_del = this.eval_libc_i32(<span class="string">&quot;EPOLL_CTL_DEL&quot;</span>);
 
         <span class="kw">if </span>op == epoll_ctl_add || op == epoll_ctl_mod {
-            <span class="kw">let </span>event = this.deref_operand(event)<span class="question-mark">?</span>;
+            <span class="kw">let </span>event = this.deref_pointer_as(event, this.libc_ty_layout(<span class="string">&quot;epoll_event&quot;</span>))<span class="question-mark">?</span>;
 
-            <span class="kw">let </span>events = this.mplace_field(<span class="kw-2">&amp;</span>event, <span class="number">0</span>)<span class="question-mark">?</span>;
-            <span class="kw">let </span>events = this.read_scalar(<span class="kw-2">&amp;</span>events.into())<span class="question-mark">?</span>.to_u32()<span class="question-mark">?</span>;
-            <span class="kw">let </span>data = this.mplace_field(<span class="kw-2">&amp;</span>event, <span class="number">1</span>)<span class="question-mark">?</span>;
-            <span class="kw">let </span>data = this.read_scalar(<span class="kw-2">&amp;</span>data.into())<span class="question-mark">?</span>;
+            <span class="kw">let </span>events = this.project_field(<span class="kw-2">&amp;</span>event, <span class="number">0</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>events = this.read_scalar(<span class="kw-2">&amp;</span>events)<span class="question-mark">?</span>.to_u32()<span class="question-mark">?</span>;
+            <span class="kw">let </span>data = this.project_field(<span class="kw-2">&amp;</span>event, <span class="number">1</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>data = this.read_scalar(<span class="kw-2">&amp;</span>data)<span class="question-mark">?</span>;
             <span class="kw">let </span>event = EpollEvent { events, data };
 
             <span class="kw">if let </span><span class="prelude-val">Some</span>(epfd) = this.machine.file_handler.handles.get_mut(<span class="kw-2">&amp;</span>epfd) {
                 <span class="kw">let </span>epfd = epfd
-                    .as_any_mut()
                     .downcast_mut::&lt;Epoll&gt;()
                     .ok_or_else(|| <span class="macro">err_unsup_format!</span>(<span class="string">&quot;non-epoll FD passed to `epoll_ctl`&quot;</span>))<span class="question-mark">?</span>;
 
@@ -349,7 +345,6 @@
         } <span class="kw">else if </span>op == epoll_ctl_del {
             <span class="kw">if let </span><span class="prelude-val">Some</span>(epfd) = this.machine.file_handler.handles.get_mut(<span class="kw-2">&amp;</span>epfd) {
                 <span class="kw">let </span>epfd = epfd
-                    .as_any_mut()
                     .downcast_mut::&lt;Epoll&gt;()
                     .ok_or_else(|| <span class="macro">err_unsup_format!</span>(<span class="string">&quot;non-epoll FD passed to `epoll_ctl`&quot;</span>))<span class="question-mark">?</span>;
 
@@ -408,15 +403,13 @@
         <span class="kw">let </span>_maxevents = this.read_scalar(maxevents)<span class="question-mark">?</span>.to_i32()<span class="question-mark">?</span>;
         <span class="kw">let </span>_timeout = this.read_scalar(timeout)<span class="question-mark">?</span>.to_i32()<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>numevents = <span class="number">0</span>;
         <span class="kw">if let </span><span class="prelude-val">Some</span>(epfd) = this.machine.file_handler.handles.get_mut(<span class="kw-2">&amp;</span>epfd) {
             <span class="kw">let </span>_epfd = epfd
-                .as_any_mut()
                 .downcast_mut::&lt;Epoll&gt;()
                 .ok_or_else(|| <span class="macro">err_unsup_format!</span>(<span class="string">&quot;non-epoll FD passed to `epoll_wait`&quot;</span>))<span class="question-mark">?</span>;
 
             <span class="comment">// FIXME return number of events ready when scheme for marking events ready exists
-            </span><span class="prelude-val">Ok</span>(Scalar::from_i32(numevents))
+            </span><span class="macro">throw_unsup_format!</span>(<span class="string">&quot;returning ready events from epoll_wait is not yet implemented&quot;</span>);
         } <span class="kw">else </span>{
             <span class="prelude-val">Ok</span>(Scalar::from_i32(this.handle_not_found()<span class="question-mark">?</span>))
         }
@@ -438,6 +431,7 @@
     /// `EFD_SEMAPHORE` - miri does not support semaphore-like semantics.
     ///
     /// &lt;https://linux.die.net/man/2/eventfd&gt;
+    </span><span class="attr">#[expect(clippy::needless_if)]
     </span><span class="kw">fn </span>eventfd(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         val: <span class="kw-2">&amp;</span>OpTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
@@ -496,7 +490,7 @@
         <span class="kw">let </span>_domain = this.read_scalar(domain)<span class="question-mark">?</span>.to_i32()<span class="question-mark">?</span>;
         <span class="kw">let </span>_type_ = this.read_scalar(type_)<span class="question-mark">?</span>.to_i32()<span class="question-mark">?</span>;
         <span class="kw">let </span>_protocol = this.read_scalar(protocol)<span class="question-mark">?</span>.to_i32()<span class="question-mark">?</span>;
-        <span class="kw">let </span>sv = this.deref_operand(sv)<span class="question-mark">?</span>;
+        <span class="kw">let </span>sv = this.deref_pointer(sv)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>fh = <span class="kw-2">&amp;mut </span>this.machine.file_handler;
         <span class="kw">let </span>sv0 = fh.insert_fd(Box::new(SocketPair));
@@ -504,8 +498,8 @@
         <span class="kw">let </span>sv1 = fh.insert_fd(Box::new(SocketPair));
         <span class="kw">let </span>sv1 = ScalarInt::try_from_int(sv1, sv.layout.size).unwrap();
 
-        this.write_scalar(sv0, <span class="kw-2">&amp;</span>sv.into())<span class="question-mark">?</span>;
-        this.write_scalar(sv1, <span class="kw-2">&amp;</span>sv.offset(sv.layout.size, sv.layout, this)<span class="question-mark">?</span>.into())<span class="question-mark">?</span>;
+        this.write_scalar(sv0, <span class="kw-2">&amp;</span>sv)<span class="question-mark">?</span>;
+        this.write_scalar(sv1, <span class="kw-2">&amp;</span>sv.offset(sv.layout.size, sv.layout, this)<span class="question-mark">?</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(Scalar::from_i32(<span class="number">0</span>))
     }

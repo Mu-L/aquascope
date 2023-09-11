@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/miri-8f8b361f28c5a248/35d6927/src/shims/foreign_items.rs`."><title>foreign_items.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-63a85fc7cf22dee2.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="miri" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (9df3a39fb 2023-04-11)" data-search-js="search-bc5a112813b5d712.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-1159a395118aa44e.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../miri/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/miri-8f8b361f28c5a248/63c5542/src/shims/foreign_items.rs`."><title>foreign_items.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-47e7ab555ef2818a.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="miri" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0-nightly (58eefc33a 2023-08-24)" data-channel="nightly" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-b2d31d2efc7e9b67.css" data-theme-dark-css="dark-3388a2fb2ef8066b.css" data-theme-ayu-css="ayu-8c3c66a6cf12cb2f.css" ><script src="../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-ef3a2de404864b0b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-b2d31d2efc7e9b67.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-3388a2fb2ef8066b.css"><link rel="stylesheet" href="../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../miri/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -953,6 +953,122 @@
 <a href="#953" id="953">953</a>
 <a href="#954" id="954">954</a>
 <a href="#955" id="955">955</a>
+<a href="#956" id="956">956</a>
+<a href="#957" id="957">957</a>
+<a href="#958" id="958">958</a>
+<a href="#959" id="959">959</a>
+<a href="#960" id="960">960</a>
+<a href="#961" id="961">961</a>
+<a href="#962" id="962">962</a>
+<a href="#963" id="963">963</a>
+<a href="#964" id="964">964</a>
+<a href="#965" id="965">965</a>
+<a href="#966" id="966">966</a>
+<a href="#967" id="967">967</a>
+<a href="#968" id="968">968</a>
+<a href="#969" id="969">969</a>
+<a href="#970" id="970">970</a>
+<a href="#971" id="971">971</a>
+<a href="#972" id="972">972</a>
+<a href="#973" id="973">973</a>
+<a href="#974" id="974">974</a>
+<a href="#975" id="975">975</a>
+<a href="#976" id="976">976</a>
+<a href="#977" id="977">977</a>
+<a href="#978" id="978">978</a>
+<a href="#979" id="979">979</a>
+<a href="#980" id="980">980</a>
+<a href="#981" id="981">981</a>
+<a href="#982" id="982">982</a>
+<a href="#983" id="983">983</a>
+<a href="#984" id="984">984</a>
+<a href="#985" id="985">985</a>
+<a href="#986" id="986">986</a>
+<a href="#987" id="987">987</a>
+<a href="#988" id="988">988</a>
+<a href="#989" id="989">989</a>
+<a href="#990" id="990">990</a>
+<a href="#991" id="991">991</a>
+<a href="#992" id="992">992</a>
+<a href="#993" id="993">993</a>
+<a href="#994" id="994">994</a>
+<a href="#995" id="995">995</a>
+<a href="#996" id="996">996</a>
+<a href="#997" id="997">997</a>
+<a href="#998" id="998">998</a>
+<a href="#999" id="999">999</a>
+<a href="#1000" id="1000">1000</a>
+<a href="#1001" id="1001">1001</a>
+<a href="#1002" id="1002">1002</a>
+<a href="#1003" id="1003">1003</a>
+<a href="#1004" id="1004">1004</a>
+<a href="#1005" id="1005">1005</a>
+<a href="#1006" id="1006">1006</a>
+<a href="#1007" id="1007">1007</a>
+<a href="#1008" id="1008">1008</a>
+<a href="#1009" id="1009">1009</a>
+<a href="#1010" id="1010">1010</a>
+<a href="#1011" id="1011">1011</a>
+<a href="#1012" id="1012">1012</a>
+<a href="#1013" id="1013">1013</a>
+<a href="#1014" id="1014">1014</a>
+<a href="#1015" id="1015">1015</a>
+<a href="#1016" id="1016">1016</a>
+<a href="#1017" id="1017">1017</a>
+<a href="#1018" id="1018">1018</a>
+<a href="#1019" id="1019">1019</a>
+<a href="#1020" id="1020">1020</a>
+<a href="#1021" id="1021">1021</a>
+<a href="#1022" id="1022">1022</a>
+<a href="#1023" id="1023">1023</a>
+<a href="#1024" id="1024">1024</a>
+<a href="#1025" id="1025">1025</a>
+<a href="#1026" id="1026">1026</a>
+<a href="#1027" id="1027">1027</a>
+<a href="#1028" id="1028">1028</a>
+<a href="#1029" id="1029">1029</a>
+<a href="#1030" id="1030">1030</a>
+<a href="#1031" id="1031">1031</a>
+<a href="#1032" id="1032">1032</a>
+<a href="#1033" id="1033">1033</a>
+<a href="#1034" id="1034">1034</a>
+<a href="#1035" id="1035">1035</a>
+<a href="#1036" id="1036">1036</a>
+<a href="#1037" id="1037">1037</a>
+<a href="#1038" id="1038">1038</a>
+<a href="#1039" id="1039">1039</a>
+<a href="#1040" id="1040">1040</a>
+<a href="#1041" id="1041">1041</a>
+<a href="#1042" id="1042">1042</a>
+<a href="#1043" id="1043">1043</a>
+<a href="#1044" id="1044">1044</a>
+<a href="#1045" id="1045">1045</a>
+<a href="#1046" id="1046">1046</a>
+<a href="#1047" id="1047">1047</a>
+<a href="#1048" id="1048">1048</a>
+<a href="#1049" id="1049">1049</a>
+<a href="#1050" id="1050">1050</a>
+<a href="#1051" id="1051">1051</a>
+<a href="#1052" id="1052">1052</a>
+<a href="#1053" id="1053">1053</a>
+<a href="#1054" id="1054">1054</a>
+<a href="#1055" id="1055">1055</a>
+<a href="#1056" id="1056">1056</a>
+<a href="#1057" id="1057">1057</a>
+<a href="#1058" id="1058">1058</a>
+<a href="#1059" id="1059">1059</a>
+<a href="#1060" id="1060">1060</a>
+<a href="#1061" id="1061">1061</a>
+<a href="#1062" id="1062">1062</a>
+<a href="#1063" id="1063">1063</a>
+<a href="#1064" id="1064">1064</a>
+<a href="#1065" id="1065">1065</a>
+<a href="#1066" id="1066">1066</a>
+<a href="#1067" id="1067">1067</a>
+<a href="#1068" id="1068">1068</a>
+<a href="#1069" id="1069">1069</a>
+<a href="#1070" id="1070">1070</a>
+<a href="#1071" id="1071">1071</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::{collections::hash_map::Entry, io::Write, iter, path::Path};
 
 <span class="kw">use </span>log::trace;
@@ -1000,8 +1116,9 @@
         <span class="comment">// List taken from `library/std/src/sys/common/alloc.rs`.
         // This list should be kept in sync with the one from libstd.
         </span><span class="kw">let </span>min_align = <span class="kw">match </span>this.tcx.sess.target.arch.as_ref() {
-            <span class="string">&quot;x86&quot; </span>| <span class="string">&quot;arm&quot; </span>| <span class="string">&quot;mips&quot; </span>| <span class="string">&quot;powerpc&quot; </span>| <span class="string">&quot;powerpc64&quot; </span>| <span class="string">&quot;asmjs&quot; </span>| <span class="string">&quot;wasm32&quot; </span>=&gt; <span class="number">8</span>,
-            <span class="string">&quot;x86_64&quot; </span>| <span class="string">&quot;aarch64&quot; </span>| <span class="string">&quot;mips64&quot; </span>| <span class="string">&quot;s390x&quot; </span>| <span class="string">&quot;sparc64&quot; </span>=&gt; <span class="number">16</span>,
+            <span class="string">&quot;x86&quot; </span>| <span class="string">&quot;arm&quot; </span>| <span class="string">&quot;mips&quot; </span>| <span class="string">&quot;mips32r6&quot; </span>| <span class="string">&quot;powerpc&quot; </span>| <span class="string">&quot;powerpc64&quot; </span>| <span class="string">&quot;asmjs&quot; </span>| <span class="string">&quot;wasm32&quot; </span>=&gt; <span class="number">8</span>,
+            <span class="string">&quot;x86_64&quot; </span>| <span class="string">&quot;aarch64&quot; </span>| <span class="string">&quot;mips64&quot; </span>| <span class="string">&quot;mips64r6&quot; </span>| <span class="string">&quot;s390x&quot; </span>| <span class="string">&quot;sparc64&quot; </span>| <span class="string">&quot;loongarch64&quot; </span>=&gt;
+                <span class="number">16</span>,
             arch =&gt; <span class="macro">bug!</span>(<span class="string">&quot;unsupported target architecture for malloc: `{}`&quot;</span>, arch),
         };
         <span class="comment">// Windows always aligns, even small allocations.
@@ -1121,7 +1238,7 @@
                     dependency_format.<span class="number">1</span>.iter().enumerate().filter_map(|(num, <span class="kw-2">&amp;</span>linkage)| {
                         <span class="comment">// We add 1 to the number because that&#39;s what rustc also does everywhere it
                         // calls `CrateNum::new`...
-                        </span><span class="attr">#[allow(clippy::integer_arithmetic)]
+                        </span><span class="attr">#[allow(clippy::arithmetic_side_effects)]
                         </span>(linkage != Linkage::NotLinked).then_some(CrateNum::new(num + <span class="number">1</span>))
                     }),
                 ) {
@@ -1302,7 +1419,6 @@
     <span class="doccomment">/// Emulates calling the internal __rust_* allocator functions
     </span><span class="kw">fn </span>emulate_allocator(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        symbol: Symbol,
         default: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span>MiriInterpCx&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt;) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt;,
     ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, EmulateByNameResult&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt;&gt; {
         <span class="kw">let </span>this = <span class="self">self</span>.eval_context_mut();
@@ -1314,11 +1430,12 @@
 
         <span class="kw">match </span>allocator_kind {
             AllocatorKind::Global =&gt; {
-                <span class="kw">let </span>(body, instance) = this
-                    .lookup_exported_symbol(symbol)<span class="question-mark">?
-                    </span>.expect(<span class="string">&quot;symbol should be present if there is a global allocator&quot;</span>);
-
-                <span class="prelude-val">Ok</span>(EmulateByNameResult::MirBody(body, instance))
+                <span class="comment">// When `#[global_allocator]` is used, `__rust_*` is defined by the macro expansion
+                // of this attribute. As such we have to call an exported Rust function,
+                // and not execute any Miri shim. Somewhat unintuitively doing so is done
+                // by returning `NotSupported`, which triggers the `lookup_exported_symbol`
+                // fallback case in `emulate_foreign_item`.
+                </span><span class="kw">return </span><span class="prelude-val">Ok</span>(EmulateByNameResult::NotSupported);
             }
             AllocatorKind::Default =&gt; {
                 default(this)<span class="question-mark">?</span>;
@@ -1364,14 +1481,18 @@
         //     &amp;mut self,
         //     arg1: &amp;OpTy&lt;&#39;tcx, Provenance&gt;,
         //     arg2: &amp;OpTy&lt;&#39;tcx, Provenance&gt;,
-        //     arg3: &amp;OpTy&lt;&#39;tcx, Provenance&gt;)
+        //     arg3: &amp;OpTy&lt;&#39;tcx, Provenance&gt;,
+        //     arg4: &amp;OpTy&lt;&#39;tcx, Provenance&gt;)
         // -&gt; InterpResult&lt;&#39;tcx, Scalar&lt;Provenance&gt;&gt; {
         //     let this = self.eval_context_mut();
         //
         //     // First thing: load all the arguments. Details depend on the shim.
         //     let arg1 = this.read_scalar(arg1)?.to_u32()?;
         //     let arg2 = this.read_pointer(arg2)?; // when you need to work with the pointer directly
-        //     let arg3 = this.deref_operand(arg3)?; // when you want to load/store through the pointer at its declared type
+        //     let arg3 = this.deref_pointer_as(arg3, this.libc_ty_layout(&quot;some_libc_struct&quot;))?; // when you want to load/store
+        //         // through the pointer and supply the type information yourself
+        //     let arg4 = this.deref_pointer(arg4)?; // when you want to load/store through the pointer and trust
+        //         // the user-given type (which you shouldn&#39;t usually do)
         //
         //     // ...
         //
@@ -1513,11 +1634,13 @@
 
             <span class="comment">// Rust allocation
             </span><span class="string">&quot;__rust_alloc&quot; </span>| <span class="string">&quot;miri_alloc&quot; </span>=&gt; {
-                <span class="kw">let </span>[size, align] = this.check_shim(abi, Abi::Rust, link_name, args)<span class="question-mark">?</span>;
-                <span class="kw">let </span>size = this.read_target_usize(size)<span class="question-mark">?</span>;
-                <span class="kw">let </span>align = this.read_target_usize(align)<span class="question-mark">?</span>;
-
                 <span class="kw">let </span>default = |this: <span class="kw-2">&amp;mut </span>MiriInterpCx&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt;| {
+                    <span class="comment">// Only call `check_shim` when `#[global_allocator]` isn&#39;t used. When that
+                    // macro is used, we act like no shim exists, so that the exported function can run.
+                    </span><span class="kw">let </span>[size, align] = this.check_shim(abi, Abi::Rust, link_name, args)<span class="question-mark">?</span>;
+                    <span class="kw">let </span>size = this.read_target_usize(size)<span class="question-mark">?</span>;
+                    <span class="kw">let </span>align = this.read_target_usize(align)<span class="question-mark">?</span>;
+
                     <span class="self">Self</span>::check_alloc_request(size, align)<span class="question-mark">?</span>;
 
                     <span class="kw">let </span>memory_kind = <span class="kw">match </span>link_name.as_str() {
@@ -1536,8 +1659,7 @@
                 };
 
                 <span class="kw">match </span>link_name.as_str() {
-                    <span class="string">&quot;__rust_alloc&quot; </span>=&gt;
-                        <span class="kw">return </span>this.emulate_allocator(Symbol::intern(<span class="string">&quot;__rg_alloc&quot;</span>), default),
+                    <span class="string">&quot;__rust_alloc&quot; </span>=&gt; <span class="kw">return </span>this.emulate_allocator(default),
                     <span class="string">&quot;miri_alloc&quot; </span>=&gt; {
                         default(this)<span class="question-mark">?</span>;
                         <span class="kw">return </span><span class="prelude-val">Ok</span>(EmulateByNameResult::NeedsJumping);
@@ -1546,11 +1668,13 @@
                 }
             }
             <span class="string">&quot;__rust_alloc_zeroed&quot; </span>=&gt; {
-                <span class="kw">let </span>[size, align] = this.check_shim(abi, Abi::Rust, link_name, args)<span class="question-mark">?</span>;
-                <span class="kw">let </span>size = this.read_target_usize(size)<span class="question-mark">?</span>;
-                <span class="kw">let </span>align = this.read_target_usize(align)<span class="question-mark">?</span>;
+                <span class="kw">return </span>this.emulate_allocator(|this| {
+                    <span class="comment">// See the comment for `__rust_alloc` why `check_shim` is only called in the
+                    // default case.
+                    </span><span class="kw">let </span>[size, align] = this.check_shim(abi, Abi::Rust, link_name, args)<span class="question-mark">?</span>;
+                    <span class="kw">let </span>size = this.read_target_usize(size)<span class="question-mark">?</span>;
+                    <span class="kw">let </span>align = this.read_target_usize(align)<span class="question-mark">?</span>;
 
-                <span class="kw">return </span>this.emulate_allocator(Symbol::intern(<span class="string">&quot;__rg_alloc_zeroed&quot;</span>), |this| {
                     <span class="self">Self</span>::check_alloc_request(size, align)<span class="question-mark">?</span>;
 
                     <span class="kw">let </span>ptr = this.allocate_ptr(
@@ -1569,12 +1693,15 @@
                 });
             }
             <span class="string">&quot;__rust_dealloc&quot; </span>| <span class="string">&quot;miri_dealloc&quot; </span>=&gt; {
-                <span class="kw">let </span>[ptr, old_size, align] = this.check_shim(abi, Abi::Rust, link_name, args)<span class="question-mark">?</span>;
-                <span class="kw">let </span>ptr = this.read_pointer(ptr)<span class="question-mark">?</span>;
-                <span class="kw">let </span>old_size = this.read_target_usize(old_size)<span class="question-mark">?</span>;
-                <span class="kw">let </span>align = this.read_target_usize(align)<span class="question-mark">?</span>;
-
                 <span class="kw">let </span>default = |this: <span class="kw-2">&amp;mut </span>MiriInterpCx&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt;| {
+                    <span class="comment">// See the comment for `__rust_alloc` why `check_shim` is only called in the
+                    // default case.
+                    </span><span class="kw">let </span>[ptr, old_size, align] =
+                        this.check_shim(abi, Abi::Rust, link_name, args)<span class="question-mark">?</span>;
+                    <span class="kw">let </span>ptr = this.read_pointer(ptr)<span class="question-mark">?</span>;
+                    <span class="kw">let </span>old_size = this.read_target_usize(old_size)<span class="question-mark">?</span>;
+                    <span class="kw">let </span>align = this.read_target_usize(align)<span class="question-mark">?</span>;
+
                     <span class="kw">let </span>memory_kind = <span class="kw">match </span>link_name.as_str() {
                         <span class="string">&quot;__rust_dealloc&quot; </span>=&gt; MiriMemoryKind::Rust,
                         <span class="string">&quot;miri_dealloc&quot; </span>=&gt; MiriMemoryKind::Miri,
@@ -1590,8 +1717,9 @@
                 };
 
                 <span class="kw">match </span>link_name.as_str() {
-                    <span class="string">&quot;__rust_dealloc&quot; </span>=&gt;
-                        <span class="kw">return </span>this.emulate_allocator(Symbol::intern(<span class="string">&quot;__rg_dealloc&quot;</span>), default),
+                    <span class="string">&quot;__rust_dealloc&quot; </span>=&gt; {
+                        <span class="kw">return </span>this.emulate_allocator(default);
+                    }
                     <span class="string">&quot;miri_dealloc&quot; </span>=&gt; {
                         default(this)<span class="question-mark">?</span>;
                         <span class="kw">return </span><span class="prelude-val">Ok</span>(EmulateByNameResult::NeedsJumping);
@@ -1600,16 +1728,18 @@
                 }
             }
             <span class="string">&quot;__rust_realloc&quot; </span>=&gt; {
-                <span class="kw">let </span>[ptr, old_size, align, new_size] =
-                    this.check_shim(abi, Abi::Rust, link_name, args)<span class="question-mark">?</span>;
-                <span class="kw">let </span>ptr = this.read_pointer(ptr)<span class="question-mark">?</span>;
-                <span class="kw">let </span>old_size = this.read_target_usize(old_size)<span class="question-mark">?</span>;
-                <span class="kw">let </span>align = this.read_target_usize(align)<span class="question-mark">?</span>;
-                <span class="kw">let </span>new_size = this.read_target_usize(new_size)<span class="question-mark">?</span>;
-                <span class="comment">// No need to check old_size; we anyway check that they match the allocation.
+                <span class="kw">return </span>this.emulate_allocator(|this| {
+                    <span class="comment">// See the comment for `__rust_alloc` why `check_shim` is only called in the
+                    // default case.
+                    </span><span class="kw">let </span>[ptr, old_size, align, new_size] =
+                        this.check_shim(abi, Abi::Rust, link_name, args)<span class="question-mark">?</span>;
+                    <span class="kw">let </span>ptr = this.read_pointer(ptr)<span class="question-mark">?</span>;
+                    <span class="kw">let </span>old_size = this.read_target_usize(old_size)<span class="question-mark">?</span>;
+                    <span class="kw">let </span>align = this.read_target_usize(align)<span class="question-mark">?</span>;
+                    <span class="kw">let </span>new_size = this.read_target_usize(new_size)<span class="question-mark">?</span>;
+                    <span class="comment">// No need to check old_size; we anyway check that they match the allocation.
 
-                </span><span class="kw">return </span>this.emulate_allocator(Symbol::intern(<span class="string">&quot;__rg_realloc&quot;</span>), |this| {
-                    <span class="self">Self</span>::check_alloc_request(new_size, align)<span class="question-mark">?</span>;
+                    </span><span class="self">Self</span>::check_alloc_request(new_size, align)<span class="question-mark">?</span>;
 
                     <span class="kw">let </span>align = Align::from_bytes(align).unwrap();
                     <span class="kw">let </span>new_ptr = this.reallocate_ptr(
@@ -1630,6 +1760,10 @@
                 <span class="kw">let </span>left = this.read_pointer(left)<span class="question-mark">?</span>;
                 <span class="kw">let </span>right = this.read_pointer(right)<span class="question-mark">?</span>;
                 <span class="kw">let </span>n = Size::from_bytes(this.read_target_usize(n)<span class="question-mark">?</span>);
+
+                <span class="comment">// C requires that this must always be a valid pointer (C18 §7.1.4).
+                </span>this.ptr_get_alloc_id(left)<span class="question-mark">?</span>;
+                this.ptr_get_alloc_id(right)<span class="question-mark">?</span>;
 
                 <span class="kw">let </span>result = {
                     <span class="kw">let </span>left_bytes = this.read_bytes_ptr_strip_provenance(left, n)<span class="question-mark">?</span>;
@@ -1655,6 +1789,9 @@
                 </span><span class="attr">#[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
                 </span><span class="kw">let </span>val = val <span class="kw">as </span>u8;
 
+                <span class="comment">// C requires that this must always be a valid pointer (C18 §7.1.4).
+                </span>this.ptr_get_alloc_id(ptr)<span class="question-mark">?</span>;
+
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(idx) = this
                     .read_bytes_ptr_strip_provenance(ptr, Size::from_bytes(num))<span class="question-mark">?
                     </span>.iter()
@@ -1662,7 +1799,7 @@
                     .position(|<span class="kw-2">&amp;</span>c| c == val)
                 {
                     <span class="kw">let </span>idx = u64::try_from(idx).unwrap();
-                    <span class="attr">#[allow(clippy::integer_arithmetic)] </span><span class="comment">// idx &lt; num, so this never wraps
+                    <span class="attr">#[allow(clippy::arithmetic_side_effects)] </span><span class="comment">// idx &lt; num, so this never wraps
                     </span><span class="kw">let </span>new_ptr = ptr.offset(Size::from_bytes(num - idx - <span class="number">1</span>), this)<span class="question-mark">?</span>;
                     this.write_pointer(new_ptr, dest)<span class="question-mark">?</span>;
                 } <span class="kw">else </span>{
@@ -1679,6 +1816,9 @@
                 </span><span class="attr">#[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
                 </span><span class="kw">let </span>val = val <span class="kw">as </span>u8;
 
+                <span class="comment">// C requires that this must always be a valid pointer (C18 §7.1.4).
+                </span>this.ptr_get_alloc_id(ptr)<span class="question-mark">?</span>;
+
                 <span class="kw">let </span>idx = this
                     .read_bytes_ptr_strip_provenance(ptr, Size::from_bytes(num))<span class="question-mark">?
                     </span>.iter()
@@ -1693,11 +1833,57 @@
             <span class="string">&quot;strlen&quot; </span>=&gt; {
                 <span class="kw">let </span>[ptr] = this.check_shim(abi, Abi::C { unwind: <span class="bool-val">false </span>}, link_name, args)<span class="question-mark">?</span>;
                 <span class="kw">let </span>ptr = this.read_pointer(ptr)<span class="question-mark">?</span>;
-                <span class="kw">let </span>n = this.read_c_str(ptr)<span class="question-mark">?</span>.len();
+                <span class="comment">// This reads at least 1 byte, so we are already enforcing that this is a valid pointer.
+                </span><span class="kw">let </span>n = this.read_c_str(ptr)<span class="question-mark">?</span>.len();
                 this.write_scalar(
                     Scalar::from_target_usize(u64::try_from(n).unwrap(), this),
                     dest,
                 )<span class="question-mark">?</span>;
+            }
+            <span class="string">&quot;memcpy&quot; </span>=&gt; {
+                <span class="kw">let </span>[ptr_dest, ptr_src, n] =
+                    this.check_shim(abi, Abi::C { unwind: <span class="bool-val">false </span>}, link_name, args)<span class="question-mark">?</span>;
+                <span class="kw">let </span>ptr_dest = this.read_pointer(ptr_dest)<span class="question-mark">?</span>;
+                <span class="kw">let </span>ptr_src = this.read_pointer(ptr_src)<span class="question-mark">?</span>;
+                <span class="kw">let </span>n = this.read_target_usize(n)<span class="question-mark">?</span>;
+
+                <span class="comment">// C requires that this must always be a valid pointer, even if `n` is zero, so we better check that.
+                // (This is more than Rust requires, so `mem_copy` is not sufficient.)
+                </span>this.ptr_get_alloc_id(ptr_dest)<span class="question-mark">?</span>;
+                this.ptr_get_alloc_id(ptr_src)<span class="question-mark">?</span>;
+
+                this.mem_copy(
+                    ptr_src,
+                    Align::ONE,
+                    ptr_dest,
+                    Align::ONE,
+                    Size::from_bytes(n),
+                    <span class="bool-val">true</span>,
+                )<span class="question-mark">?</span>;
+                this.write_pointer(ptr_dest, dest)<span class="question-mark">?</span>;
+            }
+            <span class="string">&quot;strcpy&quot; </span>=&gt; {
+                <span class="kw">let </span>[ptr_dest, ptr_src] =
+                    this.check_shim(abi, Abi::C { unwind: <span class="bool-val">false </span>}, link_name, args)<span class="question-mark">?</span>;
+                <span class="kw">let </span>ptr_dest = this.read_pointer(ptr_dest)<span class="question-mark">?</span>;
+                <span class="kw">let </span>ptr_src = this.read_pointer(ptr_src)<span class="question-mark">?</span>;
+
+                <span class="comment">// We use `read_c_str` to determine the amount of data to copy,
+                // and then use `mem_copy` for the actual copy. This means
+                // pointer provenance is preserved by this implementation of `strcpy`.
+                // That is probably overly cautious, but there also is no fundamental
+                // reason to have `strcpy` destroy pointer provenance.
+                // This reads at least 1 byte, so we are already enforcing that this is a valid pointer.
+                </span><span class="kw">let </span>n = this.read_c_str(ptr_src)<span class="question-mark">?</span>.len().checked_add(<span class="number">1</span>).unwrap();
+                this.mem_copy(
+                    ptr_src,
+                    Align::ONE,
+                    ptr_dest,
+                    Align::ONE,
+                    Size::from_bytes(n),
+                    <span class="bool-val">true</span>,
+                )<span class="question-mark">?</span>;
+                this.write_pointer(ptr_dest, dest)<span class="question-mark">?</span>;
             }
 
             <span class="comment">// math functions (note that there are also intrinsics for some other functions)
@@ -1712,6 +1898,7 @@
             </span>| <span class="string">&quot;atanf&quot;
             </span>| <span class="string">&quot;log1pf&quot;
             </span>| <span class="string">&quot;expm1f&quot;
+            </span>| <span class="string">&quot;tgammaf&quot;
             </span>=&gt; {
                 <span class="kw">let </span>[f] = this.check_shim(abi, Abi::C { unwind: <span class="bool-val">false </span>}, link_name, args)<span class="question-mark">?</span>;
                 <span class="comment">// FIXME: Using host floats.
@@ -1727,6 +1914,7 @@
                     <span class="string">&quot;atanf&quot; </span>=&gt; f.atan(),
                     <span class="string">&quot;log1pf&quot; </span>=&gt; f.ln_1p(),
                     <span class="string">&quot;expm1f&quot; </span>=&gt; f.exp_m1(),
+                    <span class="string">&quot;tgammaf&quot; </span>=&gt; f.gamma(),
                     <span class="kw">_ </span>=&gt; <span class="macro">bug!</span>(),
                 };
                 this.write_scalar(Scalar::from_u32(res.to_bits()), dest)<span class="question-mark">?</span>;
@@ -1763,6 +1951,7 @@
             </span>| <span class="string">&quot;atan&quot;
             </span>| <span class="string">&quot;log1p&quot;
             </span>| <span class="string">&quot;expm1&quot;
+            </span>| <span class="string">&quot;tgamma&quot;
             </span>=&gt; {
                 <span class="kw">let </span>[f] = this.check_shim(abi, Abi::C { unwind: <span class="bool-val">false </span>}, link_name, args)<span class="question-mark">?</span>;
                 <span class="comment">// FIXME: Using host floats.
@@ -1778,6 +1967,7 @@
                     <span class="string">&quot;atan&quot; </span>=&gt; f.atan(),
                     <span class="string">&quot;log1p&quot; </span>=&gt; f.ln_1p(),
                     <span class="string">&quot;expm1&quot; </span>=&gt; f.exp_m1(),
+                    <span class="string">&quot;tgamma&quot; </span>=&gt; f.gamma(),
                     <span class="kw">_ </span>=&gt; <span class="macro">bug!</span>(),
                 };
                 this.write_scalar(Scalar::from_u64(res.to_bits()), dest)<span class="question-mark">?</span>;
@@ -1811,37 +2001,73 @@
                 </span><span class="kw">let </span>x = this.read_scalar(x)<span class="question-mark">?</span>.to_f64()<span class="question-mark">?</span>;
                 <span class="kw">let </span>exp = this.read_scalar(exp)<span class="question-mark">?</span>.to_i32()<span class="question-mark">?</span>;
 
-                <span class="comment">// Saturating cast to i16. Even those are outside the valid exponent range so
-                // `scalbn` below will do its over/underflow handling.
-                </span><span class="kw">let </span>exp = <span class="kw">if </span>exp &gt; i32::from(i16::MAX) {
-                    i16::MAX
-                } <span class="kw">else if </span>exp &lt; i32::from(i16::MIN) {
-                    i16::MIN
-                } <span class="kw">else </span>{
-                    exp.try_into().unwrap()
-                };
-
                 <span class="kw">let </span>res = x.scalbn(exp);
                 this.write_scalar(Scalar::from_f64(res), dest)<span class="question-mark">?</span>;
             }
+            <span class="string">&quot;lgammaf_r&quot; </span>=&gt; {
+                <span class="kw">let </span>[x, signp] = this.check_shim(abi, Abi::C { unwind: <span class="bool-val">false </span>}, link_name, args)<span class="question-mark">?</span>;
+                <span class="comment">// FIXME: Using host floats.
+                </span><span class="kw">let </span>x = f32::from_bits(this.read_scalar(x)<span class="question-mark">?</span>.to_u32()<span class="question-mark">?</span>);
+                <span class="kw">let </span>signp = this.deref_pointer(signp)<span class="question-mark">?</span>;
 
-            <span class="comment">// Architecture-specific shims
-            </span><span class="string">&quot;llvm.x86.addcarry.64&quot; </span><span class="kw">if </span>this.tcx.sess.target.arch == <span class="string">&quot;x86_64&quot; </span>=&gt; {
+                <span class="kw">let </span>(res, sign) = x.ln_gamma();
+                this.write_int(sign, <span class="kw-2">&amp;</span>signp)<span class="question-mark">?</span>;
+                this.write_scalar(Scalar::from_u32(res.to_bits()), dest)<span class="question-mark">?</span>;
+            }
+            <span class="string">&quot;lgamma_r&quot; </span>=&gt; {
+                <span class="kw">let </span>[x, signp] = this.check_shim(abi, Abi::C { unwind: <span class="bool-val">false </span>}, link_name, args)<span class="question-mark">?</span>;
+                <span class="comment">// FIXME: Using host floats.
+                </span><span class="kw">let </span>x = f64::from_bits(this.read_scalar(x)<span class="question-mark">?</span>.to_u64()<span class="question-mark">?</span>);
+                <span class="kw">let </span>signp = this.deref_pointer(signp)<span class="question-mark">?</span>;
+
+                <span class="kw">let </span>(res, sign) = x.ln_gamma();
+                this.write_int(sign, <span class="kw-2">&amp;</span>signp)<span class="question-mark">?</span>;
+                this.write_scalar(Scalar::from_u64(res.to_bits()), dest)<span class="question-mark">?</span>;
+            }
+
+            <span class="comment">// LLVM intrinsics
+            </span><span class="string">&quot;llvm.prefetch&quot; </span>=&gt; {
+                <span class="kw">let </span>[p, rw, loc, ty] =
+                    this.check_shim(abi, Abi::C { unwind: <span class="bool-val">false </span>}, link_name, args)<span class="question-mark">?</span>;
+
+                <span class="kw">let _ </span>= this.read_pointer(p)<span class="question-mark">?</span>;
+                <span class="kw">let </span>rw = this.read_scalar(rw)<span class="question-mark">?</span>.to_i32()<span class="question-mark">?</span>;
+                <span class="kw">let </span>loc = this.read_scalar(loc)<span class="question-mark">?</span>.to_i32()<span class="question-mark">?</span>;
+                <span class="kw">let </span>ty = this.read_scalar(ty)<span class="question-mark">?</span>.to_i32()<span class="question-mark">?</span>;
+
+                <span class="kw">if </span>ty == <span class="number">1 </span>{
+                    <span class="comment">// Data cache prefetch.
+                    // Notably, we do not have to check the pointer, this operation is never UB!
+
+                    </span><span class="kw">if </span>!<span class="macro">matches!</span>(rw, <span class="number">0 </span>| <span class="number">1</span>) {
+                        <span class="macro">throw_unsup_format!</span>(<span class="string">&quot;invalid `rw` value passed to `llvm.prefetch`: {}&quot;</span>, rw);
+                    }
+                    <span class="kw">if </span>!<span class="macro">matches!</span>(loc, <span class="number">0</span>..=<span class="number">3</span>) {
+                        <span class="macro">throw_unsup_format!</span>(
+                            <span class="string">&quot;invalid `loc` value passed to `llvm.prefetch`: {}&quot;</span>,
+                            loc
+                        );
+                    }
+                } <span class="kw">else </span>{
+                    <span class="macro">throw_unsup_format!</span>(<span class="string">&quot;unsupported `llvm.prefetch` type argument: {}&quot;</span>, ty);
+                }
+            }
+            <span class="string">&quot;llvm.x86.addcarry.64&quot; </span><span class="kw">if </span>this.tcx.sess.target.arch == <span class="string">&quot;x86_64&quot; </span>=&gt; {
                 <span class="comment">// Computes u8+u64+u64, returning tuple (u8,u64) comprising the output carry and truncated sum.
                 </span><span class="kw">let </span>[c_in, a, b] = this.check_shim(abi, Abi::Unadjusted, link_name, args)<span class="question-mark">?</span>;
                 <span class="kw">let </span>c_in = this.read_scalar(c_in)<span class="question-mark">?</span>.to_u8()<span class="question-mark">?</span>;
                 <span class="kw">let </span>a = this.read_scalar(a)<span class="question-mark">?</span>.to_u64()<span class="question-mark">?</span>;
                 <span class="kw">let </span>b = this.read_scalar(b)<span class="question-mark">?</span>.to_u64()<span class="question-mark">?</span>;
 
-                <span class="attr">#[allow(clippy::integer_arithmetic)]
+                <span class="attr">#[allow(clippy::arithmetic_side_effects)]
                 </span><span class="comment">// adding two u64 and a u8 cannot wrap in a u128
                 </span><span class="kw">let </span>wide_sum = u128::from(c_in) + u128::from(a) + u128::from(b);
-                <span class="attr">#[allow(clippy::integer_arithmetic)] </span><span class="comment">// it&#39;s a u128, we can shift by 64
+                <span class="attr">#[allow(clippy::arithmetic_side_effects)] </span><span class="comment">// it&#39;s a u128, we can shift by 64
                 </span><span class="kw">let </span>(c_out, sum) = ((wide_sum &gt;&gt; <span class="number">64</span>).truncate::&lt;u8&gt;(), wide_sum.truncate::&lt;u64&gt;());
 
-                <span class="kw">let </span>c_out_field = this.place_field(dest, <span class="number">0</span>)<span class="question-mark">?</span>;
+                <span class="kw">let </span>c_out_field = this.project_field(dest, <span class="number">0</span>)<span class="question-mark">?</span>;
                 this.write_scalar(Scalar::from_u8(c_out), <span class="kw-2">&amp;</span>c_out_field)<span class="question-mark">?</span>;
-                <span class="kw">let </span>sum_field = this.place_field(dest, <span class="number">1</span>)<span class="question-mark">?</span>;
+                <span class="kw">let </span>sum_field = this.project_field(dest, <span class="number">1</span>)<span class="question-mark">?</span>;
                 this.write_scalar(Scalar::from_u64(sum), <span class="kw-2">&amp;</span>sum_field)<span class="question-mark">?</span>;
             }
             <span class="string">&quot;llvm.x86.sse2.pause&quot;
@@ -1875,6 +2101,12 @@
                         <span class="macro">throw_unsup_format!</span>(<span class="string">&quot;unsupported llvm.arm.hint argument {}&quot;</span>, arg);
                     }
                 }
+            }
+
+            name <span class="kw">if </span>name.starts_with(<span class="string">&quot;llvm.x86.sse.&quot;</span>) =&gt; {
+                <span class="kw">return </span>shims::x86::sse::EvalContextExt::emulate_x86_sse_intrinsic(
+                    this, link_name, abi, args, dest,
+                );
             }
 
             <span class="comment">// Platform-specific shims

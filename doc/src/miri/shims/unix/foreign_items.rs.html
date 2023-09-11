@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/miri-8f8b361f28c5a248/35d6927/src/shims/unix/foreign_items.rs`."><title>foreign_items.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-63a85fc7cf22dee2.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="miri" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (9df3a39fb 2023-04-11)" data-search-js="search-bc5a112813b5d712.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-1159a395118aa44e.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../miri/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/miri-8f8b361f28c5a248/63c5542/src/shims/unix/foreign_items.rs`."><title>foreign_items.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-47e7ab555ef2818a.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="miri" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0-nightly (58eefc33a 2023-08-24)" data-channel="nightly" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-b2d31d2efc7e9b67.css" data-theme-dark-css="dark-3388a2fb2ef8066b.css" data-theme-ayu-css="ayu-8c3c66a6cf12cb2f.css" ><script src="../../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-ef3a2de404864b0b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-b2d31d2efc7e9b67.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-3388a2fb2ef8066b.css"><link rel="stylesheet" href="../../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../miri/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -609,6 +609,18 @@
 <a href="#609" id="609">609</a>
 <a href="#610" id="610">610</a>
 <a href="#611" id="611">611</a>
+<a href="#612" id="612">612</a>
+<a href="#613" id="613">613</a>
+<a href="#614" id="614">614</a>
+<a href="#615" id="615">615</a>
+<a href="#616" id="616">616</a>
+<a href="#617" id="617">617</a>
+<a href="#618" id="618">618</a>
+<a href="#619" id="619">619</a>
+<a href="#620" id="620">620</a>
+<a href="#621" id="621">621</a>
+<a href="#622" id="622">622</a>
+<a href="#623" id="623">623</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::ffi::OsStr;
 
 <span class="kw">use </span>log::trace;
@@ -621,6 +633,7 @@
 <span class="kw">use crate</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span>shims::foreign_items::EmulateByNameResult;
 <span class="kw">use </span>shims::unix::fs::EvalContextExt <span class="kw">as _</span>;
+<span class="kw">use </span>shims::unix::mem::EvalContextExt <span class="kw">as _</span>;
 <span class="kw">use </span>shims::unix::sync::EvalContextExt <span class="kw">as _</span>;
 <span class="kw">use </span>shims::unix::thread::EvalContextExt <span class="kw">as _</span>;
 
@@ -801,7 +814,7 @@
             <span class="comment">// Allocation
             </span><span class="string">&quot;posix_memalign&quot; </span>=&gt; {
                 <span class="kw">let </span>[ret, align, size] = this.check_shim(abi, Abi::C { unwind: <span class="bool-val">false </span>}, link_name, args)<span class="question-mark">?</span>;
-                <span class="kw">let </span>ret = this.deref_operand(ret)<span class="question-mark">?</span>;
+                <span class="kw">let </span>ret = this.deref_pointer(ret)<span class="question-mark">?</span>;
                 <span class="kw">let </span>align = this.read_target_usize(align)<span class="question-mark">?</span>;
                 <span class="kw">let </span>size = this.read_target_usize(size)<span class="question-mark">?</span>;
                 <span class="comment">// Align must be power of 2, and also at least ptr-sized (POSIX rules).
@@ -811,17 +824,28 @@
                     this.write_int(einval, dest)<span class="question-mark">?</span>;
                 } <span class="kw">else </span>{
                     <span class="kw">if </span>size == <span class="number">0 </span>{
-                        this.write_null(<span class="kw-2">&amp;</span>ret.into())<span class="question-mark">?</span>;
+                        this.write_null(<span class="kw-2">&amp;</span>ret)<span class="question-mark">?</span>;
                     } <span class="kw">else </span>{
                         <span class="kw">let </span>ptr = this.allocate_ptr(
                             Size::from_bytes(size),
                             Align::from_bytes(align).unwrap(),
                             MiriMemoryKind::C.into(),
                         )<span class="question-mark">?</span>;
-                        this.write_pointer(ptr, <span class="kw-2">&amp;</span>ret.into())<span class="question-mark">?</span>;
+                        this.write_pointer(ptr, <span class="kw-2">&amp;</span>ret)<span class="question-mark">?</span>;
                     }
                     this.write_null(dest)<span class="question-mark">?</span>;
                 }
+            }
+
+            <span class="string">&quot;mmap&quot; </span>=&gt; {
+                <span class="kw">let </span>[addr, length, prot, flags, fd, offset] = this.check_shim(abi, Abi::C {unwind: <span class="bool-val">false</span>}, link_name, args)<span class="question-mark">?</span>;
+                <span class="kw">let </span>ptr = this.mmap(addr, length, prot, flags, fd, offset)<span class="question-mark">?</span>;
+                this.write_scalar(ptr, dest)<span class="question-mark">?</span>;
+            }
+            <span class="string">&quot;munmap&quot; </span>=&gt; {
+                <span class="kw">let </span>[addr, length] = this.check_shim(abi, Abi::C {unwind: <span class="bool-val">false</span>}, link_name, args)<span class="question-mark">?</span>;
+                <span class="kw">let </span>result = this.munmap(addr, length)<span class="question-mark">?</span>;
+                this.write_scalar(result, dest)<span class="question-mark">?</span>;
             }
 
             <span class="comment">// Dynamic symbol loading
@@ -870,7 +894,7 @@
             <span class="comment">// Thread-local storage
             </span><span class="string">&quot;pthread_key_create&quot; </span>=&gt; {
                 <span class="kw">let </span>[key, dtor] = this.check_shim(abi, Abi::C { unwind: <span class="bool-val">false </span>}, link_name, args)<span class="question-mark">?</span>;
-                <span class="kw">let </span>key_place = this.deref_operand(key)<span class="question-mark">?</span>;
+                <span class="kw">let </span>key_place = this.deref_pointer_as(key, this.libc_ty_layout(<span class="string">&quot;pthread_key_t&quot;</span>))<span class="question-mark">?</span>;
                 <span class="kw">let </span>dtor = this.read_pointer(dtor)<span class="question-mark">?</span>;
 
                 <span class="comment">// Extract the function type out of the signature (that seems easier than constructing it ourselves).
@@ -892,7 +916,7 @@
 
                 <span class="comment">// Create key and write it into the memory where `key_ptr` wants it.
                 </span><span class="kw">let </span>key = this.machine.tls.create_tls_key(dtor, key_layout.size)<span class="question-mark">?</span>;
-                this.write_scalar(Scalar::from_uint(key, key_layout.size), <span class="kw-2">&amp;</span>key_place.into())<span class="question-mark">?</span>;
+                this.write_scalar(Scalar::from_uint(key, key_layout.size), <span class="kw-2">&amp;</span>key_place)<span class="question-mark">?</span>;
 
                 <span class="comment">// Return success (`0`).
                 </span>this.write_null(dest)<span class="question-mark">?</span>;
@@ -1105,9 +1129,9 @@
             </span><span class="string">&quot;pthread_attr_getguardsize&quot;
             </span><span class="kw">if </span>this.frame_in_std() =&gt; {
                 <span class="kw">let </span>[_attr, guard_size] = this.check_shim(abi, Abi::C { unwind: <span class="bool-val">false </span>}, link_name, args)<span class="question-mark">?</span>;
-                <span class="kw">let </span>guard_size = this.deref_operand(guard_size)<span class="question-mark">?</span>;
+                <span class="kw">let </span>guard_size = this.deref_pointer(guard_size)<span class="question-mark">?</span>;
                 <span class="kw">let </span>guard_size_layout = this.libc_ty_layout(<span class="string">&quot;size_t&quot;</span>);
-                this.write_scalar(Scalar::from_uint(this.machine.page_size, guard_size_layout.size), <span class="kw-2">&amp;</span>guard_size.into())<span class="question-mark">?</span>;
+                this.write_scalar(Scalar::from_uint(this.machine.page_size, guard_size_layout.size), <span class="kw-2">&amp;</span>guard_size)<span class="question-mark">?</span>;
 
                 <span class="comment">// Return success (`0`).
                 </span>this.write_null(dest)<span class="question-mark">?</span>;
@@ -1131,17 +1155,17 @@
                 // Hence we can mostly ignore the input `attr_place`.
                 </span><span class="kw">let </span>[attr_place, addr_place, size_place] =
                     this.check_shim(abi, Abi::C { unwind: <span class="bool-val">false </span>}, link_name, args)<span class="question-mark">?</span>;
-                <span class="kw">let </span>_attr_place = this.deref_operand(attr_place)<span class="question-mark">?</span>;
-                <span class="kw">let </span>addr_place = this.deref_operand(addr_place)<span class="question-mark">?</span>;
-                <span class="kw">let </span>size_place = this.deref_operand(size_place)<span class="question-mark">?</span>;
+                <span class="kw">let </span>_attr_place = this.deref_pointer_as(attr_place, this.libc_ty_layout(<span class="string">&quot;pthread_attr_t&quot;</span>))<span class="question-mark">?</span>;
+                <span class="kw">let </span>addr_place = this.deref_pointer(addr_place)<span class="question-mark">?</span>;
+                <span class="kw">let </span>size_place = this.deref_pointer(size_place)<span class="question-mark">?</span>;
 
                 this.write_scalar(
                     Scalar::from_uint(this.machine.stack_addr, this.pointer_size()),
-                    <span class="kw-2">&amp;</span>addr_place.into(),
+                    <span class="kw-2">&amp;</span>addr_place,
                 )<span class="question-mark">?</span>;
                 this.write_scalar(
                     Scalar::from_uint(this.machine.stack_size, this.pointer_size()),
-                    <span class="kw-2">&amp;</span>size_place.into(),
+                    <span class="kw-2">&amp;</span>size_place,
                 )<span class="question-mark">?</span>;
 
                 <span class="comment">// Return success (`0`).
@@ -1174,10 +1198,10 @@
                 this.check_no_isolation(<span class="string">&quot;`getpwuid_r`&quot;</span>)<span class="question-mark">?</span>;
 
                 <span class="kw">let </span>uid = this.read_scalar(uid)<span class="question-mark">?</span>.to_u32()<span class="question-mark">?</span>;
-                <span class="kw">let </span>pwd = this.deref_operand(pwd)<span class="question-mark">?</span>;
+                <span class="kw">let </span>pwd = this.deref_pointer_as(pwd, this.libc_ty_layout(<span class="string">&quot;passwd&quot;</span>))<span class="question-mark">?</span>;
                 <span class="kw">let </span>buf = this.read_pointer(buf)<span class="question-mark">?</span>;
                 <span class="kw">let </span>buflen = this.read_target_usize(buflen)<span class="question-mark">?</span>;
-                <span class="kw">let </span>result = this.deref_operand(result)<span class="question-mark">?</span>;
+                <span class="kw">let </span>result = this.deref_pointer(result)<span class="question-mark">?</span>;
 
                 <span class="comment">// Must be for &quot;us&quot;.
                 </span><span class="kw">if </span>uid != <span class="kw">crate</span>::shims::unix::UID {
@@ -1186,20 +1210,20 @@
 
                 <span class="comment">// Reset all fields to `uninit` to make sure nobody reads them.
                 // (This is a std-only shim so we are okay with such hacks.)
-                </span>this.write_uninit(<span class="kw-2">&amp;</span>pwd.into())<span class="question-mark">?</span>;
+                </span>this.write_uninit(<span class="kw-2">&amp;</span>pwd)<span class="question-mark">?</span>;
 
                 <span class="comment">// We only set the home_dir field.
                 </span><span class="attr">#[allow(deprecated)]
                 </span><span class="kw">let </span>home_dir = std::env::home_dir().unwrap();
                 <span class="kw">let </span>(written, <span class="kw">_</span>) = this.write_path_to_c_str(<span class="kw-2">&amp;</span>home_dir, buf, buflen)<span class="question-mark">?</span>;
-                <span class="kw">let </span>pw_dir = this.mplace_field_named(<span class="kw-2">&amp;</span>pwd, <span class="string">&quot;pw_dir&quot;</span>)<span class="question-mark">?</span>;
-                this.write_pointer(buf, <span class="kw-2">&amp;</span>pw_dir.into())<span class="question-mark">?</span>;
+                <span class="kw">let </span>pw_dir = this.project_field_named(<span class="kw-2">&amp;</span>pwd, <span class="string">&quot;pw_dir&quot;</span>)<span class="question-mark">?</span>;
+                this.write_pointer(buf, <span class="kw-2">&amp;</span>pw_dir)<span class="question-mark">?</span>;
 
                 <span class="kw">if </span>written {
-                    this.write_pointer(pwd.ptr, <span class="kw-2">&amp;</span>result.into())<span class="question-mark">?</span>;
+                    this.write_pointer(pwd.ptr, <span class="kw-2">&amp;</span>result)<span class="question-mark">?</span>;
                     this.write_null(dest)<span class="question-mark">?</span>;
                 } <span class="kw">else </span>{
-                    this.write_null(<span class="kw-2">&amp;</span>result.into())<span class="question-mark">?</span>;
+                    this.write_null(<span class="kw-2">&amp;</span>result)<span class="question-mark">?</span>;
                     this.write_scalar(this.eval_libc(<span class="string">&quot;ERANGE&quot;</span>), dest)<span class="question-mark">?</span>;
                 }
             }

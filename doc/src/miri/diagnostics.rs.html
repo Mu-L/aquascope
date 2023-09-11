@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/miri-8f8b361f28c5a248/35d6927/src/diagnostics.rs`."><title>diagnostics.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-63a85fc7cf22dee2.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="miri" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (9df3a39fb 2023-04-11)" data-search-js="search-bc5a112813b5d712.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-1159a395118aa44e.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../miri/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/miri-8f8b361f28c5a248/63c5542/src/diagnostics.rs`."><title>diagnostics.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-47e7ab555ef2818a.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="miri" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0-nightly (58eefc33a 2023-08-24)" data-channel="nightly" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-b2d31d2efc7e9b67.css" data-theme-dark-css="dark-3388a2fb2ef8066b.css" data-theme-ayu-css="ayu-8c3c66a6cf12cb2f.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-ef3a2de404864b0b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-b2d31d2efc7e9b67.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-3388a2fb2ef8066b.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../miri/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -537,15 +537,116 @@
 <a href="#537" id="537">537</a>
 <a href="#538" id="538">538</a>
 <a href="#539" id="539">539</a>
+<a href="#540" id="540">540</a>
+<a href="#541" id="541">541</a>
+<a href="#542" id="542">542</a>
+<a href="#543" id="543">543</a>
+<a href="#544" id="544">544</a>
+<a href="#545" id="545">545</a>
+<a href="#546" id="546">546</a>
+<a href="#547" id="547">547</a>
+<a href="#548" id="548">548</a>
+<a href="#549" id="549">549</a>
+<a href="#550" id="550">550</a>
+<a href="#551" id="551">551</a>
+<a href="#552" id="552">552</a>
+<a href="#553" id="553">553</a>
+<a href="#554" id="554">554</a>
+<a href="#555" id="555">555</a>
+<a href="#556" id="556">556</a>
+<a href="#557" id="557">557</a>
+<a href="#558" id="558">558</a>
+<a href="#559" id="559">559</a>
+<a href="#560" id="560">560</a>
+<a href="#561" id="561">561</a>
+<a href="#562" id="562">562</a>
+<a href="#563" id="563">563</a>
+<a href="#564" id="564">564</a>
+<a href="#565" id="565">565</a>
+<a href="#566" id="566">566</a>
+<a href="#567" id="567">567</a>
+<a href="#568" id="568">568</a>
+<a href="#569" id="569">569</a>
+<a href="#570" id="570">570</a>
+<a href="#571" id="571">571</a>
+<a href="#572" id="572">572</a>
+<a href="#573" id="573">573</a>
+<a href="#574" id="574">574</a>
+<a href="#575" id="575">575</a>
+<a href="#576" id="576">576</a>
+<a href="#577" id="577">577</a>
+<a href="#578" id="578">578</a>
+<a href="#579" id="579">579</a>
+<a href="#580" id="580">580</a>
+<a href="#581" id="581">581</a>
+<a href="#582" id="582">582</a>
+<a href="#583" id="583">583</a>
+<a href="#584" id="584">584</a>
+<a href="#585" id="585">585</a>
+<a href="#586" id="586">586</a>
+<a href="#587" id="587">587</a>
+<a href="#588" id="588">588</a>
+<a href="#589" id="589">589</a>
+<a href="#590" id="590">590</a>
+<a href="#591" id="591">591</a>
+<a href="#592" id="592">592</a>
+<a href="#593" id="593">593</a>
+<a href="#594" id="594">594</a>
+<a href="#595" id="595">595</a>
+<a href="#596" id="596">596</a>
+<a href="#597" id="597">597</a>
+<a href="#598" id="598">598</a>
+<a href="#599" id="599">599</a>
+<a href="#600" id="600">600</a>
+<a href="#601" id="601">601</a>
+<a href="#602" id="602">602</a>
+<a href="#603" id="603">603</a>
+<a href="#604" id="604">604</a>
+<a href="#605" id="605">605</a>
+<a href="#606" id="606">606</a>
+<a href="#607" id="607">607</a>
+<a href="#608" id="608">608</a>
+<a href="#609" id="609">609</a>
+<a href="#610" id="610">610</a>
+<a href="#611" id="611">611</a>
+<a href="#612" id="612">612</a>
+<a href="#613" id="613">613</a>
+<a href="#614" id="614">614</a>
+<a href="#615" id="615">615</a>
+<a href="#616" id="616">616</a>
+<a href="#617" id="617">617</a>
+<a href="#618" id="618">618</a>
+<a href="#619" id="619">619</a>
+<a href="#620" id="620">620</a>
+<a href="#621" id="621">621</a>
+<a href="#622" id="622">622</a>
+<a href="#623" id="623">623</a>
+<a href="#624" id="624">624</a>
+<a href="#625" id="625">625</a>
+<a href="#626" id="626">626</a>
+<a href="#627" id="627">627</a>
+<a href="#628" id="628">628</a>
+<a href="#629" id="629">629</a>
+<a href="#630" id="630">630</a>
+<a href="#631" id="631">631</a>
+<a href="#632" id="632">632</a>
+<a href="#633" id="633">633</a>
+<a href="#634" id="634">634</a>
+<a href="#635" id="635">635</a>
+<a href="#636" id="636">636</a>
+<a href="#637" id="637">637</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::num::NonZeroU64;
 
 <span class="kw">use </span>log::trace;
 
+<span class="kw">use </span>rustc_const_eval::ReportErrorExt;
+<span class="kw">use </span>rustc_errors::DiagnosticMessage;
 <span class="kw">use </span>rustc_span::{source_map::DUMMY_SP, SpanData, Symbol};
 <span class="kw">use </span>rustc_target::abi::{Align, Size};
 
 <span class="kw">use </span><span class="kw">crate</span>::borrow_tracker::stacked_borrows::diagnostics::TagHistory;
+<span class="kw">use </span><span class="kw">crate</span>::borrow_tracker::tree_borrows::diagnostics <span class="kw">as </span>tree_diagnostics;
 <span class="kw">use crate</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Details of premature program termination.
@@ -558,13 +659,14 @@
     UnsupportedInIsolation(String),
     StackedBorrowsUb {
         msg: String,
-        help: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        help: Vec&lt;String&gt;,
         history: <span class="prelude-ty">Option</span>&lt;TagHistory&gt;,
     },
     TreeBorrowsUb {
-        msg: String,
-        <span class="comment">// FIXME: incomplete
-    </span>},
+        title: String,
+        details: Vec&lt;String&gt;,
+        history: tree_diagnostics::HistoryData,
+    },
     Int2PtrWithStrictProvenance,
     Deadlock,
     MultipleSymbolDefinitions {
@@ -604,7 +706,7 @@
                     <span class="string">&quot;integer-to-pointer casts and `ptr::from_exposed_addr` are not supported with `-Zmiri-strict-provenance`&quot;
                 </span>),
             StackedBorrowsUb { msg, .. } =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{msg}&quot;</span>),
-            TreeBorrowsUb { msg } =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{msg}&quot;</span>),
+            TreeBorrowsUb { title, .. } =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{title}&quot;</span>),
             Deadlock =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;the evaluated program deadlocked&quot;</span>),
             MultipleSymbolDefinitions { link_name, .. } =&gt;
                 <span class="macro">write!</span>(f, <span class="string">&quot;multiple definitions of symbol `{link_name}`&quot;</span>),
@@ -620,7 +722,25 @@
     }
 }
 
-<span class="kw">impl </span>MachineStopType <span class="kw">for </span>TerminationInfo {}
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>TerminationInfo {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;{self}&quot;</span>)
+    }
+}
+
+<span class="kw">impl </span>MachineStopType <span class="kw">for </span>TerminationInfo {
+    <span class="kw">fn </span>diagnostic_message(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DiagnosticMessage {
+        <span class="self">self</span>.to_string().into()
+    }
+    <span class="kw">fn </span>add_args(
+        <span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;,
+        <span class="kw">_</span>: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>FnMut(
+            std::borrow::Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;,
+            rustc_errors::DiagnosticArgValue&lt;<span class="lifetime">&#39;static</span>&gt;,
+        ),
+    ) {
+    }
+}
 
 <span class="doccomment">/// Miri specific diagnostics
 </span><span class="kw">pub enum </span>NonHaltingDiagnostic {
@@ -644,7 +764,7 @@
 }
 
 <span class="doccomment">/// Level of Miri specific diagnostics
-</span><span class="kw">enum </span>DiagLevel {
+</span><span class="kw">pub enum </span>DiagLevel {
     Error,
     Warning,
     Note,
@@ -653,7 +773,7 @@
 <span class="doccomment">/// Attempts to prune a stacktrace to omit the Rust runtime, and returns a bool indicating if any
 /// frames were pruned. If the stacktrace does not have any local frames, we conclude that it must
 /// be pointing to a problem in the Rust runtime itself, and do not prune it at all.
-</span><span class="kw">fn </span>prune_stacktrace&lt;<span class="lifetime">&#39;tcx</span>&gt;(
+</span><span class="kw">pub fn </span>prune_stacktrace&lt;<span class="lifetime">&#39;tcx</span>&gt;(
     <span class="kw-2">mut </span>stacktrace: Vec&lt;FrameInfo&lt;<span class="lifetime">&#39;tcx</span>&gt;&gt;,
     machine: <span class="kw-2">&amp;</span>MiriMachine&lt;<span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;tcx</span>&gt;,
 ) -&gt; (Vec&lt;FrameInfo&lt;<span class="lifetime">&#39;tcx</span>&gt;&gt;, bool) {
@@ -741,11 +861,10 @@
                     (<span class="prelude-val">None</span>, <span class="macro">format!</span>(<span class="string">&quot;or pass `-Zmiri-isolation-error=warn` to configure Miri to return an error code from isolated operations (if supported for that operation) and continue with a warning&quot;</span>)),
                 ],
             StackedBorrowsUb { help, history, .. } =&gt; {
-                <span class="kw">let </span>url = <span class="string">&quot;https://github.com/rust-lang/unsafe-code-guidelines/blob/master/wip/stacked-borrows.md&quot;</span>;
                 msg.extend(help.clone());
                 <span class="kw">let </span><span class="kw-2">mut </span>helps = <span class="macro">vec!</span>[
                     (<span class="prelude-val">None</span>, <span class="macro">format!</span>(<span class="string">&quot;this indicates a potential bug in the program: it performed an invalid operation, but the Stacked Borrows rules it violated are still experimental&quot;</span>)),
-                    (<span class="prelude-val">None</span>, <span class="macro">format!</span>(<span class="string">&quot;see {url} for further information&quot;</span>)),
+                    (<span class="prelude-val">None</span>, <span class="macro">format!</span>(<span class="string">&quot;see https://github.com/rust-lang/unsafe-code-guidelines/blob/master/wip/stacked-borrows.md for further information&quot;</span>)),
                 ];
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(TagHistory {created, invalidated, protected}) = history.clone() {
                     helps.push((<span class="prelude-val">Some</span>(created.<span class="number">1</span>), created.<span class="number">0</span>));
@@ -758,10 +877,16 @@
                 }
                 helps
             },
-            TreeBorrowsUb { .. } =&gt; {
-                <span class="kw">let </span>helps = <span class="macro">vec!</span>[
-                    (<span class="prelude-val">None</span>, <span class="macro">format!</span>(<span class="string">&quot;this indicates a potential bug in the program: it performed an invalid operation, but the Tree Borrows rules it violated are still experimental&quot;</span>)),
+            TreeBorrowsUb { title: <span class="kw">_</span>, details, history } =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>helps = <span class="macro">vec!</span>[
+                    (<span class="prelude-val">None</span>, <span class="macro">format!</span>(<span class="string">&quot;this indicates a potential bug in the program: it performed an invalid operation, but the Tree Borrows rules it violated are still experimental&quot;</span>))
                 ];
+                <span class="kw">for </span>m <span class="kw">in </span>details {
+                    helps.push((<span class="prelude-val">None</span>, m.clone()));
+                }
+                <span class="kw">for </span>event <span class="kw">in </span>history.events.clone() {
+                    helps.push(event);
+                }
                 helps
             }
             MultipleSymbolDefinitions { first, first_crate, second, second_crate, .. } =&gt;
@@ -785,6 +910,8 @@
     } <span class="kw">else </span>{
         <span class="attr">#[rustfmt::skip]
         </span><span class="kw">let </span>title = <span class="kw">match </span>e.kind() {
+            UndefinedBehavior(UndefinedBehaviorInfo::ValidationError(e)) <span class="kw">if </span><span class="macro">matches!</span>(e.kind, ValidationErrorKind::PointerAsInt { .. } | ValidationErrorKind::PartialPointer) =&gt;
+                <span class="macro">bug!</span>(<span class="string">&quot;This validation error should be impossible in Miri: {:?}&quot;</span>, e.kind),
             UndefinedBehavior(<span class="kw">_</span>) =&gt;
                 <span class="string">&quot;Undefined Behavior&quot;</span>,
             ResourceExhaustion(<span class="kw">_</span>) =&gt;
@@ -814,13 +941,23 @@
                     (<span class="prelude-val">None</span>, <span class="macro">format!</span>(<span class="string">&quot;this usually indicates that your program performed an invalid operation and caused Undefined Behavior&quot;</span>)),
                     (<span class="prelude-val">None</span>, <span class="macro">format!</span>(<span class="string">&quot;but due to `-Zmiri-symbolic-alignment-check`, alignment errors can also be false positives&quot;</span>)),
                 ],
-            UndefinedBehavior(<span class="kw">_</span>) =&gt;
-                <span class="macro">vec!</span>[
+            UndefinedBehavior(info) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>helps = <span class="macro">vec!</span>[
                     (<span class="prelude-val">None</span>, <span class="macro">format!</span>(<span class="string">&quot;this indicates a bug in the program: it performed an invalid operation, and caused Undefined Behavior&quot;</span>)),
                     (<span class="prelude-val">None</span>, <span class="macro">format!</span>(<span class="string">&quot;see https://doc.rust-lang.org/nightly/reference/behavior-considered-undefined.html for further information&quot;</span>)),
-                ],
+                ];
+                <span class="kw">if let </span>UndefinedBehaviorInfo::PointerUseAfterFree(alloc_id, <span class="kw">_</span>) | UndefinedBehaviorInfo::PointerOutOfBounds { alloc_id, .. } = info {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(span) = ecx.machine.allocated_span(<span class="kw-2">*</span>alloc_id) {
+                        helps.push((<span class="prelude-val">Some</span>(span), <span class="macro">format!</span>(<span class="string">&quot;{:?} was allocated here:&quot;</span>, alloc_id)));
+                    }
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(span) = ecx.machine.deallocated_span(<span class="kw-2">*</span>alloc_id) {
+                        helps.push((<span class="prelude-val">Some</span>(span), <span class="macro">format!</span>(<span class="string">&quot;{:?} was deallocated here:&quot;</span>, alloc_id)));
+                    }
+                }
+                helps
+            }
             InvalidProgram(
-                InvalidProgramInfo::AlreadyReported(rustc_errors::ErrorGuaranteed { .. })
+                InvalidProgramInfo::AlreadyReported(<span class="kw">_</span>)
             ) =&gt; {
                 <span class="comment">// This got already reported. No point in reporting it again.
                 </span><span class="kw">return </span><span class="prelude-val">None</span>;
@@ -833,11 +970,34 @@
 
     <span class="kw">let </span>stacktrace = ecx.generate_stacktrace();
     <span class="kw">let </span>(stacktrace, was_pruned) = prune_stacktrace(stacktrace, <span class="kw-2">&amp;</span>ecx.machine);
-    e.print_backtrace();
-    msg.insert(<span class="number">0</span>, e.to_string());
+    <span class="kw">let </span>(e, backtrace) = e.into_parts();
+    backtrace.print_backtrace();
+
+    <span class="comment">// We want to dump the allocation if this is `InvalidUninitBytes`. Since `add_args` consumes
+    // the `InterpError`, we extract the variables it before that.
+    </span><span class="kw">let </span>extra = <span class="kw">match </span>e {
+        UndefinedBehavior(UndefinedBehaviorInfo::InvalidUninitBytes(<span class="prelude-val">Some</span>((alloc_id, access)))) =&gt;
+            <span class="prelude-val">Some</span>((alloc_id, access)),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+    };
+
+    <span class="comment">// FIXME(fee1-dead), HACK: we want to use the error as title therefore we can just extract the
+    // label and arguments from the InterpError.
+    </span><span class="kw">let </span>e = {
+        <span class="kw">let </span>handler = <span class="kw-2">&amp;</span>ecx.tcx.sess.parse_sess.span_diagnostic;
+        <span class="kw">let </span><span class="kw-2">mut </span>diag = ecx.tcx.sess.struct_allow(<span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span>msg = e.diagnostic_message();
+        e.add_args(handler, <span class="kw-2">&amp;mut </span>diag);
+        <span class="kw">let </span>s = handler.eagerly_translate_to_string(msg, diag.args());
+        diag.cancel();
+        s
+    };
+
+    msg.insert(<span class="number">0</span>, e);
+
     report_msg(
         DiagLevel::Error,
-        <span class="kw-2">&amp;</span><span class="kw">if let </span><span class="prelude-val">Some</span>(title) = title { <span class="macro">format!</span>(<span class="string">&quot;{title}: {}&quot;</span>, msg[<span class="number">0</span>]) } <span class="kw">else </span>{ msg[<span class="number">0</span>].clone() },
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(title) = title { <span class="macro">format!</span>(<span class="string">&quot;{title}: {}&quot;</span>, msg[<span class="number">0</span>]) } <span class="kw">else </span>{ msg[<span class="number">0</span>].clone() },
         msg,
         <span class="macro">vec!</span>[],
         helps,
@@ -863,28 +1023,58 @@
     }
 
     <span class="comment">// Extra output to help debug specific issues.
-    </span><span class="kw">match </span>e.kind() {
-        UndefinedBehavior(UndefinedBehaviorInfo::InvalidUninitBytes(<span class="prelude-val">Some</span>((alloc_id, access)))) =&gt; {
-            <span class="macro">eprintln!</span>(
-                <span class="string">&quot;Uninitialized memory occurred at {alloc_id:?}{range:?}, in this allocation:&quot;</span>,
-                range = access.uninit,
-            );
-            <span class="macro">eprintln!</span>(<span class="string">&quot;{:?}&quot;</span>, ecx.dump_alloc(<span class="kw-2">*</span>alloc_id));
-        }
-        <span class="kw">_ </span>=&gt; {}
+    </span><span class="kw">if let </span><span class="prelude-val">Some</span>((alloc_id, access)) = extra {
+        <span class="macro">eprintln!</span>(
+            <span class="string">&quot;Uninitialized memory occurred at {alloc_id:?}{range:?}, in this allocation:&quot;</span>,
+            range = access.bad,
+        );
+        <span class="macro">eprintln!</span>(<span class="string">&quot;{:?}&quot;</span>, ecx.dump_alloc(alloc_id));
     }
 
     <span class="prelude-val">None
 </span>}
+
+<span class="kw">pub fn </span>report_leaks&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt;(
+    ecx: <span class="kw-2">&amp;</span>InterpCx&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>, MiriMachine&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt;&gt;,
+    leaks: Vec&lt;(AllocId, MemoryKind&lt;MiriMemoryKind&gt;, Allocation&lt;Provenance, AllocExtra&lt;<span class="lifetime">&#39;tcx</span>&gt;&gt;)&gt;,
+) {
+    <span class="kw">let </span><span class="kw-2">mut </span>any_pruned = <span class="bool-val">false</span>;
+    <span class="kw">for </span>(id, kind, <span class="kw-2">mut </span>alloc) <span class="kw">in </span>leaks {
+        <span class="kw">let </span><span class="prelude-val">Some</span>(backtrace) = alloc.extra.backtrace.take() <span class="kw">else </span>{
+            <span class="kw">continue</span>;
+        };
+        <span class="kw">let </span>(backtrace, pruned) = prune_stacktrace(backtrace, <span class="kw-2">&amp;</span>ecx.machine);
+        any_pruned |= pruned;
+        report_msg(
+            DiagLevel::Error,
+            <span class="macro">format!</span>(
+                <span class="string">&quot;memory leaked: {id:?} ({}, size: {:?}, align: {:?}), allocated here:&quot;</span>,
+                kind,
+                alloc.size().bytes(),
+                alloc.align.bytes()
+            ),
+            <span class="macro">vec!</span>[],
+            <span class="macro">vec!</span>[],
+            <span class="macro">vec!</span>[],
+            <span class="kw-2">&amp;</span>backtrace,
+            <span class="kw-2">&amp;</span>ecx.machine,
+        );
+    }
+    <span class="kw">if </span>any_pruned {
+        ecx.tcx.sess.diagnostic().note_without_error(
+            <span class="string">&quot;some details are omitted, run with `MIRIFLAGS=-Zmiri-backtrace=full` for a verbose backtrace&quot;</span>,
+        );
+    }
+}
 
 <span class="doccomment">/// Report an error or note (depending on the `error` argument) with the given stacktrace.
 /// Also emits a full stacktrace of the interpreter stack.
 /// We want to present a multi-line span message for some errors. Diagnostics do not support this
 /// directly, so we pass the lines as a `Vec&lt;String&gt;` and display each line after the first with an
 /// additional `span_label` or `note` call.
-</span><span class="kw">fn </span>report_msg&lt;<span class="lifetime">&#39;tcx</span>&gt;(
+</span><span class="kw">pub fn </span>report_msg&lt;<span class="lifetime">&#39;tcx</span>&gt;(
     diag_level: DiagLevel,
-    title: <span class="kw-2">&amp;</span>str,
+    title: String,
     span_msg: Vec&lt;String&gt;,
     notes: Vec&lt;(<span class="prelude-ty">Option</span>&lt;SpanData&gt;, String)&gt;,
     helps: Vec&lt;(<span class="prelude-ty">Option</span>&lt;SpanData&gt;, String)&gt;,
@@ -907,14 +1097,15 @@
     } <span class="kw">else </span>{
         <span class="comment">// Make sure we show the message even when it is a dummy span.
         </span><span class="kw">for </span>line <span class="kw">in </span>span_msg {
-            err.note(<span class="kw-2">&amp;</span>line);
+            err.note(line);
         }
         err.note(<span class="string">&quot;(no span available)&quot;</span>);
     }
 
     <span class="comment">// Show note and help messages.
     </span><span class="kw">let </span><span class="kw-2">mut </span>extra_span = <span class="bool-val">false</span>;
-    <span class="kw">for </span>(span_data, note) <span class="kw">in </span><span class="kw-2">&amp;</span>notes {
+    <span class="kw">let </span>notes_len = notes.len();
+    <span class="kw">for </span>(span_data, note) <span class="kw">in </span>notes {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(span_data) = span_data {
             err.span_note(span_data.span(), note);
             extra_span = <span class="bool-val">true</span>;
@@ -922,7 +1113,8 @@
             err.note(note);
         }
     }
-    <span class="kw">for </span>(span_data, help) <span class="kw">in </span><span class="kw-2">&amp;</span>helps {
+    <span class="kw">let </span>helps_len = helps.len();
+    <span class="kw">for </span>(span_data, help) <span class="kw">in </span>helps {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(span_data) = span_data {
             err.span_help(span_data.span(), help);
             extra_span = <span class="bool-val">true</span>;
@@ -930,16 +1122,19 @@
             err.help(help);
         }
     }
-    <span class="kw">if </span>notes.len() + helps.len() &gt; <span class="number">0 </span>{
+    <span class="kw">if </span>notes_len + helps_len &gt; <span class="number">0 </span>{
         <span class="comment">// Add visual separator before backtrace.
         </span>err.note(<span class="kw">if </span>extra_span { <span class="string">&quot;BACKTRACE (of the first span):&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;BACKTRACE:&quot; </span>});
     }
+
+    <span class="kw">let </span>(<span class="kw-2">mut </span>err, handler) = err.into_diagnostic().unwrap();
+
     <span class="comment">// Add backtrace
     </span><span class="kw">for </span>(idx, frame_info) <span class="kw">in </span>stacktrace.iter().enumerate() {
         <span class="kw">let </span>is_local = machine.is_local(frame_info);
         <span class="comment">// No span for non-local frames and the first frame (which is the error site).
         </span><span class="kw">if </span>is_local &amp;&amp; idx &gt; <span class="number">0 </span>{
-            err.span_note(frame_info.span, <span class="kw-2">&amp;</span>frame_info.to_string());
+            err.eager_subdiagnostic(handler, frame_info.as_note(machine.tcx));
         } <span class="kw">else </span>{
             <span class="kw">let </span>sm = sess.source_map();
             <span class="kw">let </span>span = sm.span_to_embeddable_string(frame_info.span);
@@ -947,7 +1142,7 @@
         }
     }
 
-    err.emit();
+    handler.emit_diagnostic(<span class="kw-2">&amp;mut </span>err);
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt; MiriMachine&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt; {
@@ -959,15 +1154,16 @@
         <span class="kw">let </span>(stacktrace, _was_pruned) = prune_stacktrace(stacktrace, <span class="self">self</span>);
 
         <span class="kw">let </span>(title, diag_level) = <span class="kw">match </span><span class="kw-2">&amp;</span>e {
-            RejectedIsolatedOp(<span class="kw">_</span>) =&gt; (<span class="string">&quot;operation rejected by isolation&quot;</span>, DiagLevel::Warning),
-            Int2Ptr { .. } =&gt; (<span class="string">&quot;integer-to-pointer cast&quot;</span>, DiagLevel::Warning),
+            RejectedIsolatedOp(<span class="kw">_</span>) =&gt;
+                (<span class="string">&quot;operation rejected by isolation&quot;</span>.to_string(), DiagLevel::Warning),
+            Int2Ptr { .. } =&gt; (<span class="string">&quot;integer-to-pointer cast&quot;</span>.to_string(), DiagLevel::Warning),
             CreatedPointerTag(..)
             | PoppedPointerTag(..)
             | CreatedCallId(..)
             | CreatedAlloc(..)
             | FreedAlloc(..)
             | ProgressReport { .. }
-            | WeakMemoryOutdatedLoad =&gt; (<span class="string">&quot;tracking was triggered&quot;</span>, DiagLevel::Note),
+            | WeakMemoryOutdatedLoad =&gt; (<span class="string">&quot;tracking was triggered&quot;</span>.to_string(), DiagLevel::Note),
         };
 
         <span class="kw">let </span>msg = <span class="kw">match </span><span class="kw-2">&amp;</span>e {
@@ -1067,7 +1263,7 @@
         <span class="kw">let </span>stacktrace = this.generate_stacktrace();
         report_msg(
             DiagLevel::Note,
-            <span class="string">&quot;the place in the program where the ICE was triggered&quot;</span>,
+            <span class="string">&quot;the place in the program where the ICE was triggered&quot;</span>.to_string(),
             <span class="macro">vec!</span>[],
             <span class="macro">vec!</span>[],
             <span class="macro">vec!</span>[],

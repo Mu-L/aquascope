@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/miri-8f8b361f28c5a248/35d6927/src/borrow_tracker/stacked_borrows/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-63a85fc7cf22dee2.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="miri" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0-nightly (9df3a39fb 2023-04-11)" data-search-js="search-bc5a112813b5d712.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-0bcba95ff279c1db.css" data-theme-light-css="light-db279b6232be9c13.css" data-theme-dark-css="dark-cf923f49f397b216.css" data-theme-ayu-css="ayu-be46fdc453a55015.css" ></div><script src="../../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../../static.files/source-script-1b95b7cca98b26e5.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-1159a395118aa44e.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-db279b6232be9c13.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-cf923f49f397b216.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../miri/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/miri-8f8b361f28c5a248/63c5542/src/borrow_tracker/stacked_borrows/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-47e7ab555ef2818a.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="miri" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0-nightly (58eefc33a 2023-08-24)" data-channel="nightly" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-b2d31d2efc7e9b67.css" data-theme-dark-css="dark-3388a2fb2ef8066b.css" data-theme-ayu-css="ayu-8c3c66a6cf12cb2f.css" ><script src="../../../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-ef3a2de404864b0b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-b2d31d2efc7e9b67.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-3388a2fb2ef8066b.css"><link rel="stylesheet" href="../../../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../miri/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1035,37 +1035,6 @@
 <a href="#1035" id="1035">1035</a>
 <a href="#1036" id="1036">1036</a>
 <a href="#1037" id="1037">1037</a>
-<a href="#1038" id="1038">1038</a>
-<a href="#1039" id="1039">1039</a>
-<a href="#1040" id="1040">1040</a>
-<a href="#1041" id="1041">1041</a>
-<a href="#1042" id="1042">1042</a>
-<a href="#1043" id="1043">1043</a>
-<a href="#1044" id="1044">1044</a>
-<a href="#1045" id="1045">1045</a>
-<a href="#1046" id="1046">1046</a>
-<a href="#1047" id="1047">1047</a>
-<a href="#1048" id="1048">1048</a>
-<a href="#1049" id="1049">1049</a>
-<a href="#1050" id="1050">1050</a>
-<a href="#1051" id="1051">1051</a>
-<a href="#1052" id="1052">1052</a>
-<a href="#1053" id="1053">1053</a>
-<a href="#1054" id="1054">1054</a>
-<a href="#1055" id="1055">1055</a>
-<a href="#1056" id="1056">1056</a>
-<a href="#1057" id="1057">1057</a>
-<a href="#1058" id="1058">1058</a>
-<a href="#1059" id="1059">1059</a>
-<a href="#1060" id="1060">1060</a>
-<a href="#1061" id="1061">1061</a>
-<a href="#1062" id="1062">1062</a>
-<a href="#1063" id="1063">1063</a>
-<a href="#1064" id="1064">1064</a>
-<a href="#1065" id="1065">1065</a>
-<a href="#1066" id="1066">1066</a>
-<a href="#1067" id="1067">1067</a>
-<a href="#1068" id="1068">1068</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Implements &quot;Stacked Borrows&quot;.  See &lt;https://github.com/rust-lang/unsafe-code-guidelines/blob/master/wip/stacked-borrows.md&gt;
 //! for further information.
 
@@ -1073,26 +1042,24 @@
 <span class="kw">mod </span>item;
 <span class="kw">mod </span>stack;
 
-<span class="kw">use </span>log::trace;
 <span class="kw">use </span>std::cmp;
 <span class="kw">use </span>std::fmt::Write;
+<span class="kw">use </span>std::mem;
+
+<span class="kw">use </span>log::trace;
 
 <span class="kw">use </span>rustc_data_structures::fx::FxHashSet;
 <span class="kw">use </span>rustc_middle::mir::{Mutability, RetagKind};
-<span class="kw">use </span>rustc_middle::ty::{
-    <span class="self">self</span>,
-    layout::{HasParamEnv, LayoutOf},
-    Ty,
-};
-<span class="kw">use </span>rustc_target::abi::{Abi, Size};
+<span class="kw">use </span>rustc_middle::ty::{<span class="self">self</span>, layout::HasParamEnv, Ty};
+<span class="kw">use </span>rustc_target::abi::{Abi, Align, Size};
 
 <span class="kw">use </span><span class="kw">crate</span>::borrow_tracker::{
-    stacked_borrows::diagnostics::{AllocHistory, DiagnosticCx, DiagnosticCxBuilder, TagHistory},
+    stacked_borrows::diagnostics::{AllocHistory, DiagnosticCx, DiagnosticCxBuilder},
     AccessKind, GlobalStateInner, ProtectorKind, RetagFields,
 };
 <span class="kw">use crate</span>::<span class="kw-2">*</span>;
 
-<span class="kw">use </span>diagnostics::RetagCause;
+<span class="kw">use </span>diagnostics::{RetagCause, RetagInfo};
 <span class="kw">pub use </span>item::{Item, Permission};
 <span class="kw">pub use </span>stack::Stack;
 
@@ -1236,15 +1203,6 @@
     }
 }
 
-<span class="doccomment">/// Error reporting
-</span><span class="kw">pub fn </span>err_sb_ub&lt;<span class="lifetime">&#39;tcx</span>&gt;(
-    msg: String,
-    help: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    history: <span class="prelude-ty">Option</span>&lt;TagHistory&gt;,
-) -&gt; InterpError&lt;<span class="lifetime">&#39;tcx</span>&gt; {
-    <span class="macro">err_machine_stop!</span>(TerminationInfo::StackedBorrowsUb { msg, help, history })
-}
-
 <span class="comment">// # Stacked Borrows Core Begin
 
 </span><span class="doccomment">/// We need to make at least the following things true:
@@ -1312,7 +1270,7 @@
     </span><span class="kw">fn </span>item_invalidated(
         item: <span class="kw-2">&amp;</span>Item,
         global: <span class="kw-2">&amp;</span>GlobalStateInner,
-        dcx: <span class="kw-2">&amp;mut </span>DiagnosticCx&lt;<span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;tcx</span>&gt;,
+        dcx: <span class="kw-2">&amp;</span>DiagnosticCx&lt;<span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;tcx</span>&gt;,
         cause: ItemInvalidationCause,
     ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
         <span class="kw">if </span>!global.tracked_pointer_tags.is_empty() {
@@ -1498,12 +1456,15 @@
                 </span>.find_granting(AccessKind::Write, derived_from, exposed_tags)
                 .map_err(|()| dcx.grant_error(<span class="self">self</span>))<span class="question-mark">?</span>;
 
-            <span class="kw">let </span>(<span class="prelude-val">Some</span>(granting_idx), ProvenanceExtra::Concrete(<span class="kw">_</span>)) = (granting_idx, derived_from) <span class="kw">else </span>{
+            <span class="kw">let </span>(<span class="prelude-val">Some</span>(granting_idx), ProvenanceExtra::Concrete(<span class="kw">_</span>)) = (granting_idx, derived_from)
+            <span class="kw">else </span>{
                 <span class="comment">// The parent is a wildcard pointer or matched the unknown bottom.
                 // This is approximate. Nobody knows what happened, so forget everything.
-                // The new thing is SRW anyway, so we cannot push it &quot;on top of the unkown part&quot;
+                // The new thing is SRW anyway, so we cannot push it &quot;on top of the unknown part&quot;
                 // (for all we know, it might join an SRW group inside the unknown).
-                </span><span class="macro">trace!</span>(<span class="string">&quot;reborrow: forgetting stack entirely due to SharedReadWrite reborrow from wildcard or unknown&quot;</span>);
+                </span><span class="macro">trace!</span>(
+                    <span class="string">&quot;reborrow: forgetting stack entirely due to SharedReadWrite reborrow from wildcard or unknown&quot;
+                </span>);
                 <span class="self">self</span>.set_unknown_bottom(global.next_ptr_tag);
                 <span class="kw">return </span><span class="prelude-val">Ok</span>(());
             };
@@ -1527,7 +1488,7 @@
 </span><span class="kw">impl </span>Stacks {
     <span class="kw">pub fn </span>remove_unreachable_tags(<span class="kw-2">&amp;mut </span><span class="self">self</span>, live_tags: <span class="kw-2">&amp;</span>FxHashSet&lt;BorTag&gt;) {
         <span class="kw">if </span><span class="self">self</span>.modified_since_last_gc {
-            <span class="kw">for </span>stack <span class="kw">in </span><span class="self">self</span>.stacks.iter_mut_all() {
+            <span class="kw">for </span>(_stack_range, stack) <span class="kw">in </span><span class="self">self</span>.stacks.iter_mut_all() {
                 <span class="kw">if </span>stack.len() &gt; <span class="number">64 </span>{
                     stack.retain(live_tags);
                 }
@@ -1579,8 +1540,8 @@
         ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt;,
     ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
         <span class="self">self</span>.modified_since_last_gc = <span class="bool-val">true</span>;
-        <span class="kw">for </span>(offset, stack) <span class="kw">in </span><span class="self">self</span>.stacks.iter_mut(range.start, range.size) {
-            <span class="kw">let </span><span class="kw-2">mut </span>dcx = dcx_builder.build(<span class="kw-2">&amp;mut </span><span class="self">self</span>.history, offset);
+        <span class="kw">for </span>(stack_range, stack) <span class="kw">in </span><span class="self">self</span>.stacks.iter_mut(range.start, range.size) {
+            <span class="kw">let </span><span class="kw-2">mut </span>dcx = dcx_builder.build(<span class="kw-2">&amp;mut </span><span class="self">self</span>.history, Size::from_bytes(stack_range.start));
             f(stack, <span class="kw-2">&amp;mut </span>dcx, <span class="kw-2">&amp;mut </span><span class="self">self</span>.exposed_tags)<span class="question-mark">?</span>;
             dcx_builder = dcx.unbuild();
         }
@@ -1640,7 +1601,7 @@
         alloc_id: AllocId,
         tag: ProvenanceExtra,
         range: AllocRange,
-        machine: <span class="kw-2">&amp;mut </span>MiriMachine&lt;<span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;tcx</span>&gt;,
+        machine: <span class="kw-2">&amp;</span>MiriMachine&lt;<span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;tcx</span>&gt;,
     ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
         <span class="macro">trace!</span>(
             <span class="string">&quot;write access with tag {:?}: {:?}, size {}&quot;</span>,
@@ -1661,7 +1622,7 @@
         alloc_id: AllocId,
         tag: ProvenanceExtra,
         range: AllocRange,
-        machine: <span class="kw-2">&amp;mut </span>MiriMachine&lt;<span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;tcx</span>&gt;,
+        machine: <span class="kw-2">&amp;</span>MiriMachine&lt;<span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;tcx</span>&gt;,
     ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
         <span class="macro">trace!</span>(<span class="string">&quot;deallocation with tag {:?}: {:?}, size {}&quot;</span>, tag, alloc_id, range.size.bytes());
         <span class="kw">let </span>dcx = DiagnosticCxBuilder::dealloc(machine, tag);
@@ -1680,17 +1641,18 @@
 {
 }
 <span class="kw">trait </span>EvalContextPrivExt&lt;<span class="lifetime">&#39;mir</span>: <span class="lifetime">&#39;ecx</span>, <span class="lifetime">&#39;tcx</span>: <span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;ecx</span>&gt;: <span class="kw">crate</span>::MiriInterpCxExt&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt; {
-    <span class="doccomment">/// Returns the `AllocId` the reborrow was done in, if some actual borrow stack manipulation
-    /// happened.
+    <span class="doccomment">/// Returns the provenance that should be used henceforth.
     </span><span class="kw">fn </span>sb_reborrow(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         place: <span class="kw-2">&amp;</span>MPlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
         size: Size,
         new_perm: NewPermission,
         new_tag: BorTag,
-        retag_cause: RetagCause, <span class="comment">// What caused this retag, for diagnostics only
-    </span>) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, <span class="prelude-ty">Option</span>&lt;AllocId&gt;&gt; {
+        retag_info: RetagInfo, <span class="comment">// diagnostics info about this retag
+    </span>) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, <span class="prelude-ty">Option</span>&lt;Provenance&gt;&gt; {
         <span class="kw">let </span>this = <span class="self">self</span>.eval_context_mut();
+        <span class="comment">// Ensure we bail out if the pointer goes out-of-bounds (see miri#1050).
+        </span>this.check_ptr_access_align(place.ptr, size, Align::ONE, CheckInAllocMsg::InboundsTest)<span class="question-mark">?</span>;
 
         <span class="comment">// It is crucial that this gets called on all code paths, to ensure we track tag creation.
         </span><span class="kw">let </span>log_creation = |this: <span class="kw-2">&amp;</span>MiriInterpCx&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt;,
@@ -1735,7 +1697,7 @@
                     // FIXME: can this be done cleaner?
                     </span><span class="kw">let </span>dcx = DiagnosticCxBuilder::retag(
                         <span class="kw-2">&amp;</span>this.machine,
-                        retag_cause,
+                        retag_info,
                         new_tag,
                         orig_tag,
                         alloc_range(base_offset, size),
@@ -1769,27 +1731,18 @@
             // pointer tagging for example all calls to get_unchecked on them are invalid.
             </span><span class="kw">if let </span><span class="prelude-val">Ok</span>((alloc_id, base_offset, orig_tag)) = this.ptr_try_get_alloc_id(place.ptr) {
                 log_creation(this, <span class="prelude-val">Some</span>((alloc_id, base_offset, orig_tag)))<span class="question-mark">?</span>;
-                <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(alloc_id));
+                <span class="comment">// Still give it the new provenance, it got retagged after all.
+                </span><span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(Provenance::Concrete { alloc_id, tag: new_tag }));
+            } <span class="kw">else </span>{
+                <span class="comment">// This pointer doesn&#39;t come with an AllocId. :shrug:
+                </span>log_creation(this, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+                <span class="comment">// Provenance unchanged.
+                </span><span class="kw">return </span><span class="prelude-val">Ok</span>(place.ptr.provenance);
             }
-            <span class="comment">// This pointer doesn&#39;t come with an AllocId. :shrug:
-            </span>log_creation(this, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
-            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
         }
 
         <span class="kw">let </span>(alloc_id, base_offset, orig_tag) = this.ptr_get_alloc_id(place.ptr)<span class="question-mark">?</span>;
         log_creation(this, <span class="prelude-val">Some</span>((alloc_id, base_offset, orig_tag)))<span class="question-mark">?</span>;
-
-        <span class="comment">// Ensure we bail out if the pointer goes out-of-bounds (see miri#1050).
-        </span><span class="kw">let </span>(alloc_size, <span class="kw">_</span>) = this.get_live_alloc_size_and_align(alloc_id)<span class="question-mark">?</span>;
-        <span class="kw">if </span>base_offset + size &gt; alloc_size {
-            <span class="macro">throw_ub!</span>(PointerOutOfBounds {
-                alloc_id,
-                alloc_size,
-                ptr_offset: this.target_usize_to_isize(base_offset.bytes()),
-                ptr_size: size,
-                msg: CheckInAllocMsg::InboundsTest
-            });
-        }
 
         <span class="macro">trace!</span>(
             <span class="string">&quot;reborrow: reference {:?} derived from {:?} (pointee {}): {:?}, size {}&quot;</span>,
@@ -1826,7 +1779,7 @@
                 <span class="kw">let </span>global = machine.borrow_tracker.as_ref().unwrap().borrow();
                 <span class="kw">let </span>dcx = DiagnosticCxBuilder::retag(
                     machine,
-                    retag_cause,
+                    retag_info,
                     new_tag,
                     orig_tag,
                     alloc_range(base_offset, size),
@@ -1869,7 +1822,7 @@
                     <span class="kw">let </span>global = this.machine.borrow_tracker.as_ref().unwrap().borrow();
                     <span class="kw">let </span>dcx = DiagnosticCxBuilder::retag(
                         <span class="kw-2">&amp;</span>this.machine,
-                        retag_cause,
+                        retag_info,
                         new_tag,
                         orig_tag,
                         alloc_range(base_offset, size),
@@ -1890,16 +1843,16 @@
             }
         }
 
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(alloc_id))
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(Provenance::Concrete { alloc_id, tag: new_tag }))
     }
 
-    <span class="doccomment">/// Retags an indidual pointer, returning the retagged version.
+    <span class="doccomment">/// Retags an individual pointer, returning the retagged version.
     /// `kind` indicates what kind of reference is being created.
     </span><span class="kw">fn </span>sb_retag_reference(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         val: <span class="kw-2">&amp;</span>ImmTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
         new_perm: NewPermission,
-        cause: RetagCause, <span class="comment">// What caused this retag, for diagnostics only
+        info: RetagInfo, <span class="comment">// diagnostics info about this retag
     </span>) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, ImmTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;&gt; {
         <span class="kw">let </span>this = <span class="self">self</span>.eval_context_mut();
         <span class="comment">// We want a place for where the ptr *points to*, so we get one.
@@ -1917,25 +1870,10 @@
         </span><span class="kw">let </span>new_tag = this.machine.borrow_tracker.as_mut().unwrap().get_mut().new_ptr();
 
         <span class="comment">// Reborrow.
-        </span><span class="kw">let </span>alloc_id = this.sb_reborrow(<span class="kw-2">&amp;</span>place, size, new_perm, new_tag, cause)<span class="question-mark">?</span>;
+        </span><span class="kw">let </span>new_prov = this.sb_reborrow(<span class="kw-2">&amp;</span>place, size, new_perm, new_tag, info)<span class="question-mark">?</span>;
 
         <span class="comment">// Adjust pointer.
-        </span><span class="kw">let </span>new_place = place.map_provenance(|p| {
-            p.map(|prov| {
-                <span class="kw">match </span>alloc_id {
-                    <span class="prelude-val">Some</span>(alloc_id) =&gt; {
-                        <span class="comment">// If `reborrow` could figure out the AllocId of this ptr, hard-code it into the new one.
-                        // Even if we started out with a wildcard, this newly retagged pointer is tied to that allocation.
-                        </span>Provenance::Concrete { alloc_id, tag: new_tag }
-                    }
-                    <span class="prelude-val">None </span>=&gt; {
-                        <span class="comment">// Looks like this has to stay a wildcard pointer.
-                        </span><span class="macro">assert!</span>(<span class="macro">matches!</span>(prov, Provenance::Wildcard));
-                        Provenance::Wildcard
-                    }
-                }
-            })
-        });
+        </span><span class="kw">let </span>new_place = place.map_provenance(|<span class="kw">_</span>| new_prov);
 
         <span class="comment">// Return new pointer.
         </span><span class="prelude-val">Ok</span>(ImmTy::from_immediate(new_place.to_ref(this), val.layout))
@@ -1951,12 +1889,12 @@
     ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>, ImmTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;&gt; {
         <span class="kw">let </span>this = <span class="self">self</span>.eval_context_mut();
         <span class="kw">let </span>new_perm = NewPermission::from_ref_ty(val.layout.ty, kind, this);
-        <span class="kw">let </span>retag_cause = <span class="kw">match </span>kind {
+        <span class="kw">let </span>cause = <span class="kw">match </span>kind {
             RetagKind::TwoPhase { .. } =&gt; RetagCause::TwoPhase,
             RetagKind::FnEntry =&gt; <span class="macro">unreachable!</span>(),
             RetagKind::Raw | RetagKind::Default =&gt; RetagCause::Normal,
         };
-        this.sb_retag_reference(val, new_perm, retag_cause)
+        this.sb_retag_reference(val, new_perm, RetagInfo { cause, in_field: <span class="bool-val">false </span>})
     }
 
     <span class="kw">fn </span>sb_retag_place_contents(
@@ -1971,7 +1909,8 @@
             </span>RetagKind::FnEntry =&gt; RetagCause::FnEntry,
             RetagKind::Default =&gt; RetagCause::Normal,
         };
-        <span class="kw">let </span><span class="kw-2">mut </span>visitor = RetagVisitor { ecx: this, kind, retag_cause, retag_fields };
+        <span class="kw">let </span><span class="kw-2">mut </span>visitor =
+            RetagVisitor { ecx: this, kind, retag_cause, retag_fields, in_field: <span class="bool-val">false </span>};
         <span class="kw">return </span>visitor.visit_value(place);
 
         <span class="comment">// The actual visitor.
@@ -1980,6 +1919,7 @@
             kind: RetagKind,
             retag_cause: RetagCause,
             retag_fields: RetagFields,
+            in_field: bool,
         }
         <span class="kw">impl</span>&lt;<span class="lifetime">&#39;ecx</span>, <span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt; RetagVisitor&lt;<span class="lifetime">&#39;ecx</span>, <span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt; {
             <span class="attr">#[inline(always)] </span><span class="comment">// yes this helps in our benchmarks
@@ -1987,28 +1927,31 @@
                 <span class="kw-2">&amp;mut </span><span class="self">self</span>,
                 place: <span class="kw-2">&amp;</span>PlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;,
                 new_perm: NewPermission,
-                retag_cause: RetagCause,
             ) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
                 <span class="kw">let </span>val = <span class="self">self</span>.ecx.read_immediate(<span class="kw-2">&amp;</span><span class="self">self</span>.ecx.place_to_op(place)<span class="question-mark">?</span>)<span class="question-mark">?</span>;
-                <span class="kw">let </span>val = <span class="self">self</span>.ecx.sb_retag_reference(<span class="kw-2">&amp;</span>val, new_perm, retag_cause)<span class="question-mark">?</span>;
+                <span class="kw">let </span>val = <span class="self">self</span>.ecx.sb_retag_reference(
+                    <span class="kw-2">&amp;</span>val,
+                    new_perm,
+                    RetagInfo { cause: <span class="self">self</span>.retag_cause, in_field: <span class="self">self</span>.in_field },
+                )<span class="question-mark">?</span>;
                 <span class="self">self</span>.ecx.write_immediate(<span class="kw-2">*</span>val, place)<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(())
             }
         }
-        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;ecx</span>, <span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt; MutValueVisitor&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>, MiriMachine&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt;&gt;
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;ecx</span>, <span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt; ValueVisitor&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>, MiriMachine&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt;&gt;
             <span class="kw">for </span>RetagVisitor&lt;<span class="lifetime">&#39;ecx</span>, <span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt;
         {
             <span class="kw">type </span>V = PlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;;
 
             <span class="attr">#[inline(always)]
-            </span><span class="kw">fn </span>ecx(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>MiriInterpCx&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt; {
+            </span><span class="kw">fn </span>ecx(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>MiriInterpCx&lt;<span class="lifetime">&#39;mir</span>, <span class="lifetime">&#39;tcx</span>&gt; {
                 <span class="self">self</span>.ecx
             }
 
             <span class="kw">fn </span>visit_box(<span class="kw-2">&amp;mut </span><span class="self">self</span>, place: <span class="kw-2">&amp;</span>PlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
                 <span class="comment">// Boxes get a weak protectors, since they may be deallocated.
                 </span><span class="kw">let </span>new_perm = NewPermission::from_box_ty(place.layout.ty, <span class="self">self</span>.kind, <span class="self">self</span>.ecx);
-                <span class="self">self</span>.retag_ptr_inplace(place, new_perm, <span class="self">self</span>.retag_cause)
+                <span class="self">self</span>.retag_ptr_inplace(place, new_perm)
             }
 
             <span class="kw">fn </span>visit_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>, place: <span class="kw-2">&amp;</span>PlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
@@ -2025,7 +1968,7 @@
                     ty::Ref(..) =&gt; {
                         <span class="kw">let </span>new_perm =
                             NewPermission::from_ref_ty(place.layout.ty, <span class="self">self</span>.kind, <span class="self">self</span>.ecx);
-                        <span class="self">self</span>.retag_ptr_inplace(place, new_perm, <span class="self">self</span>.retag_cause)<span class="question-mark">?</span>;
+                        <span class="self">self</span>.retag_ptr_inplace(place, new_perm)<span class="question-mark">?</span>;
                     }
                     ty::RawPtr(..) =&gt; {
                         <span class="comment">// We do *not* want to recurse into raw pointers -- wide raw pointers have
@@ -2049,7 +1992,9 @@
                             }
                         };
                         <span class="kw">if </span>recurse {
-                            <span class="self">self</span>.walk_value(place)<span class="question-mark">?</span>;
+                            <span class="kw">let </span>in_field = mem::replace(<span class="kw-2">&amp;mut </span><span class="self">self</span>.in_field, <span class="bool-val">true</span>); <span class="comment">// remember and restore old value
+                            </span><span class="self">self</span>.walk_value(place)<span class="question-mark">?</span>;
+                            <span class="self">self</span>.in_field = in_field;
                         }
                     }
                 }
@@ -2059,37 +2004,30 @@
         }
     }
 
-    <span class="doccomment">/// After a stack frame got pushed, retag the return place so that we are sure
-    /// it does not alias with anything.
+    <span class="doccomment">/// Protect a place so that it cannot be used any more for the duration of the current function
+    /// call.
     ///
-    /// This is a HACK because there is nothing in MIR that would make the retag
-    /// explicit. Also see &lt;https://github.com/rust-lang/rust/issues/71117&gt;.
-    </span><span class="kw">fn </span>sb_retag_return_place(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
+    /// This is used to ensure soundness of in-place function argument/return passing.
+    </span><span class="kw">fn </span>sb_protect_place(<span class="kw-2">&amp;mut </span><span class="self">self</span>, place: <span class="kw-2">&amp;</span>MPlaceTy&lt;<span class="lifetime">&#39;tcx</span>, Provenance&gt;) -&gt; InterpResult&lt;<span class="lifetime">&#39;tcx</span>&gt; {
         <span class="kw">let </span>this = <span class="self">self</span>.eval_context_mut();
-        <span class="kw">let </span>return_place = <span class="kw-2">&amp;</span>this.frame().return_place;
-        <span class="kw">if </span>return_place.layout.is_zst() {
-            <span class="comment">// There may not be any memory here, nothing to do.
-            </span><span class="kw">return </span><span class="prelude-val">Ok</span>(());
-        }
-        <span class="comment">// We need this to be in-memory to use tagged pointers.
-        </span><span class="kw">let </span>return_place = this.force_allocation(<span class="kw-2">&amp;</span>return_place.clone())<span class="question-mark">?</span>;
 
-        <span class="comment">// We have to turn the place into a pointer to use the existing code.
+        <span class="comment">// We have to turn the place into a pointer to use the usual retagging logic.
         // (The pointer type does not matter, so we use a raw pointer.)
-        </span><span class="kw">let </span>ptr_layout = this.layout_of(this.tcx.mk_mut_ptr(return_place.layout.ty))<span class="question-mark">?</span>;
-        <span class="kw">let </span>val = ImmTy::from_immediate(return_place.to_ref(this), ptr_layout);
-        <span class="comment">// Reborrow it. With protection! That is part of the point.
+        </span><span class="kw">let </span>ptr = this.mplace_to_ref(place)<span class="question-mark">?</span>;
+        <span class="comment">// Reborrow it. With protection! That is the entire point.
         </span><span class="kw">let </span>new_perm = NewPermission::Uniform {
             perm: Permission::Unique,
             access: <span class="prelude-val">Some</span>(AccessKind::Write),
             protector: <span class="prelude-val">Some</span>(ProtectorKind::StrongProtector),
         };
-        <span class="kw">let </span>val = this.sb_retag_reference(<span class="kw-2">&amp;</span>val, new_perm, RetagCause::FnReturnPlace)<span class="question-mark">?</span>;
-        <span class="comment">// And use reborrowed pointer for return place.
-        </span><span class="kw">let </span>return_place = this.ref_to_mplace(<span class="kw-2">&amp;</span>val)<span class="question-mark">?</span>;
-        this.frame_mut().return_place = return_place.into();
+        <span class="kw">let </span>_new_ptr = this.sb_retag_reference(
+            <span class="kw-2">&amp;</span>ptr,
+            new_perm,
+            RetagInfo { cause: RetagCause::InPlaceFnPassing, in_field: <span class="bool-val">false </span>},
+        )<span class="question-mark">?</span>;
+        <span class="comment">// We just throw away `new_ptr`, so nobody can access this memory while it is protected.
 
-        <span class="prelude-val">Ok</span>(())
+        </span><span class="prelude-val">Ok</span>(())
     }
 
     <span class="doccomment">/// Mark the given tag as exposed. It was found on a pointer with the given AllocId.
